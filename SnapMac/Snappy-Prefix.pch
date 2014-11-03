@@ -1,0 +1,37 @@
+//
+//  Prefix header
+//
+//  The contents of this file are implicitly included at the beginning of every source file.
+//
+
+#ifdef __OBJC__
+
+    #import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
+#import "SMBezierPath.h"
+
+#define NSLoc(a) NSLocalizedString(a, nil)
+typedef void (^SMCallback)(id);
+
+#define AppearanceBypass 1
+
+#if AppearanceBypass
+#define NSAppearanceNameVibrantDark  @"NSAppearanceNameVibrantDark"
+#define NSAppearanceNameVibrantLight @"NSAppearanceNameVibrantLight"
+#endif
+#endif
+
+#import "main.h"
+
+#define SnapBug 1
+
+#define LogRect(RECT) NSLog(@"%s: (%0.0f, %0.0f) %0.0f x %0.0f", #RECT, RECT.origin.x, RECT.origin.y, RECT.size.width, RECT.size.height)
+
+#define SnapVer   "Beta"
+#define SnapAbout "Beta 1 ("CFBundleVersion")"
+
+#if SnapBug
+#   define NSLog(format,...) debugOutput(__FILE__, __func__, __LINE__, format, ##__VA_ARGS__)
+#else
+#   //define NSLog(format,...) 1;
+#endif

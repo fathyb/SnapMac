@@ -1,0 +1,495 @@
+html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
+pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd,
+q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt,
+dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot,
+thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption,
+footer, header, hgroup, menu, nav, output, ruby, section, summary, time,
+mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+article, aside, details, figcaption, figure, footer, header, hgroup,
+menu, nav, section {
+    display: block;
+}
+
+html {
+	width: 100%;
+	height: 100%;
+}
+body {
+	width: -webkit-calc(100% - 1px);
+	height: 100%;
+	   line-height: 1;
+	   font-family: Helvetica Neue;/*'Oswald', sans-serif;*/
+	   text-align: center;
+	   background: transparent;/*url(bgsnap.png) center repeat;*/
+	background-size: 100%;
+	border-left: 1px solid black;
+	overflow: hidden;
+}
+
+ol, ul {
+    list-style: none;
+}
+
+blockquote, q {
+    quotes: none;
+}
+
+blockquote:before, blockquote:after, q:before, q:after {
+    content: '';
+    content: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+input {
+    border-radius: 5px;
+    padding: 5px;
+    border: none;
+    width: 200px;
+    background: transparent;
+} 
+input:focus {
+    outline-width: 0;
+}
+*:not(input):not(textarea):not(button) {
+    -webkit-user-select: none;
+    cursor: default;
+}
+p {
+	margin: 20px 0;
+}
+h1 {
+    font-family: Pacifico;
+    font-size: 50px;
+    margin: 20px 0;
+    
+}
+
+button:not(.sendPageActions button) {
+    background: -webkit-linear-gradient(rgb(249, 249, 249), rgb(235, 235, 235));
+    border: 1px solid rgb(147, 162, 154);
+    border-radius: 5px;
+    padding: 2px 10px;
+    font-family: Lucida Grande;
+    font-size: 13px;
+    min-width: 100px;
+}
+button:not(.sendPageActions button):active {
+    background: -webkit-linear-gradient(rgb(235, 235, 235), rgb(249, 249, 249));
+}
+body.loading section, body.offline section {
+    -webkit-filter: blur(10px);
+}
+section header {
+	background-color: rgba(0, 0, 0, 0.31);
+	margin: -20px 0 30px -20px;
+	color: white;
+	width: -webkit-calc(100% + 40px);
+	height: 50px;
+	line-height: 50px;
+}
+section {
+	-webkit-transition: all 0.5s, -webkit-transform 1s ease-in, -webkit-perspective-origin-x 0, -webkit-perspective-origin-y 0;
+	position: absolute;
+	height: 100%;
+	width: -webkit-calc(100% - 40px);
+	right: 0;
+	left: 0;
+	bottom: 110%;
+	box-shadow: 0px 0px 10px black;
+	overflow: auto;
+	-webkit-perspective : 1500px;
+	-webkit-perspective-origin: 50% 50%;
+	padding: 0 20px;
+}
+section.sendPage {	
+	padding: 0;
+	width: 100%;
+}
+section.active {
+    bottom: 0;
+}
+section.zoom {
+    -webkit-transform: scale(60);
+    overflow: hidden;
+}
+section.zoom .friend {
+    opacity: 0;
+}
+div.offlinePage {
+    -webkit-transition: all 0.5s;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: -150%;
+    right: 0;
+    left: 0;
+    padding: 30px 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0px 0px 10px black;
+}
+div.offlinePage p {
+    padding: 10px 20px;
+}
+body.offline div.offlinePage {
+    top: 0;
+}
+div.snap, div.friend {
+    width: 150px;
+    height: 150px;
+    display: inline-block;
+    border-radius: 15px;
+    margin: 5px;
+    background-color: rgba(255, 255, 255, 0.2);
+    font-size: 0;
+    -webkit-transition: 0.5s;
+    overflow: hidden;
+    background-size: 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+    border: 2px solid rgba(0, 0, 0, 0.5);
+    vertical-align:middle;
+}
+div.snap[data-media-type="1"], div.snap[data-media-type="2"], div.snap[data-media-type="5"], div.snap[data-media-type="6"] {
+    background-size: 50px, 100%;
+}
+div.snap {
+    cursor: pointer;
+}
+body.enable3d div.snap:hover, body.enable3d div.friend:hover {
+	-webkit-transform: rotateX(0deg);
+}
+div.snap *, div.friend * {
+    cursor: pointer;
+}
+div.snap.hide, div.friend.hide {
+    opacity: 0.5;
+}
+div.snap.hide:hover, div.friend.hide:hover {
+    opacity: 1;
+}
+div.snap:hover p, div.friend:hover p {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+div.snap p, div.friend p {
+    text-align: left;
+    padding: 10px;
+    -webkit-transition: all 0.5s;
+    background-color: rgba(255, 255, 255, 0.5);
+    max-height: 10px;
+    margin: 0;
+    word-wrap:break-word;
+}
+div.friend .displayName {
+	display: block;
+	height: 30px;
+	width: 300px;
+}
+div.friend .displayName input {
+	text-align: left;
+	padding: 10px;
+	-webkit-transition: all 0.5s;
+	background-color: rgba(0, 0, 0, 0.2);
+	color: gray;
+	height: 10px;
+	cursor: initial;
+	width: 130px;
+	-webkit-transform: translate(150px);
+	display: inline-block;
+	vertical-align: top;
+}
+div.friend .displayName p {
+	  -webkit-transform: translate(-150px);
+	display: inline-block;
+	width: 130px;
+	height: 10px;
+	vertical-align: top;
+}
+div.friend .displayName.edit input {
+    -webkit-transform: translate(0px);
+}
+div.friend .displayName.edit p {
+	-webkit-transform: translate(-300px);
+}
+div.snap>*, div.friend>* {
+    font-size: 13px;
+}
+body.enable3d div.snap, body.enable3d div.friend {
+    -webkit-transform: rotateX(-20deg) translateY(-5px);
+}
+
+div.snap.hide[data-media-type="3"] {
+    border-color: yellow;
+    top: 20px;
+}
+div.snap.hide[data-media-type="0"], div.snap.hide[data-media-type="4"] {
+    border-color: red;
+}
+div.snap.hide[data-media-type="1"], div.snap.hide[data-media-type="2"], div.snap.hide[data-media-type="5"], div.snap.hide[data-media-type="6"] {
+    border-color: purple;
+}
+
+.sendSnapBtn, .storiesBtn, .acceptFriend {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+.sendSnapBtn:hover {
+    background-color: yellow !important;
+}
+.storiesBtn:hover {
+    background-color: lightblue !important;
+}
+.acceptFriend:hover {
+    background-color: rgba(0,128,0,0.5) !important;
+}
+@-webkit-keyframes numStoriesAnim {
+    from {color: black;}
+    to {color: lightblue;}
+}
+.numStories {
+    color: rgb(27, 173, 255);
+    -webkit-transition: 0.5s;
+}
+.storiesBtn:hover .numStories {
+    color: black;
+}
+section input[type=search] {
+    display: block;
+    width: 100%;
+    color: black;
+    padding: 15px 0px;
+    margin: 0;
+    font-size: 20px;
+    background-color: rgba(255, 255, 255, 0.4);
+    -webkit-appearance: none;
+    border-radius: 0;
+}
+section input[type=search]::-webkit-input-placeholder {
+    color: gray;
+}
+.friendList {
+    display: block;
+    background-color: rgba(255, 255, 255, 0.3);
+    width: 100%;
+    height: -webkit-calc(100% - 53px - 150px);
+    overflow: auto;
+}
+.sendPageActions {
+    display: block;
+    width: 100%;
+    height: 150px;
+}
+.sendPageActions>button, .sendPageActions>div {
+    display: inline-block;
+    font-family: Helvetica Neue;
+    height: 75px;
+    width: -webkit-calc(100% / 3);
+    border: none;
+    cursor: pointer;
+    -webkit-transition: 0.5s;
+    color: white;
+    font-size: 20px;
+    text-transform: uppercase;
+    vertical-align: top;
+}
+.sendPageActions .select:hover {
+    background: rgba(247,255,0,0.5);
+}
+.sendPageActions .select {
+    background: rgba(247,255,0,0.3);
+}
+.sendPageActions .cancel:hover {
+    background: rgba(255, 0, 0, 0.5);
+}
+.sendPageActions .cancel {
+    background: rgba(255, 0, 0, 0.3);
+}
+.sendPageActions .send:hover {
+    background: rgba(0, 255, 0, 0.5);
+}
+.sendPageActions .send {
+    background: rgba(0, 255, 0, 0.3);
+}
+.sendPageActions .send:hover {
+    background: rgba(0, 255, 0, 0.5);
+}
+.sendPageActions .share {
+	width: 50%;
+    background: rgba(13, 5, 255, 0.3);
+}
+.sendPageActions .share:hover {
+    background: rgba(13, 5, 255, 0.5);
+}
+.sendPageActions .save {
+	width: 50%;
+    background: rgba(10, 255, 245, 0.3);
+}
+.sendPageActions .save:hover {
+    background: rgba(10, 255, 245, 0.5);
+}
+.sendPage .friendList>div {
+    display: block;
+    height: 50px;
+}
+.sendPage .friendList>div:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.sendPage .friendList>div>div {
+    display: inline-block;
+    margin: 0px;
+}
+.sendPage p {
+	margin: 0;
+}
+.sendPage .friendList>div>div p:first-child {
+	color: rgb(97, 175, 223);
+}
+.sendPage .friendList>div>div p:last-child {
+    color: rgb(208, 215, 65);
+    font-size: 12px;
+}
+.sendPage .friendList>div .sendFriend {
+    height: 100%;
+    width: -webkit-calc(100% - 50px);
+    line-height: 25px;
+    float: right;
+    text-align: left;
+}
+.sendPage .friendList>div .check {
+    height: 30px;
+    width: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid white;
+    border-radius: 5px;
+    margin: 8px;
+    cursor: pointer;
+    -webkit-transition: 0.5s;
+}
+.sendPage .friendList>div .check:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.sendPage .friendList>div .check.clicked {
+    background-color: rgba(86, 238, 255, 0.37);
+}
+.sendPageActions .check {
+    height: 30px;
+    width: 30px;
+    margin-left: -webkit-calc(100% / 2 - 15px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 5px;
+    cursor: pointer;
+    -webkit-transition: 0.5s
+}
+
+.sendPageActions .check.checked {
+    background-color: rgba(86, 238, 255, 0.37);
+}
+div.storiesToolbox {
+    -webkit-transform: scale(-webkit-calc(1 / 60)) translateZ(0);
+    -webkit-font-smoothing: subpixel-antialiased;
+    -webkit-backface-visibility: hidden;
+    z-index: 99999;
+    position: absolute;
+    overflow: auto;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+	opacity: 0;
+	-webkit-transition: 0.5s;
+}
+.zoom .storiesToolbox {
+	opacity: 1;
+}
+
+.storyBox {
+    margin-bottom: 15px;
+    -webkit-transition: .5s;
+}
+.storyBox .imgStory {
+    width: 70px;
+    height: 70px;
+    background-size: 100%;
+    background-position: center;
+    border-radius: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    -webkit-transition: 0.25s ease-in-out;
+    -webkit-transform: scale(0.9);
+}
+.storyBox .imgStory:hover {
+    -webkit-transform: scale(1);
+	box-shadow: 0 0 5px black;
+}
+.storyBox .imgStory:active {
+    -webkit-transform: scale(0.8);
+	box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5) inset;
+    border-color: rgba(0, 0, 0, 0.5);
+}
+.storyBox div {
+    display: inline-block;
+}
+.storiesToolbox .storyBack {
+	position: fixed;
+	top: 0;
+	left: 10px;
+	-webkit-transition: 0.5s;
+	-webkit-transform: scale(1);
+	cursor: pointer;
+	text-shadow: 0 0 0px black;
+}
+.zoom .storiesToolbox .storyBack {
+	top: 10px;
+}
+.storiesToolbox .storyBack:hover {
+	color: rgb(27, 173, 255);
+}
+.storiesToolbox .storyBack:active {
+	-webkit-transform: scale(0.9);
+}
+.friendName {
+	color: gray;
+}
+
+body>.toggleCam {
+	width: 40px;
+	height: 50px;
+	display: inline-block;
+	background-color: rgba(255, 255, 255, 0.2);
+	position: fixed;
+	text-align: center;
+	top: 50%;
+	left: 0;
+	border-radius: 0px 10px 10px 0px;
+	margin-top: -10px;
+	z-index: 11;
+	font-family: 'ElegantIcons';
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 50px;
+	font-size: 30px;
+	color: white;
+	
+	-webkit-transition: 0.5s;
+	-webkit-transform: rotate(0deg);
+}
+body>.toggleCam:hover, body>.toggleCam:active {
+	background-color: rgba(255, 255, 255, 0.8);
+	color: black;
+}
+
+.loginForm input {
+	display: block;
+	margin: auto;
+}
