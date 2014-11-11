@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Fathy B. All rights reserved.
 //
 
-#import "SnapMac.h"
+#import "Snappy.h"
 #import "SMClient.h"
 #import "SMConnection.h"
 #import "ASIFormDataRequest.h"
@@ -17,7 +17,7 @@
 #include <sys/sysctl.h>
 
 
-@implementation SnapMac
+@implementation Snappy
 @synthesize effectList;
 
 NSImage *current;
@@ -44,16 +44,18 @@ BOOL hideDivider = NO;
     self.window.title    = @"Snappy - chargement";
     
     
-    
     self.window.delegate = self;
     self.settingsView    = [[SMSettings alloc] initForWindow:_window];
+    self.about = [About new];
+    
+    self.window.settingsWindow = self.settingsView.settingsWindow;
+    self.window.webUI = self.webUI;
+    self.window.aboutWindow = self.about.aboutWindow;
+    self.about.window = self.window;
     
     if(isYosemite()) {
         NSAppearance *appearance = [NSAppearance appearanceNamed:[_settingsView objectForKey:@"SMDefaultTheme"]];
-        ((NSView*)_window.contentView).appearance = appearance;
         self.window.appearance = appearance;
-        //self.window.styleMask = self.window.styleMask | NSFullSizeContentViewWindowMask;
-        //self.window.titlebarAppearsTransparent = YES;
         self.window.movableByWindowBackground = YES;
     }
     [self setEffects];
@@ -122,14 +124,11 @@ BOOL hideDivider = NO;
     [_settingsView show];
 }
 - (IBAction)deconnection:(id)sender {
-    [self.webView script:@"logout();"];
+    [self.webView script:@"SnappyUI.logout();"];
 }
 
 
 -(IBAction)showAbout:(id)sender {
-    if(!_about)
-        _about = [About new];
-    
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowAboutWindow"
                                                         object:self];
 }
@@ -144,7 +143,6 @@ BOOL hideDivider = NO;
         CGFloat totalTime = asset.duration.value/asset.duration.timescale;
         return currentTime/totalTime*100;
     }
-    NSLog(@"zebi");
     return 0;
 }
 -(void)showVideo:(NSString*)videoUrl {

@@ -31,12 +31,12 @@ static NSString *kDefaultAPIServer = @"https://feelinsonice-hrd.appspot.com";
     int timeStamp = (int)[[NSDate date] timeIntervalSince1970];
     return [SMConnection tokenWithAuthToken:authToken andTimeStamp:timeStamp];
 }
-+(NSString*)tokenWithAuthToken:(NSString*)authToken andTimeStamp:(int)timestamp {
++(NSString*)tokenWithAuthToken:(NSString*)authToken andTimeStamp:(NSTimeInterval)timestamp {
     NSString *secret = @"iEk21fuwZApXlz93750dmW22pw389dPwOk";
     NSString *pattern = @"0001110111101110001111010101111011010001001110011000110001000110";
     NSDictionary *hashes = @{
         @"0" : [SMConnection sha1ForString:[NSString stringWithFormat:@"%@%@", secret, authToken]],
-        @"1" : [SMConnection sha1ForString:[NSString stringWithFormat:@"%d%@", timestamp, secret]]
+        @"1" : [SMConnection sha1ForString:[NSString stringWithFormat:@"%f%@", timestamp, secret]]
     };
     NSMutableString *string = [NSMutableString new];
     for(int i = 0; i < [pattern length]; i++) {
@@ -49,13 +49,13 @@ static NSString *kDefaultAPIServer = @"https://feelinsonice-hrd.appspot.com";
     return [SMConnection genericDataWithToken:@"m198sOkJEn37DjqZ32lpRu76xmw288xSQ9"];
 }
 +(NSMutableDictionary*)genericDataWithToken:(NSString*)token {
-    int timeStamp = (int)[[NSDate date] timeIntervalSince1970];
-    return [@{
-              @"timestamp": [NSString stringWithFormat:@"%d", timeStamp],
-              @"req_token": [SMConnection tokenWithAuthToken:token andTimeStamp:timeStamp],
-              @"version" : @"4.1.07",
+    NSTimeInterval timeStamp = [NSDate date].timeIntervalSince1970;
+    return @{
+              @"timestamp"  : @(timeStamp),
+              @"req_token"  : [SMConnection tokenWithAuthToken:token andTimeStamp:timeStamp],
+              @"version"    : @"4.1.07",
               @"countryCode": @"fr-FR"
-            } mutableCopy];
+            }.mutableCopy;
 }
 +(void)getDataRequestToURL:(NSString*)urlString andCallback:(SMCallback)block {
     NSURL *url = [NSURL URLWithString:urlString relativeToURL:[NSURL URLWithString:kDefaultAPIServer]];

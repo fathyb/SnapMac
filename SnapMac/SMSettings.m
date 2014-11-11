@@ -72,7 +72,6 @@ static NSMutableArray *onloadBlocks;
             @"SMUse3D": @YES,
             @"SMUseFlash": @YES
         }[key]);
-        NSLog(@"Nouvelle object = %@", object);
         if(object)
             [self setObject:object forKey:key];
     }
@@ -91,13 +90,12 @@ static NSMutableArray *onloadBlocks;
     [[NSUserDefaults standardUserDefaults] setObject:object forKey:key];
 }
 -(void)show {
-    NSLog(@"show ok");
     [NSApp beginSheet:settingsWindow modalForWindow:_window modalDelegate:nil didEndSelector:nil contextInfo:nil];
 }
 -(void)setTheme {
     if(isYosemite()) {
         NSString *theme = [self objectForKey:@"SMDefaultTheme"];
-        [(NSView*)settingsWindow.contentView setAppearance:[NSAppearance appearanceNamed:theme]];
+        _window.appearance = [NSAppearance appearanceNamed:theme];
         NSDictionary *themes = @{
             NSAppearanceNameVibrantLight: @0,
             NSAppearanceNameVibrantDark: @1
@@ -115,9 +113,6 @@ static NSMutableArray *onloadBlocks;
     };
     NSString *theme = themes[btn.selectedItem.title];
     [self setObject:theme forKey:@"SMDefaultTheme"];
-    NSAppearance *appearance = [NSAppearance appearanceNamed:theme];
-    ((NSView*)_window.contentView).appearance = appearance;
-    self.window.appearance = appearance;
     [self setTheme];
 }
 - (IBAction)close:(id)sender {

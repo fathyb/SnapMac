@@ -10,7 +10,7 @@
 
 @interface About : NSObject
 
-@property (strong) IBOutlet NSPanel *aboutWindow;
 @property (nonatomic) NSWindow *window;
+@property (strong) IBOutlet NSWindow *aboutWindow;
 
 @end

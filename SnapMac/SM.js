@@ -18,7 +18,7 @@ String.prototype.endsWith = function(suffix) {
     return this.indexOf(suffix, this.length - suffix.length) !== -1;
 }
 function updateOnlineStatus(e) {
-	navigator.onLine ? $('body').removeClass('offline') : $('body').addClass('offline');
+	//navigator.onLine ? $('body').removeClass('offline') : $('body').addClass('offline');
 }
 
 window.addEventListener('online',  updateOnlineStatus);

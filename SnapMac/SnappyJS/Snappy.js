@@ -54,19 +54,17 @@ var Snappy = new (function() {
 			return;
 		}
 						
-		var friendList	= new Snappy.FriendList(result);
+		var friendList	= new Snappy.FriendList(result),
 			snapList	= new Snappy.SnapList(result),
 			updates		= new Snappy.Updates(friendList, snapList);
-							
-							
-		friendList.onload = function() {
-			callback(updates);
-		}
+												
+		callback(updates);
 	}
 	
 	this._loginCallback = null;
 	this.login = function(username, password, callback) {
 		this._loginCallback = callback;
+		
 		SnapJS.login(username, password, SnapBack(function(r) {
 			if(r.error) {
 				Snappy._loginCallback(r);
@@ -105,10 +103,17 @@ var Snappy = new (function() {
 		}
 		
 		this.addStories	 = function(stories) {
+			var story;
+			
 			for(var i in stories) {
-				this.stories.push(new Snappy.Story(stories[i], function(obj) {
-					console.log("story callback", obj);
-				}));
+				story = new Snappy.Story(stories[i]);
+				
+				story.friend = this;
+				story.change(function(story) {
+					story.friend.change();
+				});
+				
+				this.stories.push(story);
 			}
 			this.change();
 		}
@@ -175,8 +180,6 @@ var Snappy = new (function() {
 				if(friend)
 					friend.addStories(stories.stories);
 			}
-			if(this.onload)
-				this.onload();
 		}
 		
 		
@@ -201,6 +204,7 @@ var Snappy = new (function() {
 		
 		
 		SnapJS.getStories(SnapBack(function(stories) {
+			console.log("stories", stories);
 			this.friendList.attachStories(stories);
 		}, {friendList: this}));
 		
@@ -208,7 +212,7 @@ var Snappy = new (function() {
 	}
 	
 
-	this.Story = function(raw, loadEvent) {
+	this.Story = function(raw, loadEvent, userInfo) {
 		if(!raw.story)
 			return false;
 	
@@ -219,19 +223,33 @@ var Snappy = new (function() {
 		
 		this.state 	= "decrypt";
 		this.id 	= story.media_id;
-		this.date	= new Date(story.timestamp);
+		this.date	= new Snappy.SnappyDate(story.timestamp);
 		
+		this.changeBlocks = [];
 		
-		SnapJS.getStory(id, key, iv, SnapBack(function(image) {
-			if(typeof image == "string") {
-				this.story.state = "loaded";
-				this.story.image = image;
-				this.loadEvent(this.story);
+		this.change = function(fn) {
+			if(!fn) {
+				for(var i in this.changeBlocks) {
+					if(typeof this.changeBlocks[i] == "function") {
+						this.changeBlocks[i](this);
+					}
+				}
 			}
 			else {
-				console.log(image); 
+				this.changeBlocks.push(fn);
 			}
-		}, {story: this, loadEvent: loadEvent}));
+		}
+		
+		SnapJS.getStory(id, key, iv, SnapBack(function(result) {
+			if(result.error) {
+				console.log(result.error);
+			}
+			else {
+				this.story.state = "loaded";
+				this.story.image = result.thumb;
+				this.story.change();
+			}
+		}, {story: this}));
 		return this;
 		
 	}
@@ -242,7 +260,6 @@ var Snappy = new (function() {
 		this.listSnapsByName = function() {
 			
 		}
-		
 		
 		var snap,
 			rawSnaps = raw.snaps;
@@ -263,7 +280,7 @@ var Snappy = new (function() {
 		this.dest 		= this.sent 	? this.user : "me";
 		
 		this.id			= raw.id;
-		this.date		= new Date(raw.ts);
+		this.date		= new Snappy.SnappyDate(raw.ts);
 		this.mediaType 	= new Snappy.MediaType(raw.m);
 		this.state		= kStateLoading;
 		this.url		= null;
@@ -288,11 +305,8 @@ var Snappy = new (function() {
 				if(!result || result.error) {
 					return console.error("Error snap");
 				}
-				
-				if(result.url) {
-					this.snap.url = result.url;
-					this.snap.change();
-				}
+				this.snap.url = result.thumb;
+				this.snap.change();
 			}, {snap: this}));
 		}
 		
@@ -301,6 +315,39 @@ var Snappy = new (function() {
 		return this;
 	}
 	
+	this.SnappyDate = function(ts) {
+		
+		this.date = new Date(ts);
+			
+		this.timeSince = function() {
+			
+			var seconds  = Math.floor((new Date() - this.date) / 1000),
+				interval = Math.floor(seconds / 31536000);
+			
+			if(interval > 1)
+		        return interval + " années";
+		        
+		    interval = Math.floor(seconds / 2592000);
+		    if(interval > 1)
+		        return interval + " mois";
+		        
+		    interval = Math.floor(seconds / 86400);
+		    if(interval > 1)
+		        return interval + " jours";
+		        
+		    interval = Math.floor(seconds / 3600);
+		    if(interval > 1)
+		        return interval + " heures";
+		        
+		    interval = Math.floor(seconds / 60);
+		    if(interval > 1)
+		        return interval + " minutes";
+		        
+		    return Math.floor(seconds) + " secondes";
+		}
+		
+		return this;
+	}
 	this.MediaType = function(id) {
 		function a(b) {
 			return !!b[id];
@@ -314,9 +361,8 @@ var Snappy = new (function() {
 			FriendRequest: [0, 0, 0, 1, 1, 1, 1]
 		}
 		
-		for(var k in mask) {
+		for(var k in mask)
 			this["is"+k] = a(mask[k]);
-		}
 		
 		return this;
 	}
@@ -329,14 +375,14 @@ var Snappy = new (function() {
 })();
 
 
-var SnapBack = function(var1, var2) {
+var SnapBack = function(var1, var2, var3) {
 	if(typeof var1 == "function") {
 		var id = (Math.round(Math.random()*10000000000)).toString();
 			
 		if(!var2)
 			var2 = new Object();
 		
-		Snappy.tmp.SnapBack[id] = new SnapBack(var2, var1);
+		Snappy.tmp.SnapBack[id] = new SnapBack(var2, var1, id);
 		
 		return id;
 	}
@@ -345,6 +391,7 @@ var SnapBack = function(var1, var2) {
 			this[k] = var1[k];
 		}
 		
+		this.id = var3;
 		this.func = var2;
 		this.call = function() {
 			var vars = "";
@@ -363,6 +410,7 @@ var SnapBack = function(var1, var2) {
 		this.destroy = function() {
 			delete Snappy.tmp.SnapBack[this.id];
 		}
+		
 		return this;
 	}
 	

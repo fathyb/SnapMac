@@ -24,13 +24,12 @@
         }
         if([self respondsToSelector:@selector(setAllowsVibrancy:)]) {
             [self performSelector:@selector(setAllowsVibrancy:) withObject:@YES];
-            [self setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
         }
     }
     
     NSString *resourcesPath = [NSBundle mainBundle].resourcePath;
     NSString *htmlPath      = [resourcesPath stringByAppendingString:@"/mainUI.html"];
-    [[self mainFrame] loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:htmlPath]]];
+    [self.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:htmlPath]]];
     
     self.jsClient = [SMJSClient new];
     self.SnapJS   = [SnapJS new];
@@ -42,8 +41,8 @@
     [self.windowScriptObject setValue:self.SnapJS   forKey:@"SnapJS"];
     
     
-    NSScrollView * scrollView = (NSScrollView *)([[[self mainFrame] frameView] subviews][0]);
-    [scrollView setVerticalScrollElasticity:NSScrollElasticityAutomatic];
+    NSScrollView* scrollView = (NSScrollView *)(self.mainFrame.frameView.subviews[0]);
+    scrollView.verticalScrollElasticity = NSScrollElasticityAllowed;
 }
 /*
 -(id)webView:(WebView *)sender contextMenuItemsForElement:(NSDictionary *)element defaultMenuItems:(NSArray *)defaultMenuItems {

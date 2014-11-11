@@ -125,37 +125,22 @@ BOOL isHandlingEvent;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         if([[_settings objectForKey:@"SMUseFlash"] boolValue])
             [self flashScreen:YES];
-        AVCaptureConnection *videoConnection = nil;
-        for (AVCaptureConnection *connection in stillImageOutput.connections) {
-            for (AVCaptureInputPort *port in [connection inputPorts]) {
-                if ([[port mediaType] isEqual:AVMediaTypeVideo]) {
-                    videoConnection = connection;
-                    break;
-                }
-            }
-            if (videoConnection)
-                break;
-        }
-        [stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+        
+        [stillImageOutput captureStillImageAsynchronouslyFromConnection:[stillImageOutput connectionWithMediaType:AVMediaTypeVideo] completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
             if([[_settings objectForKey:@"SMUseFlash"] boolValue])
                 [self flashScreen:NO];
             
             if(!error && imageSampleBuffer) {
                 [session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
                 
-                NSData* jpegData        = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-                NSImage* oldImage       = [[NSImage alloc] initWithData:jpegData];
-                NSLog(@"oldimage size = %f, %f", oldImage.size.width, oldImage.size.height);
-                /*     width            height
-                    1280/2 = 640     1024/2 = 512
-                    640-240 = 300    512-360 = 125
-                 */
-                NSRect newRect          = NSMakeRect(300, 125, 480, 720);
+                NSData        *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
+                NSImage       *oldImage = [[NSImage alloc] initWithData:jpegData];
+                NSRect          newRect = NSMakeRect(400, 0, 480, 720);
                 CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)[oldImage TIFFRepresentation], nil);
-                CGImageRef nImageRef    = CGImageSourceCreateImageAtIndex(source, 0, nil);
-                CGImageRef imageRef     = CGImageCreateWithImageInRect(nImageRef, newRect);
-                NSImage* newImage       = [[NSImage alloc] initWithCGImage:imageRef size:newRect.size];
-                NSArray* filters        = previewLayer.filters;
+                CGImageRef    nImageRef = CGImageSourceCreateImageAtIndex(source, 0, nil);
+                CGImageRef     imageRef = CGImageCreateWithImageInRect(nImageRef, newRect);
+                NSImage       *newImage = [[NSImage alloc] initWithCGImage:imageRef size:newRect.size];
+                NSArray        *filters = previewLayer.filters;
                 
                 CFRelease(source);
                 CFRelease(nImageRef);
@@ -177,11 +162,11 @@ BOOL isHandlingEvent;
     CGDisplayFadeReservationToken fadeToken;
     
     NSColor*     flashColor = [NSColor colorWithCalibratedRed:255
-                                                    green:255
-                                                     blue:255
-                                                    alpha:1];
+                                                        green:255
+                                                         blue:255
+                                                        alpha:1];
     NSTimeInterval duration = .25;
-    CGError           error = CGAcquireDisplayFadeReservation(duration*2, &fadeToken);
+    CGError        error    = CGAcquireDisplayFadeReservation(duration * 2, &fadeToken);
     
     if (error != kCGErrorSuccess)
         return;
@@ -195,6 +180,13 @@ BOOL isHandlingEvent;
     
 }
 -(void)awakeFromNib {
+    
+    for(NSLayoutConstraint *constraint in self.superview.superview.constraints) {
+        if(constraint.constant == -256.f)
+            _positionLeft = constraint;
+        _positionLeft.constant = 0;
+    }
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(screenResize) name:NSWindowDidResizeNotification object:nil];
     [self showLoading];
     [SMSettings addOnloadBlock:^(SMSettings* settings) {
@@ -230,20 +222,12 @@ BOOL isHandlingEvent;
     
         previewLayer               = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self->session];
         previewLayer.frame         = self.bounds;
-        previewLayer.opacity       = (isYosemite() ? .8 : 1);
+        previewLayer.opacity       = 1.f;
         previewLayer.videoGravity  = AVLayerVideoGravityResizeAspectFill;
         previewLayer.masksToBounds = YES;
         
         previewLayer.connection.automaticallyAdjustsVideoMirroring = NO;
         previewLayer.connection.videoMirrored                      = YES;
-        
-        for(NSLayoutConstraint *constraint in self.superview.superview.constraints) {
-            if(constraint.constant == -256.f)
-                _positionLeft = constraint;
-            _positionLeft.constant = 0;
-        }
-        
-        
         
         [self cleanStart];
         [self hideLoading];
@@ -253,13 +237,33 @@ BOOL isHandlingEvent;
     if(_positionLeft.constant != 0)
         _positionLeft.constant = -self.bounds.size.width;
 }
--(void)show {
+-(void)showAndUseCamera:(BOOL)showCamera {
     _positionLeft.animator.constant = 0;
-    [self cleanStart];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowingCamera"
+                                                            object:self];
+        if(showCamera) {
+            [self performSelectorOnMainThread:@selector(showLoading) withObject:nil waitUntilDone:YES];
+            usleep(1000000);
+            [self performSelectorOnMainThread:@selector(cleanStart) withObject:nil waitUntilDone:YES];
+            sleep(2);
+            [self hideLoading];
+        }
+    });
+}
+-(void)show {
+    [self showAndUseCamera:YES];
 }
 -(void)hide {
     _positionLeft.animator.constant = -self.bounds.size.width;
-    [self cleanStop];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ClosingCamera"
+                                                            object:self];
+        sleep(1);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self cleanStop];
+        });
+    });
 }
 
 -(NSView*)photoTools {
@@ -352,6 +356,7 @@ BOOL isHandlingEvent;
     self.showPhotoBtn   = YES;
     self.showFilterList = YES;
     self.showPhotoTools = YES;
+    
     if(!session.isRunning)
             [session startRunning];
     [self resetSubviews];
@@ -371,6 +376,9 @@ BOOL isHandlingEvent;
     [self showImage:sourceImage];
 }
 -(void)showImage:(NSImage*)image {
+    if(_positionLeft.animator.constant != 0)
+        [self showAndUseCamera:NO];
+    
     [self cleanStop];
     self.showCancelBtn  = YES;
     self.showPhotoBtn   =

@@ -1,3 +1,18 @@
+/*
+
+###############################################################################################
+#																							  #
+#							   UI.js, part of Snappy Project								  #
+#																							  #
+#					#################################################						  #
+#																							  #
+#								  2014 - Fathy Boundjadj									  #
+#																							  #
+###############################################################################################
+
+
+*/
+
 function e(tag, cls, text, css) {
 	var el = $("<"+tag+">", (typeof cls == "object" ? cls : null));
 	
@@ -10,17 +25,13 @@ function e(tag, cls, text, css) {
 	return el;
 }
 
-function toggleClass(el, cls) {
-	el[el.hasClass(cls) ? "removeClass" : "addClass"](cls);
+function toggleClass(el, cls, bool) {
+	el[(arguments.length == 3 ? bool : !el.hasClass(cls)) ? "addClass" : "removeClass"](cls);
 }
 SnappyUI = new (function() {
 	
 	this.use3D = function(value) {
-		toggleClass(this.body, "enable3d");
-	}
-	
-	this.setLoading = function(bool) {
-		this.body[bool ? "addClass" : "removeClass"]("loading");
+		toggleClass(this.body, "enable3d", value);
 	}
 	
 	this.hideSend = function() {
@@ -30,7 +41,12 @@ SnappyUI = new (function() {
 		this.SendPage.hide();
 		this.SnapsPage.show();
 	}
-	
+	this.logout = function() {
+		this.LoginPage.show();
+		this.SnapsPage.erase();
+		this.FriendsPage.erase();
+		this.logged = false;
+	}
 	return this;
 })();
 
@@ -40,34 +56,92 @@ SnappyUI.init = function() {
 	this.body = $("body");
 	this.updates = new Object();
 	
-	this.Header = function(_this) {
-		this.element = e("header").appendTo(_this.element);
+	this.Header = function(parent) {
+		this.element = e("header").appendTo(parent.element);
 		
+		this.leftButton = new (function(parent) {
+			this.element = e("span", "leftButton")
+							.appendTo(parent.element)
+							.data("button", this);
+			
+			this.icon = "hide";
+			
+			this.setIcon = function(icon) {
+				
+				this.element.removeClass("spin");
+				
+				this.icon = icon;
+				
+				if(!icon)
+					this.element.html("");
+				else
+					this.element.html(({
+						back   : "4",
+						update : "",
+						loading: ""
+					})[this.icon]);
+				
+				if(icon == "update" || icon == "loading")
+					this.spin();
+				
+				this.element.css("font-size", icon == "back" ? "30px" : "20px");
+			}
+			this.spin = function(bool) {
+				if(arguments.length == 1)
+					this.spinVal = bool;
+				
+				this.element[this.spinVal ? "addClass" : "removeClass"]("spin");
+			}
+			this.element.click(function() {
+				var button = $(this).data("button"),
+					icon   = button.icon;
+				
+				switch(icon) {
+					case "update":
+						button.spin(true);
+						SnappyUI.update();
+						
+						break;
+					case "back":
+						SnappyUI.FriendsPage.StoriesView.close();
+						
+						break;
+				}
+			});
+				
+		})(this);
 		
-		this.title = new (function() {
-			this.element = e("p");
+		this.title = new (function(parent) {
+			this.element = e("p").appendTo(parent.element);
 			
 			this.setTitle = function(title) {
 				this.element.text(title);
 			}
-		})();
-		this.title.element.appendTo(this.element);
+		})(this);
 	}
 	this.Section = function(_this, name) {
 		_this.element = e("section", name).appendTo("body");
 		
 		_this.header = new SnappyUI.Header(_this);
 		
+		
 		_this.hide = function() {
 			this.element.removeClass("active");
 		}
 	
 		_this.show = function() {
-			if(!SnappyUI.logged && this.onlyShowIfLogged)
+			if((!SnappyUI.logged && this.onlyShowIfLogged) || $(".zoom").length)
 				return;
-			$(".active").removeClass("active");
+			
+			if(SnappyUI.currentPage)
+				SnappyUI.currentPage.hide();
+
+			SnappyUI.currentPage = this;
 			this.element.addClass("active");
-			this.element.scroll(0);
+			this.element.scrollTop(0);
+			
+			if(this.content)
+				this.content.scrollTop(0);
 		}
 		
 		_this.isVisible = function() {
@@ -87,14 +161,10 @@ SnappyUI.init = function() {
 		}
 		
 		this.element.click(function() {
-			if(SnappyUI.toggleCam.icon == "show") {
-				SnappyUI.toggleCam.setIcon("hide");
+			if(SnappyUI.toggleCam.icon == "show")
 				SnapJS.showCamera();
-			}
-			else {
-				SnappyUI.toggleCam.setIcon("show");
+			else
 				SnapJS.hideCamera();
-			}
 		});
 		
 		this.setIcon("hide");
@@ -122,20 +192,25 @@ SnappyUI.init = function() {
 		this.connectBtn = e("button", 0, "Connection").appendTo(this.loginForm);
 		
 		this.connectBtn.click(function() {
-			SnappyUI.setLoading(true);
-			
 			var username = SnappyUI.LoginPage.inputLogin.val(),
-				password = SnappyUI.LoginPage.inputPassword.val();
+				password = SnappyUI.LoginPage.inputPassword.val(),
+				leftButton = SnappyUI.LoginPage.header.leftButton;
 			
+			leftButton.setIcon("loading");
+			leftButton.spin(true);
+				
 			Snappy.login(username, password, function(r) {
-				SnappyUI.setLoading(false);
+				
 				if(r.error) {
+					console.error(r.error);
 					SnappyUI.logged = false;
-					console.log("Error lors de la connection", r.error);
-					//ERRRRROR
+					leftButton.spin(false);
+					leftButton.setIcon(null);
 				}
 				else {
 					SnappyUI.setUpdates(r);
+					leftButton.spin(false);
+					leftButton.setIcon(null);
 				}
 			});
 		});
@@ -145,7 +220,9 @@ SnappyUI.init = function() {
 			
 			this.element = e("div", "iOSSync");
 			
-			e("h1", 0, "Compte iOS").appendTo(this.element);
+			
+			this.header = new SnappyUI.Header(this);
+			this.header.title.setTitle("Synchronisation iOS");
 		
 			this.accountList = e("select").data("syncClass", this).appendTo(this.element)
 			this.accountList.change(function() {
@@ -165,7 +242,9 @@ SnappyUI.init = function() {
 			
 			this.element = e("div", "androSync");
 			
-			e("h1", 0, "Compte Android").appendTo(this.element);
+			this.header = new SnappyUI.Header(this);
+			this.header.title.setTitle("Synchronisation Android");
+			
 			e("p", 0, "Veuillez connecter un appareil Android rooté avec le débogage activé").appendTo(this.element);
 			
 			this.error = e("p", "androidError");
@@ -200,8 +279,14 @@ SnappyUI.init = function() {
 		SnappyUI.Section(this, "snapsPage");
 		
 		this.header.title.setTitle("Mon fil");
+		this.header.leftButton.setIcon("update");
 		
-		e("p", "name").appendTo(this.element);
+		this.content = e("div", "content").appendTo(this.element);
+		
+		this.erase = function() {
+			this.snapList = new Object();
+			this.element.children(".snap").remove();
+		}
 		
 		this.snapList = new Object();
 		this.setSnapList = function(snapList) {
@@ -215,15 +300,33 @@ SnappyUI.init = function() {
 		}
 		
 		this.snapElement = function(snap) {
-			var el 	 	= e("div", "snap"),
-				friend  = SnappyUI.updates.FriendList.friendByName(snap.user),
-				name 	= friend ? friend.displayName : snap.user;
+			var el 	 	  = e("div", "snap"),
+				friend    = SnappyUI.updates.FriendList.friendByName(snap.user),
+				userText  = e("p", 0, (friend ? friend.displayName : snap.user)),
+				iconDiv	  = e("p"),
+				mediaType = snap.mediaType;
 			
-			if(snap.mediaType.isFriendRequest)
-				e("p", 0, "Demande d'amitié").appendTo(el);
 			
-			e("p", 0, (snap.received ? "De" : "À") + " "+name).appendTo(el);
-			e("p", 0, "Il y a "+timeSince(snap.date)).appendTo(el);
+			function icon(icon) {
+				return e("span", "icon", icon);
+			}
+			
+			if(mediaType.isFriendRequest)
+				iconDiv.append(icon(""));
+			else
+				iconDiv.append(icon(snap.received ? "8" : "9"));
+			
+			if(mediaType.isImage)
+				iconDiv.append(icon(""));
+			if(mediaType.isVideo)
+				iconDiv.append(icon(""));
+			if(mediaType.isAudio)
+				iconDiv.append(icon("z"));
+			
+			userText.appendTo(el);
+			iconDiv.appendTo(el);
+			
+			e("p", 0, "Il y a "+snap.date.timeSince()).appendTo(el);
 			
 			if(snap.mediaType.isFriendRequest)
 				e("p", "acceptFriend", "Accepter").appendTo(el);
@@ -233,6 +336,13 @@ SnappyUI.init = function() {
 			if(snap.url)
 				el.css("background-image", "url('"+snap.url+"')");
 			
+			el.data("snap", snap)
+			  .click(function() {
+				  	var snap = $(this).data("snap");
+				  	if(snap)
+				  		SnapJS.showMedia(snap.id); 
+			  });
+		
 			return el;
 		}
 		
@@ -244,16 +354,13 @@ SnappyUI.init = function() {
 					continue;
 				
 				snap.element = this.snapElement(snap);
-				snap.element.appendTo(this.element);
+				snap.element.appendTo(this.content);
 				
 				snap.change(function(snap) {
 					if(!snap.url)
 						snap.element.addClass("hide");
 					else
 						snap.element.css("background-image", "url('"+snap.url+"')");
-						
-						
-					console.log("snap change", snap);
 				});
 			}
 		}
@@ -267,32 +374,107 @@ SnappyUI.init = function() {
 		
 		SnappyUI.Section(this, "friendsPage");
 		
+		this.header.leftButton.setIcon("update");
 		this.header.title.setTitle("Amis");
 		
-		this.StoriesView = new (function() {
-			this.element = e("div", "storiesToolbox");
+		this.content = e("div", "content").appendTo(this.element);
+		
+		this.zoom = function(bool) {
+			this.content[bool ? "addClass" : "removeClass"]("zoom");
+		}
+		this.StoriesView = new (function(parent) {
 			
-			this.backBtn = e("span", "storyBack", "Retour").appendTo(this.element);
-			this.user	 = e("span", "user");
+			this.parent  = parent;
+			this.element = e("div", "storiesToolbox")
+							.appendTo(parent.content);
 			
-			e("p", 0, "Histoire de ").append(this.user).appendTo(this.element);
+			this.erase = function() {
+				this.element.children(".storyBox").remove();
+				this.stories = new Array();
+			}
+			
+			this.close = function() {
+				this.erase();
+			
+				this.parent.content.scrollTop(SnappyUI.FriendsPage.content.data("scrollTop"));
+				this.parent.zoom(false);
+				
+				this.parent.header.leftButton.setIcon("update");
+				this.parent.header.title.setTitle("Amis");
+			}
+			this.setStories = function(stories) {
+			
+				this.parent.header.leftButton.setIcon("back");
+				
+				this.element.scrollTop(0);
+				
+				var story,
+					storyBox,
+					storyMage,
+					dateText,
+					friendsPage;
+				
+				for(var k in stories) {
+					story = stories[k];
+					
+					storyBox = e("div", "storyBox")
+							   .data("story", story)
+							   .click(function() {
+								   	var story = $(this).data("story");
+								   	if(story)
+								   		SnapJS.showMedia(story.id);
+							   });
+					
+					storyMage = e("div", "imgStory")
+								.appendTo(storyBox);
+								
+					dateText = e("p", 0, "Il y a "+story.date.timeSince())
+							   .appendTo(storyBox);
+					
+					storyBox.data("img", storyMage)
+							.appendTo(this.element);
+					
+					story.box = storyBox;
+					story.change(function(story) {
+						story.box.data("img").css('background-image', "url('"+story.image+"')");
+					});
+					story.change();
+					
+					this.parent.header.title.setTitle("Histoires de "+story.friend.displayName);
+					
+					friendsPage = SnappyUI.FriendsPage;
+					friendsPage.content.data('scrollTop', friendsPage.content.scrollTop());
+					friendsPage.content.scrollTop(0);
+					friendsPage.zoom(true);
+				}
+			}
 			
 			return this;
-		})();
+		})(this);
 		
-		this.StoriesView.element.appendTo(this.element);
-		
+		this.erase = function() {
+			this.friendList = new Object();
+			this.element.children(".friend").remove();
+		}
 		this.friendList = new Object();
 		
 		this.setFriendList = function(friendList) {
-			this.friendList = friendList;
+			var friend;
+			
+			for(var k in friendList.friends) {
+				friend = friendList.friends[k];
+				
+				if(!this.friendList[friend.name])
+					this.friendList[friend.name] = friend;
+			}
+
 			this.update();
 		}
 		
 		
 		this.friendElement = function(friend) {
 			var el 	 	   = e("div", "friend"),
-				storiesBtn = e("p", "storiesBtn", "Voir son histoire "),
+				storiesBtn = e("p", "storiesBtn", "Voir ses histoires "),
 				numStories = e("span", "numStories").appendTo(storiesBtn),
 				displayDiv = e("div", "displayName").appendTo(el);
 			
@@ -320,55 +502,36 @@ SnappyUI.init = function() {
 			
 			
 			storiesBtn.click(function() {
-				/*var user = $(this).parent().data('friend').name;
-				var story = getUserStory(user).stories;
-				if(!story) {
+				var friend  = $(this).parent().data("friend"),
+					stories = friend.stories;
+					
+				if(!stories) {
 					$(this).shake(3, 20, 500, true);
 					return;
 				}
-				$('.storyBox').remove();
-				$.each(story, function() {
-					var story = this.story;
-					var id = story.media_id;
-					var iv = story.media_iv;
-					var key = story.media_key;
-					if(!$(".storyBox[data-id='"+id+"']").length) $('.storiesToolbox').append("<div class='storyBox' data-id='"+id+"'><div class='imgStory'></div><p>Il y a "+timeSince(story.timestamp)+"</p></div>");
-					SMClient.getStory(id, key, iv, SMCallback(function(id, result) {
-						$(".storyBox[data-id='"+id+"']").click(function() {
-							var id = $(this).data("id")+"";
-							SMClient.showSnap(id);
-						}).children(".imgStory").css('background-image', "url('"+result+"')");
-					}));
-				});
-				$('.storiesToolbox .user').text(friendDisplayName(user));
-				var friends = $('.friendsPage').addClass('zoom')
-				var scroll = $('.friendsPage').scrollTop();
-				friends.scrollTop(0);
-				friends.attr('data-oldScroll', scroll);*/
 				
-				
+				SnappyUI.FriendsPage.StoriesView.setStories(stories);				
 			});
 
-			
-			
-			
-			
-			
-			
 			return el;
 		}
 		this.update = function() {
-			for(var k in this.friendList.friends) {
-				var friend = this.friendList.friends[k];
+			for(var name in this.friendList) {
+				var friend = this.friendList[name];
 				
 				if(friend.element)
 					continue;
 				
-				friend.element = this.friendElement(friend);
-				friend.element.appendTo(this.element);
+				friend.change(function(friend) {
+					friend.numStories = friend.element.data("numStories");
+					friend.numStories.text(friend.stories.length ? "("+friend.stories.length+")" : "");
+				});
 				
-				friend.numStories = friend.element.data("numStories");
-				friend.numStories.text(friend.stories.length ? "("+friend.stories.length+")" : "");
+				friend.element = this.friendElement(friend);
+				friend.element.appendTo(this.content);
+				
+				friend.change();
+				
 			}
 		}
 		
@@ -447,40 +610,45 @@ SnappyUI.init = function() {
 		return this;
 	})();
 	
-	this.hideAll = function() {
-		var pages = "Login:Snaps:Send:Friends".split(":");
-		for(var k in pages)
-			this[pages[k]+"Page"].hide();
-	}
-
 	this.setUpdates = function(updates) {
 		
 		this.logged = true;
 		this.updates = updates;
 		
 		this.SnapsPage.setSnapList(updates.SnapList);
-		this.SnapsPage.show();
+		
+		if(this.LoginPage.isVisible())
+			this.SnapsPage.show();
 		
 		this.FriendsPage.setFriendList(updates.FriendList);
 	}
 	
 	this.use3D(SnapJS.use3D());
 	
-	SnappyUI.LoginPage.show();
-	Snappy.getUpdates(function(updates) {
-		if(updates.error)
-			SnappyUI.LoginPage.show();
-		else
-			SnappyUI.setUpdates(updates);
+	this.update = function() {
+		Snappy.getUpdates(function(updates) {
+			if(updates.error)
+				console.log(updates.error);
+			else {
+				SnappyUI.SnapsPage.header.leftButton.spin(false);
+				SnappyUI.FriendsPage.header.leftButton.spin(false);
+				SnappyUI.setUpdates(updates);
+			}
 		
-	});
+		});
+	}
 	
+	this.LoginPage.show();
 	
-		var account = JSON.parse(SMClient.account());
-		if(!account.error) {
-			$('.loginForm input[type=text]').val(account.login);
-			$('.loginForm input[type=password]').val(account.pass);
-		}
+	this.update();
 	
-	this.toggleCam.element.click();
+	SnapJS.getKeychain(SnapBack(function(account) {
+		if(!account)
+			return;
+		
+		if(account.login)
+			SnappyUI.LoginPage.inputLogin.val(account.login);
+		if(account.pass)
+			SnappyUI.LoginPage.inputPassword.val(account.pass);
+	}));
 }

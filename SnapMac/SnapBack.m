@@ -65,13 +65,14 @@ void SnapCall(NSString* identifier, id firstArg, ...) {
     va_list argumentList;
     va_start(argumentList, firstArg);
     
+    
     NSMutableString *callStr = [NSMutableString stringWithFormat:@"SnapCall(%@).call(%@", snapback_quoter(identifier), objectToJS(firstArg)];
     
     id currentObj;
     
-    while ((currentObj = va_arg(argumentList, id))) {
-        if(currentObj) [callStr appendString:[NSString stringWithFormat:@", %@", objectToJS(currentObj)]];
-    }
+    while((currentObj = va_arg(argumentList, id)))
+        if(currentObj)
+            [callStr appendString:[NSString stringWithFormat:@", %@", objectToJS(currentObj)]];
     
     [callStr appendString:@");"];
     

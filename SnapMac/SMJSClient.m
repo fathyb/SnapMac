@@ -8,7 +8,7 @@
 
 #import "SMJSClient.h"
 #import "SSKeychain.h"
-#import "SnapMac.h"
+#import "Snappy.h"
 
 @implementation SMJSClient
 

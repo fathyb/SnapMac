@@ -1,3 +1,16 @@
+
+@-webkit-keyframes spin {
+    from {
+    	-webkit-transform: rotate(0);
+    }
+    to {
+    	-webkit-transform: rotate(359deg);
+    }
+}
+
+.spin {
+	-webkit-animation: spin infinite 0.5s linear;
+}
 html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote,
 pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd,
 q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt,
@@ -31,6 +44,14 @@ body {
 	background-size: 100%;
 	border-left: 1px solid black;
 	overflow: hidden;
+}
+
+.icon {	
+	font-family: 'ElegantIcons';
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
 }
 
 ol, ul {
@@ -74,7 +95,9 @@ h1 {
     margin: 20px 0;
     
 }
-
+button {
+	color: initial !important;
+}
 button:not(.sendPageActions button) {
     background: -webkit-linear-gradient(rgb(249, 249, 249), rgb(235, 235, 235));
     border: 1px solid rgb(147, 162, 154);
@@ -92,38 +115,81 @@ body.loading section, body.offline section {
 }
 section header {
 	background-color: rgba(0, 0, 0, 0.31);
-	margin: -20px 0 30px -20px;
+	margin: -20px 0 0 -20px;
 	color: white;
 	width: -webkit-calc(100% + 40px);
 	height: 50px;
 	line-height: 50px;
+	box-shadow: 0 0 10px gray;
+	z-index: 99999;
+	position: relative;
+}
+.loginPage header {
+	margin-bottom: 20px;
+}
+section header>span {
+	font-family: 'ElegantIcons';
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 50px;
+	font-size: 20px;
+	color: white;
+	opacity: 0.7;
+	-webkit-transition: all 0.5s, font-size 0;
+	position: absolute;
+	top: 0;
+}
+section header span:hover {
+	opacity: 1;
+}
+section header .leftButton {
+	float: left;
+	margin-left: 15px;
+	left: 10px;
+}
+.iOSSync, .androSync{
+	padding: 20px 0;
 }
 section {
-	-webkit-transition: all 0.5s, -webkit-transform 1s ease-in, -webkit-perspective-origin-x 0, -webkit-perspective-origin-y 0;
+	-webkit-transition: all 0.5s, -webkit-transform 1s ease-in-out, -webkit-perspective-origin-x 0, -webkit-perspective-origin-y 0;
 	position: absolute;
 	height: 100%;
 	width: -webkit-calc(100% - 40px);
 	right: 0;
-	left: 0;
-	bottom: 110%;
+	top: 0;
+	-webkit-transform: translate(-110%) scale(0.7);
 	box-shadow: 0px 0px 10px black;
 	overflow: auto;
+	padding: 0 20px;
+	overflow: hidden;
+}
+
+section .content {
+	height: -webkit-calc(100% - 75px) !important;
+	width: -webkit-calc(100% - 10px) !important;
+	padding: 25px 25px 0 25px;
+	margin: 0;
+	margin-left: -20px;
+	overflow: auto;
+	-webkit-transition: all 0.5s;
 	-webkit-perspective : 1500px;
 	-webkit-perspective-origin: 50% 50%;
-	padding: 0 20px;
 }
+
 section.sendPage {	
 	padding: 0;
 	width: 100%;
 }
 section.active {
-    bottom: 0;
+	-webkit-transform: translate(0) scale(1);
 }
-section.zoom {
+section .zoom {
     -webkit-transform: scale(60);
     overflow: hidden;
 }
-section.zoom .friend {
+section .zoom .friend {
     opacity: 0;
 }
 div.offlinePage {
@@ -165,6 +231,10 @@ div.snap[data-media-type="1"], div.snap[data-media-type="2"], div.snap[data-medi
 }
 div.snap {
     cursor: pointer;
+}
+div.snap .icon {
+	font-size: 17px;
+	 padding: 0 5px;
 }
 body.enable3d div.snap:hover, body.enable3d div.friend:hover {
 	-webkit-transform: rotateX(0deg);
@@ -250,10 +320,6 @@ div.snap.hide[data-media-type="1"], div.snap.hide[data-media-type="2"], div.snap
 }
 .acceptFriend:hover {
     background-color: rgba(0,128,0,0.5) !important;
-}
-@-webkit-keyframes numStoriesAnim {
-    from {color: black;}
-    to {color: lightblue;}
 }
 .numStories {
     color: rgb(27, 173, 255);
@@ -395,16 +461,16 @@ section input[type=search]::-webkit-input-placeholder {
     background-color: rgba(86, 238, 255, 0.37);
 }
 div.storiesToolbox {
-    -webkit-transform: scale(-webkit-calc(1 / 60)) translateZ(0);
-    -webkit-font-smoothing: subpixel-antialiased;
-    -webkit-backface-visibility: hidden;
-    z-index: 99999;
-    position: absolute;
-    overflow: auto;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
+	-webkit-transform: scale(-webkit-calc(1 / 60)) translateZ(0);
+	-webkit-font-smoothing: subpixel-antialiased;
+	-webkit-backface-visibility: hidden;
+	z-index: 99999;
+	position: absolute;
+	overflow: auto;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	left: 0;
 	opacity: 0;
 	-webkit-transition: 0.5s;
 }
@@ -413,7 +479,7 @@ div.storiesToolbox {
 }
 
 .storyBox {
-    margin-bottom: 15px;
+    margin-top: 20px;
     -webkit-transition: .5s;
 }
 .storyBox .imgStory {
@@ -464,7 +530,7 @@ body>.toggleCam {
 	width: 40px;
 	height: 50px;
 	display: inline-block;
-	background-color: rgba(255, 255, 255, 0.2);
+	background-color: rgba(0, 0, 0, 0.2);
 	position: fixed;
 	text-align: center;
 	top: 50%;
@@ -485,7 +551,8 @@ body>.toggleCam {
 	-webkit-transform: rotate(0deg);
 }
 body>.toggleCam:hover, body>.toggleCam:active {
-	background-color: rgba(255, 255, 255, 0.8);
+	background-color: rgba(255, 255, 255, 0.9);
+	box-shadow: 0 0 10px rgba(49, 49, 49, 0.2);
 	color: black;
 }
 

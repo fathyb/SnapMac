@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6206.8" systemVersion="14A388a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6249" systemVersion="14A388a" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6206.8"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6249"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="About">
             <connections>
-                <outlet property="aboutWindow" destination="2Ax-LJ-986" id="62s-lU-z4R"/>
+                <outlet property="aboutWindow" destination="2Ax-LJ-986" id="Lp2-hd-LKL"/>
             </connections>
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="2Ax-LJ-986" customClass="NSPanel">
-            <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" utility="YES" documentModal="YES"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="2Ax-LJ-986">
+            <windowStyleMask key="styleMask" closable="YES" miniaturizable="YES" utility="YES" documentModal="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="139" y="81" width="324" height="439"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
-            <view key="contentView" appearanceType="aqua" id="ipC-Ph-C7D">
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <view key="contentView" appearanceType="aqua" id="ipC-Ph-C7D" customClass="NSVisualEffectView">
                 <rect key="frame" x="0.0" y="0.0" width="324" height="439"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
@@ -87,12 +88,12 @@
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="closeAbout:" target="-2" id="Umw-28-IoH"/>
+                            <action selector="closeAbout:" target="-2" id="nUn-TN-BvF"/>
                         </connections>
                     </button>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="109" y="252.5"/>
+            <point key="canvasLocation" x="-125" y="-5.5"/>
         </window>
     </objects>
     <resources>

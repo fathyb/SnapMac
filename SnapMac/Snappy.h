@@ -15,8 +15,9 @@
 #import "SMHTTPServer.h"
 #import "SMPhotoButton.h"
 #import "About.h"
+#import "SMWindow.h"
 
-@interface SnapMac : NSObject <NSApplicationDelegate, NSSplitViewDelegate, NSUserNotificationCenterDelegate, NSWindowDelegate> {
+@interface Snappy : NSObject <NSApplicationDelegate, NSSplitViewDelegate, NSUserNotificationCenterDelegate, NSWindowDelegate> {
     __weak NSPopUpButton *effectList;
 }
 
@@ -34,7 +35,7 @@
 @property (weak) IBOutlet   SMCamView* camView;
 @property (weak) IBOutlet   NSPopUpButton* effectList;
 @property (weak) IBOutlet   SMPhotoButton* photoButton;
-@property (assign) IBOutlet NSWindow* window;
+@property (assign) IBOutlet SMWindow* window;
 @property (weak) IBOutlet NSLayoutConstraint *photoToolsYPos;
 @property (weak) IBOutlet NSView *photoToolsView;
 @property (nonatomic) About* about;

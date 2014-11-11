@@ -10,6 +10,7 @@
 
 @interface SMFileCollector : NSObject
 
-+(NSString*)saveSnap:(NSString*)snap withData:(NSData*)data;
++(void)save:(NSString*)identifier withData:(NSData*)data andCallback:(SMCallback)callback;
++(void)urlsForMedia:(NSString*)media andCallback:(SMCallback)callback;
 
 @end

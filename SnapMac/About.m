@@ -12,17 +12,15 @@
 
 -(instancetype)init {
     if(self = [super init]) {
+        
         _window = [[NSApplication sharedApplication] mainWindow];
-        
-        
-        
-        /*NSDictionary *info = [[NSBundle mainBundle] infoDictionary];
-         NSString *version = [info objectForKey:@"CFBundleShortVersionString"];*/
         
         [[NSBundle mainBundle] loadNibNamed:@"About"
                                       owner:self
                             topLevelObjects:nil];
         
+        _aboutWindow.opaque = NO;
+        _aboutWindow.backgroundColor = [NSColor clearColor];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(showAbout)
@@ -38,12 +36,16 @@
 }
 
 - (void)showAbout {
-    [NSApp beginSheet:_aboutWindow modalForWindow:_window modalDelegate:nil didEndSelector:nil contextInfo:nil];
+    [NSApp beginSheet:_aboutWindow
+       modalForWindow:_window
+        modalDelegate:nil
+       didEndSelector:nil
+          contextInfo:nil];
 }
 
 - (IBAction)closeAbout:(id)sender {
     [NSApp endSheet:_aboutWindow];
-    [_aboutWindow orderOut:self];
+    [_aboutWindow orderOut:nil];
 }
 
 @end

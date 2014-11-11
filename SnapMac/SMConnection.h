@@ -13,7 +13,7 @@
 
 +(NSString*)sha1ForString:(NSString*)string;
 +(NSString*)tokenWithAuthToken:(NSString*)authToken;
-+(NSString*)tokenWithAuthToken:(NSString*)authToken andTimeStamp:(int)timestamp;
++(NSString*)tokenWithAuthToken:(NSString*)authToken andTimeStamp:(NSTimeInterval)timestamp;
 +(void)getDataRequestToURL:(NSString*)urlString andCallback:(SMCallback)block;
 +(void)requestToURL:(NSString*)urlString withData:(NSDictionary*)dict andCallback:(SMCallback)block;
 +(void)requestToURL:(NSString*)urlString withData:(NSDictionary*)dict andCallback:(SMCallback)block asData:(BOOL)asData;
