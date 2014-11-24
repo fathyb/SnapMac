@@ -179,6 +179,9 @@ BOOL isHandlingEvent;
         CGDisplayFade(fadeToken, duration, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal,flashColor.redComponent, flashColor.greenComponent, flashColor.blueComponent, false);
     
 }
+-(void)settingsLoaded:(NSNotification*)notification {
+    _settings = notification.object;
+}
 -(void)awakeFromNib {
     
     for(NSLayoutConstraint *constraint in self.superview.superview.constraints) {
@@ -187,11 +190,16 @@ BOOL isHandlingEvent;
         _positionLeft.constant = 0;
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(screenResize) name:NSWindowDidResizeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(settingsLoaded:)
+                                                 name:@"SnappySettingsLoaded"
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(screenResize)
+                                                 name:NSWindowDidResizeNotification
+                                               object:nil];
     [self showLoading];
-    [SMSettings addOnloadBlock:^(SMSettings* settings) {
-        _settings = settings;
-    }];
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error = nil;
     
@@ -235,35 +243,26 @@ BOOL isHandlingEvent;
 }
 -(void)screenResize {
     if(_positionLeft.constant != 0)
-        _positionLeft.constant = -self.bounds.size.width;
+            _positionLeft.constant = -self.bounds.size.width;
 }
 -(void)showAndUseCamera:(BOOL)showCamera {
     _positionLeft.animator.constant = 0;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowingCamera"
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowingCamera"
                                                             object:self];
-        if(showCamera) {
-            [self performSelectorOnMainThread:@selector(showLoading) withObject:nil waitUntilDone:YES];
-            usleep(1000000);
-            [self performSelectorOnMainThread:@selector(cleanStart) withObject:nil waitUntilDone:YES];
-            sleep(2);
-            [self hideLoading];
-        }
-    });
+    
+    if(showCamera)
+        [self cleanStart];
 }
 -(void)show {
     [self showAndUseCamera:YES];
 }
 -(void)hide {
     _positionLeft.animator.constant = -self.bounds.size.width;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"ClosingCamera"
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ClosingCamera"
                                                             object:self];
-        sleep(1);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self cleanStop];
-        });
-    });
+    [self cleanStop];
 }
 
 -(NSView*)photoTools {
@@ -357,8 +356,18 @@ BOOL isHandlingEvent;
     self.showFilterList = YES;
     self.showPhotoTools = YES;
     
-    if(!session.isRunning)
-            [session startRunning];
+    if(!session.isRunning) {
+        [self showLoading];
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+            //[session startRunning];
+            //[session performSelectorOnMainThread:@selector(startRunning) withObject:nil waitUntilDone:YES];
+            sleep(2);
+            [self hideLoading];
+        });
+    }
+        //[session startRunning];
+    
     [self resetSubviews];
 }
 -(void)cleanStop {
@@ -388,5 +397,8 @@ BOOL isHandlingEvent;
     [self resetSubviews];
 }
 
++(BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector {
+    return NO;
+}
 
 @end

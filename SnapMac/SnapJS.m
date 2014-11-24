@@ -15,6 +15,7 @@
 #import "SMFileCollector.h"
 #import "NSData+Base64.h"
 #import "SSKeychain.h"
+#import "SMConnection.h"
 
 
 static SnapJS *SnapJSSharedInstance;
@@ -22,6 +23,13 @@ BOOL use3D;
 
 NSString *api(NSString *url) {
 	return [NSString stringWithFormat:@"https://feelinsonice-hrd.appspot.com%@", url];
+}
+
+NSString *UUID() {
+	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
+	NSString *uuidString = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
+	CFRelease(uuid);
+	return uuidString;
 }
 
 NSData *padData(NSData *data) {
@@ -82,7 +90,6 @@ BOOL isError(id obj) {
 	if(SnapJSSharedInstance)
 		return SnapJSSharedInstance;
 	if(self = [super init]) {
-		
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(showingCamera)
 													 name:@"ShowingCamera"
@@ -91,7 +98,11 @@ BOOL isError(id obj) {
 												 selector:@selector(closingCamera)
 													 name:@"ClosingCamera"
 												   object:nil];
-		[self logon];
+		
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(settingsLoaded:)
+													 name:@"SnappySettingsLoaded"
+												   object:nil];
 	}
 	SnapJSSharedInstance = self;
 	return self;
@@ -105,68 +116,62 @@ BOOL isError(id obj) {
 }
 
 #pragma mark Comptes et connection
-
--(void)logon {
-	_login = [[NSUserDefaults standardUserDefaults] objectForKey:@"SMLogin"];
-	_authToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"SMAuthToken"];
-	[self testWithCallback:^(id result) {
-		if(isError(result)) {
-			NSError *err = (NSError*)result;
-			if(err.code == 3) {
-				
-			}
-		}
-		else {
-			_logged = true;
-		}
-	}];
+-(void)setUsername:(NSString *)username {
+	[[SMSettings sharedInstance] setObject:username forKey:@"SMUsername"];
+	_username = username;
 }
-
--(void)loginWithUser:(NSString*)user password:(NSString*)password andCallback:(NSString*)callback {
+-(void)setAuthToken:(NSString *)authToken {
+	[[SMSettings sharedInstance] setObject:authToken forKey:@"SMAuthToken"];
+	_authToken = authToken;
+}
+-(void)settingsLoaded:(NSNotification*)notification {
+	_username = [[SMSettings sharedInstance] objectForKey:@"SMUsername"];
+	_authToken = [[SMSettings sharedInstance] objectForKey:@"SMAuthToken"];
+}
+-(void)loginWithUser:(NSString*)user password:(NSString*)password andCallback:(WebScriptObject*)callback {
 	[self testLogin:user
 		   password:password
 		andCallback:^(id result) {
-		if(isError(result)) {
-			_logged = NO;
-			SnapCall(callback, jsError(result), nil);
-		}
-		else {
-			_logged = YES;
-			SnapCall(callback, result, nil);
-		}
+			BOOL error	 = isError(result);
+				 _logged = !error;
+			
+			[callback call:error ? jsError(result) : result, nil];
 	}];
 }
 
 -(void)testLogin:(NSString*)login password:(NSString*)password andCallback:(SMCallback)callback {
-	[self requestTo:@"/bq/login"
-		   withData:@{@"username":login, @"password": password}
+	[self requestTo:@"/loq/login"
+		   withData:@{
+					  @"username": login,
+					  @"password": password
+					}
 		andCallback:^(id result) {
 			if([result isKindOfClass:[NSDictionary class]]) {
-				NSDictionary *rep = (NSDictionary*)result;
+				NSDictionary *rep = result[@"updates_response"];
 				
-				if([rep[@"logged"] isEqualToNumber:@0]) {
+				if(!rep) {
 					NSString *message = nil;
 					SnappyError error = SnappyErrorUnknowError;
 					
 					error = [@{
 							   @(-100) : @(SnappyErrorBadPassword),
 							   @(-101) : @(SnappyErrorBadUsername)
-							  }[rep[@"status"]] integerValue];
+							  }[result[@"status"]] integerValue];
 					
-					message = rep[@"message"];
+					message = result[@"message"];
 					
 					callback(nserror(error, message));
 				}
 				else {
-					_authToken = rep[@"auth_token"];
-					_login	   = rep[@"username"];
+					self.authToken = rep[@"auth_token"];
+					self.username  = rep[@"username"];
 					callback(@{
-							   @"updates": rep
-							   });
+							   @"updates": result
+							});
 				}
 			}
 			else {
-				callback(nserror(SnappyErrorFailedToConnect, @"Impossible de se connecter à SnapChat!"));
+				callback(nserror(SnappyErrorFailedToConnect, @"Impossible de se connecter à Snapchat!"));
 			}
 	}];
 }
@@ -177,20 +182,22 @@ BOOL isError(id obj) {
 }
 
 #pragma mark WebKit
--(void)setWso:(WebScriptObject *)wso {
-	_wso = wso;
-	SnapBackWSO = wso;
+-(void)setWebView:(SMWebUI*)webView {
+	_webView = webView;
+	SBWebView = webView;
 }
 +(NSString*)webScriptNameForSelector:(SEL)sel {
 	NSDictionary *selectors = @{
 		@"getSnap:withCallback:": @"getSnap",
+		@"showInFinder:": @"showInFinder",
 		@"getKeychainWithCallback:": @"getKeychain",
 		@"showMedia:": @"showMedia",
         @"getStory:withKey:iv:andCallback:": @"getStory",
 		@"getUpdates:": @"getUpdates",
 		@"getStories:": @"getStories",
 		@"sendSnapTo:withMedia:": @"sendSnap",
-		@"loginWithUser:password:andCallback:": @"login"
+		@"loginWithUser:password:andCallback:": @"login",
+		@"testCallback:": @"testCallback"
 	};
 	for(NSString *selName in selectors) {
 		if(NSSelectorFromString(selName) == sel) return selectors[selName];
@@ -198,7 +205,7 @@ BOOL isError(id obj) {
 	return nil;
 }
 
-+ (BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector {
++(BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector {
 	return NO;
 }
 
@@ -213,11 +220,11 @@ BOOL isError(id obj) {
 }
 -(void)requestTo:(NSString*)url withData:(NSDictionary*)data andCallback:(SMCallback)callback asData:(BOOL)asData {
 	
-	if(!_login)
-		_login = @"";
+	if(!_username)
+		_username = @"";
 	
 	NSMutableDictionary *parameters				 = [SMConnection genericDataWithToken:_authToken];
-						 parameters[@"username"] = _login;
+						 parameters[@"username"] = _username;
 	
 	if(data) {
 		if(data[@"username"])
@@ -227,41 +234,45 @@ BOOL isError(id obj) {
 			parameters[key] = data[key];
 	}
 	
-	AFHTTPRequestOperationManager *manager = [AFHTTPRequestOperationManager manager];
-	manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-	
 	void (^successBlock)() = ^(AFHTTPRequestOperation *operation, NSData *responseObject) {
+		
 		if(asData) {
 			callback(responseObject);
 		}
 		else {
-			NSError *error = nil;
-			NSString *json = [NSJSONSerialization JSONObjectWithData:responseObject options:kNilOptions error:&error];
-			if(!error)
-				callback(json);
-			else {
-				callback([NSString stringWithUTF8String:responseObject.bytes]);
-				
-			}
+			NSError  *error = nil;
+			NSString *json  = [NSJSONSerialization JSONObjectWithData:responseObject
+															  options:kNilOptions
+																error:&error];
+			
+			callback(error ? [NSString stringWithUTF8String:responseObject.bytes] : json);
 		}
 	};
 	void (^failureBlock)() = ^(AFHTTPRequestOperation *operation, NSError *error) {
 		callback(AFError(error, YES));
 	};
 	
-	if(data) {
-		[manager POST:api(url)
-		   parameters:parameters
-			  success:successBlock
-			  failure:failureBlock];
-	}
-	else {
-		[manager GET:api(url)
-		  parameters:parameters
-			 success:successBlock
-			 failure:failureBlock];
 	
-	}
+	
+	NSError				*error	 = nil;
+	NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] requestWithMethod:@(data ? "POST" : "GET")
+																				 URLString:api(url)
+																				parameters:parameters
+																					 error:&error];
+	
+	[request setValue:@"Snapchat/"SNAPCHAT_VERSION" (iPhone; iOS 8.1.1; gzip)"
+   forHTTPHeaderField:@"User-Agent"];
+	
+	
+	AFHTTPRequestOperation *manager = [[AFHTTPRequestOperation alloc] initWithRequest:request];
+	
+	[manager setCompletionBlockWithSuccess:successBlock
+								   failure:failureBlock];
+	
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		[manager start];
+	});
+	
 }
 
 #pragma mark API
@@ -280,44 +291,30 @@ BOOL isError(id obj) {
 		[[self camView] showImageFile:urls[@"filePath"]];
 	}];
 }
--(NSString*)hasSnapSaved:(NSString*)snapid {
-	return [self hasSnapSaved:snapid forNative:NO];
-}
--(NSString*)hasSnapSaved:(NSString*)snapid forNative:(BOOL)native {
-	NSFileManager *fManager = [NSFileManager defaultManager];
-	NSArray *snaps = [fManager contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/SnapMac/", NSHomeDirectory()] error:nil];
-	for(NSString *snap in snaps) {
-		if([snap hasPrefix:[NSString stringWithFormat:@"%@_thumb", snapid]] && !native) return [NSString stringWithFormat:@"%@/SnapMac/%@", NSHomeDirectory(), snap];
-		if([snap hasPrefix:snapid] && !([snap hasSuffix:@"."] || ([snap hasSuffix:@".mp4"] && !native))) return [NSString stringWithFormat:@"%@/SnapMac/%@", NSHomeDirectory(), snap];
-	}
-	return nil;
-}
 -(void)sendSnapTo:(NSString*)to withMedia:(NSString*)mediaPath andCallback:(Callback)callback {
 	
 	NSImage *media = [[NSImage alloc] initWithContentsOfFile:mediaPath];
 	
 	if([media isKindOfClass:[NSImage class]]) {
 		
-		NSString *guuid	  = [NSString stringWithFormat:@"%@~%@", _login.uppercaseString, [SMClient uuidString].lowercaseString];
+		NSString *guuid	  = [NSString stringWithFormat:@"%@~%@", _username.uppercaseString, UUID().lowercaseString];
 		NSData	 *imgData = [(NSImage*)media dataForFileType:NSJPEGFileType];
 		NSData	 *data	  = [SMCrypto encryptSnap:imgData];
 		
 		if(data) {
 			[self requestTo:@"/bq/upload"
 				   withData:@{
-								@"username"	: _login,
+								@"username"	: _username,
 								@"media_id"	: guuid,
 								@"type"		: @0,
 								@"data"		: data
 							}
 				andCallback:^(NSString *result) {
-							   NSError *error = nil;
-							   if([result isKindOfClass:[NSError class]]) {
-								   error = (NSError*)result;
-							   }
-							   if(!result.length || [result isEqualToString:@""]) {
+								if(isError(result))
+									SnapCall(callback, jsError(result), nil);
+								else if(!result.length || [result isEqualToString:@""]) {
 								   
-								   [self requestTo:@"/bq/send"
+									[self requestTo:@"/bq/send"
 										  withData:@{
 													 @"media_id" : guuid,
 													 @"recipient": to,
@@ -343,10 +340,10 @@ BOOL isError(id obj) {
 		}
 	}
 }
--(void)getSnap:(NSString*)snapid withCallback:(Callback)callback {
+-(void)getSnap:(NSString*)snapid withCallback:(WebScriptObject*)callback {
 	[SMFileCollector urlsForMedia:snapid andCallback:^(NSDictionary* urls) {
 		if(urls)
-			return SnapCall(callback, urls, nil);
+			return [callback call:urls, nil];
 		
 		[self requestTo:@"/ph/blob"
 			   withData:@{
@@ -354,113 +351,105 @@ BOOL isError(id obj) {
 						  }
 			andCallback:^(id result) {
 				if(isError(result)) {
-					SnapCall(callback, jsError(result), nil);
+					[callback call:jsError(result), nil];
 				}
 				else if([result isKindOfClass:[NSData class]]) {
 					NSData *decryptedSnap = [SMCrypto decryptSnap:result];
 					if(isError(decryptedSnap)) {
-						SnapCall(callback, jsError(decryptedSnap), nil);
+						[callback call:jsError(decryptedSnap), nil];
 					}
 					else {
 						[SMFileCollector save:snapid
 									 withData:decryptedSnap
 								  andCallback:^(NSDictionary* urls) {
 									  if(!urls)
-										  SnapCall(callback,
-												   jsError(nserror(-20, @"Erreur lors de l'enregistrement d'un snap")),
-												   nil);
+										  [callback call:jsError(nserror(-20, @"Erreur lors de l'enregistrement d'un snap")), nil];
 									  else
-										  SnapCall(callback,
-												   urls,
-												   nil);
+										  [callback call:urls, nil];
 								  }];
 					}
 				}
 			} asData:YES];
 	}];
 }
--(void)getStory:(NSString*)identifier withKey:(NSString*)keyString iv:(NSString*)ivString andCallback:(Callback)callback {
-    NSString *saved = [self hasSnapSaved:identifier];
-	
-	if(saved) {
-		SnapCall(callback, @{@"url": saved}, nil);
-		return;
-	}
-	
-	NSString *storyPath = [NSString stringWithFormat:@"/bq/story_blob?story_id=%@", identifier];
-	NSData	 *key		= [NSData dataFromBase64String:keyString];
-	NSData	 *iv		= [NSData dataFromBase64String:ivString];
-	
-	[self requestTo:storyPath
-		   withData:nil
-		andCallback:^(NSData *result) {
+-(void)getStory:(NSString*)identifier withKey:(NSString*)keyString iv:(NSString*)ivString andCallback:(WebScriptObject*)callback {
+	[SMFileCollector urlsForMedia:identifier andCallback:^(NSDictionary* urls) {
 		
-		if(isError(result)) {
-			SnapCall(callback, jsError(result), nil);
-		}
-		else if([result isKindOfClass:[NSData class]]) {
-			NSData *decryptedStory = [SMCrypto decryptStory:result
-													withKey:key
-													  andIv:iv];
-			
-			if(isError(decryptedStory)) {
-				SnapCall(callback, jsError(decryptedStory), nil);
-			}
-			else {
-				[SMFileCollector save:identifier
-							 withData:decryptedStory
-						  andCallback:^(NSDictionary *urls) {
-							  SnapCall(callback, urls, nil);
-						  }];
-			}
-		}
-	} asData:YES];
+		if(urls)
+			return [callback call:urls, nil];
+		
+		NSString *storyPath = [NSString stringWithFormat:@"/bq/story_blob?story_id=%@", identifier];
+		NSData	 *key		= [NSData dataFromBase64String:keyString];
+		NSData	 *iv		= [NSData dataFromBase64String:ivString];
+		
+		[self requestTo:storyPath
+			   withData:nil
+			andCallback:^(NSData *result) {
+				
+				if(isError(result)) {
+					[callback call:jsError(result), nil];
+				}
+				else if([result isKindOfClass:[NSData class]]) {
+					NSData *decryptedStory = [SMCrypto decryptStory:result
+															withKey:key
+															  andIv:iv];
+					
+					if(isError(decryptedStory))
+						[callback call:jsError(decryptedStory), nil];
+					else
+						[SMFileCollector save:identifier
+									 withData:decryptedStory
+								  andCallback:^(NSDictionary *urls) {
+									  [callback call:urls, nil];
+								  }];
+				}
+			} asData:YES];
+	}];
 
 }
--(void)getUpdates:(Callback)callback {
-	[self requestTo:@"/bq/updates"
+-(void)getUpdates:(WebScriptObject*)callback {
+	[self requestTo:@"/loq/all_updates"
 		   withData:@{}
 		andCallback:^(id result) {
-		if(isError(result)) {
-			SnapCall(callback, AFError(result, YES), nil);
-		}
-		else {
-			SnapCall(callback, result, nil);
-		}
+		if(isError(result))
+			[callback call:AFError(result, YES), nil];
+		else
+			[callback call:result, nil];
 	}];
 }
 -(void)getStories:(Callback)callback {
 	[self requestTo:@"/bq/stories"
 		   withData:@{}
 		andCallback:^(id result) {
-			
-			if(!isError(result)) {
+			if(!isError(result))
 				SnapCall(callback, result, nil);
-			}
-			else {
+			else
 				SnapCall(callback, AFError(result, YES), nil);
-			}
 		}];
 }
 
--(void)getKeychainWithCallback:(Callback)callback {
+-(void)getKeychainWithCallback:(WebScriptObject*)callback {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
 		NSError		 *error	  = nil;
 		NSDictionary *account = [SSKeychain accountsForService:@"SnapMac"][0];
-		NSString	 *pass	  = [SSKeychain passwordForService:@"SnapMac" account:account[@"acct"] error:&error];
+		NSString	 *pass	  = [SSKeychain passwordForService:@"SnapMac"
+													   account:account[@"acct"]
+														 error:&error];
 		
 		if(error)
-			SnapCall(callback,
-					 jsError(nserror(200, @"Erreur lors de l'accès aux trousseau de clés")),
-					 nil);
-		else {
-			SnapCall(callback,
-					 @{
-						 @"login": account[@"acct"],
-						 @"pass" : pass
-					 },
-					 nil);
-		}
+			[callback call:jsError(nserror(200, @"Erreur lors de l'accès aux trousseau de clés")), nil];
+		else
+			[callback call:@{
+							 @"login": account[@"acct"],
+							 @"pass" : pass
+							}, nil];
+	});
+}
+
+-(void)showInFinder:(NSString*)url {
+	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+		[[NSWorkspace sharedWorkspace] selectFile:url
+						 inFileViewerRootedAtPath:url.stringByDeletingLastPathComponent];
 	});
 }
 
@@ -485,10 +474,12 @@ BOOL isError(id obj) {
 }
 
 -(id)script:(NSString*)command {
-	return [_wso evaluateWebScript:command];
+	return [_webView.windowScriptObject evaluateWebScript:command];
 }
 -(void)scriptTS:(NSString*)command {
-	[_wso performSelectorOnMainThread:@selector(evaluateWebScript:) withObject:command waitUntilDone:NO];
+	[_webView.windowScriptObject performSelectorOnMainThread:@selector(evaluateWebScript:)
+												  withObject:command
+											   waitUntilDone:NO];
 }
 
 -(void)setUse3D:(BOOL)use3d {

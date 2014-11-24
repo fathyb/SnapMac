@@ -23,28 +23,9 @@ void debugOutput(char* filename, const char* function, int linenumber, NSString*
                                                   length:strlen(filename)
                                                 encoding:NSUTF8StringEncoding];
     
-    NSString *format = [NSString stringWithFormat:@"[%@ -> %s][ligne %d] : %@", [filePath lastPathComponent], function, linenumber, input];
+    NSString *format = [NSString stringWithFormat:@"[%@ -> %s][ligne %d] : %@", filePath.lastPathComponent, function, linenumber, input];
     
     va_start(argList, input);
-    
-    NSString *directory = [NSString stringWithFormat:@"%@/SnapMac", NSHomeDirectory()];
-    BOOL isDir;
-    NSFileManager *fileManager= [NSFileManager defaultManager];
-    if(![fileManager fileExistsAtPath:directory isDirectory:&isDir])
-        if(![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:NULL])
-            NSLog(@"Error: Create folder failed %@", directory);
-    
-    
-    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    
-    NSDictionary *defaultParams = @{
-        @"SMDefaultTheme": @"",
-        @"SMStoryAnimation": @"true"
-    };
-    for(NSString *key in defaultParams) {
-        if(![defaults objectForKey:key])
-            [defaults setObject:defaultParams[key] forKey:key];
-    }
     NSLogv(format, argList);
     va_end(argList);
 }

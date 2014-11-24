@@ -7,7 +7,6 @@
 //
 
 #import "Snappy.h"
-#import "SMClient.h"
 #import "SMConnection.h"
 #import "ASIFormDataRequest.h"
 #import "SMAndroidSync.h"
@@ -105,7 +104,7 @@ BOOL hideDivider = NO;
     return YES;
 }
 -(void)showSend {
-    [self.webView script:@"showSend();"];
+    [self.webView script:@"SnappyUI.SendPage.show();"];
 }
 - (IBAction)cancelPhotoView:(id)sender {
     [self.camView cleanStart];
@@ -115,7 +114,7 @@ BOOL hideDivider = NO;
 - (IBAction)showMySnaps:(id)sender {
 }
 - (IBAction)showFeed:(id)sender {
-    [self.webView script:@"SnappyUI.SnapsPage.show();"];
+    [self.webView script:@"SnappyUI.FeedPage.show();"];
 }
 - (IBAction)showFriends:(id)sender {
     [self.webView script:@"SnappyUI.FriendsPage.show();"];
@@ -278,24 +277,6 @@ BOOL hideDivider = NO;
     for(NSString* effect in _effects) {
         if([CIFilter filterWithName:_effects[effect]] != nil) [effectList addItemWithTitle:effect];
     }
-}
-
-
--(void)refreshBounds {
-    /*[_previewLayer display];
-    [_camView.layer display];
-    CGFloat yBtn = _camView.frame.size.height - 200;
-    CGFloat xBtn = (_camView.frame.size.width + 100)/2;
-    _mainButtonView.frame = CGRectMake(xBtn, yBtn, 100, 100);
-    _camView.layer.frame = _camView.bounds;
-    for(CALayer *layer in _camView.layer.sublayers) {
-        if([layer isKindOfClass:[AVPlayerLayer class]]) layer.frame = _camView.bounds;
-    }
-    if(_session.isRunning) _previewLayer.frame = _camView.bounds;
-    else [self showNSImage:current];*/
-}
--(void)windowDidResize:(NSNotification *)notification {
-    [self refreshBounds];
 }
 
 @end

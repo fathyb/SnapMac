@@ -9,7 +9,6 @@
 #import "SMSettings.h"
 
 static SMSettings *sharedInstance;
-static NSMutableArray *onloadBlocks;
 
 @implementation SMSettings
 @synthesize settingsWindow;
@@ -27,24 +26,11 @@ static NSMutableArray *onloadBlocks;
         [self setTheme];
         
         sharedInstance = self;
-        [self checkBlocks];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappySettingsLoaded" object:self];
     }
     return self;
 }
--(void)checkBlocks {
-    for(SMCallback callback in [onloadBlocks copy]) {
-        callback(self);
-        [onloadBlocks removeObject:callback];
-    }
-}
-+(void)addOnloadBlock:(SMCallback)onloadBlock {
-    if(!onloadBlocks)
-        onloadBlocks = [NSMutableArray new];
-    [onloadBlocks addObject:onloadBlock];
-    
-    if(sharedInstance)
-        [sharedInstance checkBlocks];
-}
+
 +(SMSettings*)sharedInstance {
     return sharedInstance;
 }

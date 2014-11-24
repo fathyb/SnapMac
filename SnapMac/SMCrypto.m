@@ -10,8 +10,8 @@
 
 @implementation SMCrypto
 
-NSString* encryptKey = @"M02cnQ51Ji97vwT4";
-NSString* domain = @"com.fathyb.snappy";
+NSString *encryptKey = @"M02cnQ51Ji97vwT4";
+NSString *domain     = @"com.fathyb.snappy";
 
 
 
@@ -22,7 +22,7 @@ NSString* domain = @"com.fathyb.snappy";
 operation:(CCOperation)operation {
     
     id     result        = nil;
-    void*  buffer        = malloc(data.length);
+    void  *buffer        = malloc(data.length);
     size_t decryptedSize = 0;
     
     CCCryptorStatus cryptStatus = CCCrypt(operation,

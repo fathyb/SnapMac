@@ -11,7 +11,7 @@
 @implementation SMPhotoToolsView
 
 -(void)awakeFromNib {
-    SMFlashButton* flashBtn = [self flashBtn];
+    SMFlashButton __block *flashBtn = [self flashBtn];
     flashBtn.target = self;
     flashBtn.action = @selector(toggleFlash:);
     
@@ -19,14 +19,18 @@
     layer.fillColor = CGColorCreateGenericRGB(0.0, 0.0, 0.0, 0.4);
     self.layer = layer;
     
-    [SMSettings addOnloadBlock:^(SMSettings* settings) {
-        _settings = settings;
-        flashBtn.flashState = [[_settings objectForKey:@"SMUseFlash"] boolValue];
-    }];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(settingsLoaded:)
+                                                 name:@"SnappySettingsLoaded"
+                                               object:nil];
     
     self.cornerRadius = 20;
 }
-
+-(void)settingsLoaded:(NSNotification*)notification {
+    _settings = notification.object;
+    SMFlashButton *flashBtn = [self flashBtn];
+    flashBtn.flashState = [[_settings objectForKey:@"SMUseFlash"] boolValue];
+}
 -(void)setCornerRadius:(CGFloat)cornerRadius {
     _cornerRadius = cornerRadius;
     

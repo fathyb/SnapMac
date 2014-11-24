@@ -20,7 +20,6 @@
 @property NSWindow* window;
 
 -(SMSettings*)initForWindow:(NSWindow*)window;
-+(void)addOnloadBlock:(SMCallback)onloadBlock;
 +(SMSettings*)sharedInstance;
 -(void)show;
 -(void)setObject:(id)object forKey:(NSString*)key;

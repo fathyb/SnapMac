@@ -20,6 +20,7 @@ enum {
 };
 typedef NSInteger SnappyError;
 
+#define SNAPCHAT_VERSION "7.1.0.10"
 
 @interface SnapJS : NSObject
 
@@ -28,7 +29,8 @@ typedef NSInteger SnappyError;
 -(void)setUse3D:(BOOL)use3D;
 
 @property (nonatomic) NSString* authToken;
-@property (nonatomic) NSString* login;
-@property (nonatomic) WebScriptObject* wso;
+@property (nonatomic) NSString* username;
+@property (nonatomic) WebView* webView;
 @property (nonatomic) BOOL logged;
+
 @end

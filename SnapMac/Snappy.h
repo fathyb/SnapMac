@@ -12,7 +12,6 @@
 #import "SMSettings.h"
 #import "SMCamView.h"
 #import "SMImage.h"
-#import "SMHTTPServer.h"
 #import "SMPhotoButton.h"
 #import "About.h"
 #import "SMWindow.h"
@@ -30,7 +29,6 @@
 @property (nonatomic)       SMWebUI* webUI;
 @property (nonatomic)       SMSettings* settingsView;
 @property (nonatomic)       CALayer* progressLayer;
-@property (nonatomic)       SMHTTPServer* server;
 @property (weak) IBOutlet   SMWebUI* webView;
 @property (weak) IBOutlet   SMCamView* camView;
 @property (weak) IBOutlet   NSPopUpButton* effectList;

@@ -7,6 +7,19 @@
     	-webkit-transform: rotate(359deg);
     }
 }
+@-webkit-keyframes storySpin {
+    0% {
+		border-top: 2px solid rgba(255, 255, 255, 0.5);
+    	-webkit-transform: rotate(0);
+    }
+	50% {
+		border-top: 2px solid transparent;
+	}
+    100% {
+		border-top: 2px solid rgba(255, 255, 255, 0.5);
+    	-webkit-transform: rotate(359deg);
+    }
+}
 
 .spin {
 	-webkit-animation: spin infinite 0.5s linear;
@@ -490,14 +503,14 @@ div.storiesToolbox {
     border-radius: 100%;
     border: 2px solid rgba(255, 255, 255, 0.5);
     -webkit-transition: 0.25s ease-in-out;
-    -webkit-transform: scale(0.9);
+}
+.storyBox.loading .imgStory {
+	   -webkit-animation: storySpin 1s linear infinite;
 }
 .storyBox .imgStory:hover {
-    -webkit-transform: scale(1);
 	box-shadow: 0 0 5px black;
 }
 .storyBox .imgStory:active {
-    -webkit-transform: scale(0.8);
 	box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5) inset;
     border-color: rgba(0, 0, 0, 0.5);
 }

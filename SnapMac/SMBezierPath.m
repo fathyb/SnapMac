@@ -13,9 +13,6 @@
 -(CGPathRef)quartzPath {
     NSInteger i,
     numElements             = [self elementCount];
-
-    CGPathRef immutablePath = NULL;
-    numElements             = [self elementCount];
     
     if (numElements > 0) {
         NSPoint points[3];
@@ -51,10 +48,12 @@
         if (!didClosePath)
             CGPathCloseSubpath(path);
         
-        immutablePath = CGPathCreateCopy(path);
+        CGPathRef immutablePath = CGPathCreateCopy(path);
         CGPathRelease(path);
+        
+        return immutablePath;
     }
     
-    return immutablePath;
+    return nil;
 }
 @end
