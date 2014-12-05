@@ -33,6 +33,7 @@ var Snappy = new (function() {
 	
 	var __snapthis = this;
 	
+	this.cache = new Object();
 	
 	this.sendSnap = function(to, img) {
 		SnapJS.sendSnap(to, img);
@@ -50,6 +51,8 @@ var Snappy = new (function() {
 			return callback(result);
 			
 		console.log(result);
+		
+		Snappy.cache.username = result.updates_response.username;
 		
 		var friends		  = new Snappy.FriendList(result),
 			conversations = new Snappy.ConversationList(result),
@@ -88,9 +91,16 @@ var Snappy = new (function() {
 		this.best 		 = false;
 		this.name 		 = raw.name;
 		this.displayName = raw.display || this.name;
-		this.stories	 = [];
+		this.stories	 = new Array();
+		this.isEvent	 = !!raw.is_shared_story;
 		
-		this.changeBlocks = [];
+		if(this.isEvent) {
+			this.expiration = new Snappy.SnappyDate(raw.expiration);
+			this.place = raw.venue;
+			this.mapsURL = "https://www.google.fr/maps/place/"+escape(this.place);
+		}
+		
+		this.changeBlocks = new Array();
 		this.change 	  = function(fn) {
 			if(!fn)
 				for(var i in this.changeBlocks)
@@ -121,8 +131,8 @@ var Snappy = new (function() {
 	
 	this.FriendList = function(updates) {
 	
-		this.friends 	  = [];
-		this.best_friends = [];
+		this.friends 	  = new Array();
+		this.best_friends = new Array();
 		
 		this.friendByName = function(name) {
 			var friend, i;
@@ -135,6 +145,42 @@ var Snappy = new (function() {
 			}
 		}
 		
+		this.getOnlyFriends = function(opts) {
+			
+			if(!opts)
+				opts = {}
+			
+			var dOpts = {
+				showEvents: false,
+				hasStories: true,
+				list: kListByName,
+				order: kOrderAscending
+			};
+			
+			for(var k in dOpts)
+				if(!opts[k])
+					opts[k] = dOpts[k]
+			
+			var arr	    = new Array(),
+				friends = this.listFriends(opts.list, opts.order),
+				friend  = null;
+			
+			for(var i in this.friends) {
+				friend = this.friends[i];
+				
+					
+				if(opts.showEvents && friend.isEvent) {
+					arr.push(friend);
+					continue;
+				}
+				if(opts.hasStories && friend.stories.length) {
+					arr.push(friend);
+					continue;
+				}
+			}
+			
+			return arr;
+		}
 		this.listFriends = function(by, order) {
 			by = (by ? by : kListByName);
 			order = (order ? order : kOrderAscending)
@@ -192,7 +238,7 @@ var Snappy = new (function() {
 		}
 		
 		
-		var jsonFriends = updates["updates_response"].friends,
+		var jsonFriends = updates.updates_response.friends,
 				 friend;
 			
 		for(var i in jsonFriends) {
@@ -200,13 +246,15 @@ var Snappy = new (function() {
 			this.addFriend(friend);
 		}
 		
-		this.attachStories(updates["stories_response"]);
+		this.attachStories(updates.stories_response);
+		
+		Snappy.cache.friends = this;
 		
 		return this;
 	}
 	
 
-	this.Story = function(raw, loadEvent, userInfo) {
+	this.Story = function(raw) {
 		if(!raw.story)
 			return false;
 	
@@ -215,17 +263,23 @@ var Snappy = new (function() {
 			key		= story.media_key,
 			id		= story.media_id;
 		
-		this.state 	= "decrypt";
-		this.id 	= story.media_id;
-		this.date	= new Snappy.SnappyDate(story.timestamp);
+		this.viewed    = raw.viewed;
+		this.state	   = "decrypt";
+		this.id		   = story.media_id;
+		this.duration  = Math.round(story.time);
+		this.date	   = new Snappy.SnappyDate(story.timestamp);
+		this.mediaType = new Snappy.MediaType(story.media_type);
 		
-		this.changeBlocks = [];
+		this.show = function() {
+			SnapJS.showMedia(this.id);
+		}
+		this.changeBlocks = new Array();
 		
 		this.change = function(fn) {
 			if(!fn) {
 				for(var i in this.changeBlocks)
 					this.changeBlocks[i](this);
-				this.changeBlocks = [];
+				this.changeBlocks = new Array();
 			}
 			else
 				this.changeBlocks.push(fn);
@@ -248,27 +302,53 @@ var Snappy = new (function() {
 		
 	}
 	this.ConversationList = function(updates) {
-		this.conversations = [];
+		this.conversations = new Array();
 		
-		for(var i in updates["conversations_response"])
+		for(var i in updates.conversations_response)
 			this.conversations.push(
-				new Snappy.Conversation(updates["conversations_response"][i])
+				new Snappy.Conversation(updates.conversations_response[i])
 			);
 	}
 	this.Conversation = function(conversation) {
-		this.snaps = [];
-		this.users = [];
-		for(var i = 1; i < conversation.participants.length; i++)
-			this.users[i-1] = conversation.participants[i];
+		this.snaps = new Array();
+		this.messages = new Array();
+		this.users = new Array();
+		this.id = conversation.id;
+		this.lastInteraction = new Snappy.SnappyDate(conversation.last_interaction_ts);
+		this.snapsUnread = conversation.pending_received_snaps.length;
+		this.msgUnread = conversation.pending_chats_for.length;
 		
-		var messages = conversation["conversation_messages"]["messages"];
+		this.duration = 0;
+		
+		var user;
+		for(var i in conversation.participants) {
+			user = conversation.participants[i];
+			
+			if(user == Snappy.cache.username)
+				continue;
+				
+			var friend = Snappy.cache.friends.friendByName(user);
+			if(friend)
+				this.users[this.users.length] = friend.displayName;
+			else
+				this.users[this.users.length] = user;
+		}
+		
+		var messages = conversation.conversation_messages.messages;
 		
 		for(var i in messages) {
-			var snap = messages[i].snap;
-			if(snap)
-				this.snaps.push(new Snappy.Snap(snap));
-			else
-				console.log("no snap", conversation);
+			var message = messages[i],
+				snap = message.snap,
+				chat_msg = message.chat_message;
+				
+			if(snap) {
+				snap = new Snappy.Snap(snap);
+				this.snaps.push(snap);
+				if(snap.received)
+					this.duration += snap.timer;
+			}
+			else if(chat_msg)
+				this.messages.push(chat_msg);
 		}
 			
 	}
@@ -286,19 +366,21 @@ var Snappy = new (function() {
 		this.state		= kStateLoading;
 		this.url		= null;
 		this.timer		= raw.t || null;
+		this.read 		= !!this.timer;
 		
-		this.changeBlocks = [];
+		this.show = function() {
+			SnapJS.showMedia(this.id);
+		}		
+		
+		this.changeBlocks = new Array();
 		
 		this.showInFinder = function() {
 			SnapJS.showInFinder(this.urls.filePath);
 		}
 		this.change = function(fn) {
 			if(!fn) {
-				for(var i in this.changeBlocks) {
-					if(typeof this.changeBlocks[i] == "function") {
-						this.changeBlocks[i](this);
-					}
-				}
+				for(var i in this.changeBlocks) 
+					this.changeBlocks[i](this);
 			}
 			else {
 				this.changeBlocks.push(fn);
@@ -327,8 +409,11 @@ var Snappy = new (function() {
 			
 		this.timeSince = function() {
 			
-			var seconds  = Math.floor((new Date() - this.date) / 1000),
-				interval = Math.floor(seconds / 31536000);
+			var seconds  = Math.floor((new Date() - this.date) / 1000);
+			if(seconds < 0)
+				seconds = seconds * -1;
+				
+			var interval = Math.floor(seconds / 31536000);
 			
 			if(interval > 1)
 		        return interval + " années";
@@ -385,49 +470,5 @@ var Snappy = new (function() {
 function SnappyRClickHandler(element) {
 	if(element.style)
 		return Snappy.rightClick(element);
-}
-var SnapBack = function(var1, var2, var3) {
-	if(typeof var1 == "function") {
-		var id = (Math.round(Math.random()*10000000000)).toString();
-			
-		if(!var2)
-			var2 = new Object();
-		
-		Snappy.tmp.SnapBack[id] = new SnapBack(var2, var1, id);
-		
-		return id;
-	}
-	else {
-		for(var k in var1) {
-			this[k] = var1[k];
-		}
-		
-		this.id = var3;
-		this.func = var2;
-		this.call = function() {
-			var vars = "";
-			for(var i in arguments) {
-				vars += "arguments["+i+"]"+(i == arguments.length-1 ? "": ", ");
-			}
-			try {
-				eval("this.func.call(this"+(vars ? ", "+vars : "")+");");
-			}
-			catch(e) {
-				console.error("There is an error with the Snappy runtime!", e);
-				console.log("Var dump :", varsString, this);
-			}
-			this.destroy();
-		}
-		this.destroy = function() {
-			delete Snappy.tmp.SnapBack[this.id];
-		}
-		
-		return this;
-	}
-	
-}
-function SnapCall(id) {
-	return Snappy.tmp.SnapBack[id];
-	
 }
 

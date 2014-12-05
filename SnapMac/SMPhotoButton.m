@@ -25,7 +25,8 @@
 }
 -(void)mouseUp:(NSEvent*)event {
     _down = NO;
-    if(_actionBlock) _actionBlock();
+    if(_actionBlock && self.alphaValue != 0)
+        _actionBlock();
 }
 
 @end

@@ -8,14 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		01041E31199FF5C500816CB4 /* SMButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 01041E30199FF5C500816CB4 /* SMButton.m */; };
+		01083C171A2906BF00578661 /* SnappyOpeationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 01083C161A2906BF00578661 /* SnappyOpeationQueue.m */; };
 		01188AFD1A12B17E009348C3 /* SMBlockItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 01188AFC1A12B17E009348C3 /* SMBlockItem.m */; };
 		011F31DB19D9DEF1009D37DA /* SnappyJS in Resources */ = {isa = PBXBuildFile; fileRef = 011F31DA19D9DEF1009D37DA /* SnappyJS */; };
+		011F91461A29363500F7BBE5 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 011F91381A29363500F7BBE5 /* ioapi.c */; };
+		011F91481A29363500F7BBE5 /* ioapi_mem.c in Sources */ = {isa = PBXBuildFile; fileRef = 011F913C1A29363500F7BBE5 /* ioapi_mem.c */; };
+		011F914C1A29363500F7BBE5 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 011F91421A29363500F7BBE5 /* unzip.c */; };
 		0141819F19F06DFD00078B0C /* ElegantIcons.woff in Resources */ = {isa = PBXBuildFile; fileRef = 0141819E19F06DFD00078B0C /* ElegantIcons.woff */; };
 		0143431419A2FF5400AF7366 /* SMBezierPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 0143431319A2FF5400AF7366 /* SMBezierPath.m */; };
 		0143431719A3066D00AF7366 /* SMFlashButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 0143431619A3066D00AF7366 /* SMFlashButton.m */; };
 		014B8913199D939E00A4DE96 /* SMLoadingView.m in Sources */ = {isa = PBXBuildFile; fileRef = 014B8912199D939E00A4DE96 /* SMLoadingView.m */; };
 		014B8916199DA9ED00A4DE96 /* SMQuitMediaButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 014B8915199DA9ED00A4DE96 /* SMQuitMediaButton.m */; };
 		015771921A0D39B50032CDD5 /* SMWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 015771911A0D39B50032CDD5 /* SMWindow.m */; };
+		015BDB411A2A6F2000600A00 /* SnappyNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 015BDB401A2A6F2000600A00 /* SnappyNotification.m */; };
+		015BDB461A2A725400600A00 /* SnapBack.m in Sources */ = {isa = PBXBuildFile; fileRef = 015BDB451A2A725400600A00 /* SnapBack.m */; };
 		015D04A019F546F800B4F461 /* AFHTTPRequestOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 015D048E19F546F800B4F461 /* AFHTTPRequestOperation.m */; };
 		015D04A119F546F800B4F461 /* AFHTTPRequestOperationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 015D049019F546F800B4F461 /* AFHTTPRequestOperationManager.m */; };
 		015D04A219F546F800B4F461 /* AFHTTPSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 015D049219F546F800B4F461 /* AFHTTPSessionManager.m */; };
@@ -31,7 +37,6 @@
 		01A9F216199C521F003776E3 /* SMPhotoButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 01A9F215199C521F003776E3 /* SMPhotoButton.m */; };
 		01B6A22A19F1B07700E2B22B /* About.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B6A22919F1B07700E2B22B /* About.m */; };
 		01F0B61E19984B66000EF0A9 /* SnapJS.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F0B61D19984B66000EF0A9 /* SnapJS.m */; };
-		01F0B62119985F5F000EF0A9 /* SnapBack.m in Sources */ = {isa = PBXBuildFile; fileRef = 01F0B62019985F5F000EF0A9 /* SnapBack.m */; };
 		4915DFE11904202400969F60 /* Snappy.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4915DFE01904202400969F60 /* Snappy.icns */; };
 		4915DFE619045DAE00969F60 /* SMImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 4915DFE519045DAE00969F60 /* SMImage.m */; };
 		491A367818EA587900285295 /* SMWebUI.m in Sources */ = {isa = PBXBuildFile; fileRef = 491A367718EA587900285295 /* SMWebUI.m */; };
@@ -55,8 +60,6 @@
 		491D2AB018E928590026A755 /* ASIHTTPRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 491D2AA318E928590026A755 /* ASIHTTPRequest.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		491D2AB118E928590026A755 /* ASIInputStream.m in Sources */ = {isa = PBXBuildFile; fileRef = 491D2AA718E928590026A755 /* ASIInputStream.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		491D2AB218E928590026A755 /* ASINetworkQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 491D2AA918E928590026A755 /* ASINetworkQueue.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		49248D1818F023D3009837CD /* pacifico.woff in Resources */ = {isa = PBXBuildFile; fileRef = 49248D1418F023D3009837CD /* pacifico.woff */; };
-		49248D1A18F023DE009837CD /* fonts.css in Resources */ = {isa = PBXBuildFile; fileRef = 49248D1918F023DE009837CD /* fonts.css */; };
 		492A08FA192E62BF00DB0C37 /* play.png in Resources */ = {isa = PBXBuildFile; fileRef = 492A08F9192E62BF00DB0C37 /* play.png */; };
 		4935CBEA18F3135A00BF5586 /* adb in Resources */ = {isa = PBXBuildFile; fileRef = 4935CBE918F3135A00BF5586 /* adb */; };
 		4935CBED18F315E400BF5586 /* SMAndroidSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 4935CBEC18F315E400BF5586 /* SMAndroidSync.m */; };
@@ -75,7 +78,6 @@
 		49CDBDE318F1CEB40097C4B1 /* SSKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = 49CDBDE218F1CEB40097C4B1 /* SSKeychain.m */; };
 		49E2BDED19041A5500BC9DF3 /* About.xib in Resources */ = {isa = PBXBuildFile; fileRef = 49E2BDEC19041A5500BC9DF3 /* About.xib */; };
 		49E8A8E11950D84200005668 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 49E8A8DF1950D84200005668 /* NSData+Base64.m */; };
-		49FB478C18EA6106009B74BA /* glyphish.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 49FB478B18EA6106009B74BA /* glyphish.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,9 +93,18 @@
 /* Begin PBXFileReference section */
 		01041E2F199FF5C500816CB4 /* SMButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMButton.h; sourceTree = "<group>"; };
 		01041E30199FF5C500816CB4 /* SMButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMButton.m; sourceTree = "<group>"; };
+		01083C151A2906BF00578661 /* SnappyOpeationQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnappyOpeationQueue.h; sourceTree = "<group>"; };
+		01083C161A2906BF00578661 /* SnappyOpeationQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnappyOpeationQueue.m; sourceTree = "<group>"; };
 		01188AFB1A12B17E009348C3 /* SMBlockItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMBlockItem.h; path = ../SMBlockItem.h; sourceTree = "<group>"; };
 		01188AFC1A12B17E009348C3 /* SMBlockItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SMBlockItem.m; path = ../SMBlockItem.m; sourceTree = "<group>"; };
 		011F31DA19D9DEF1009D37DA /* SnappyJS */ = {isa = PBXFileReference; lastKnownFileType = folder; path = SnappyJS; sourceTree = "<group>"; };
+		011F91371A29363500F7BBE5 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
+		011F91381A29363500F7BBE5 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
+		011F91391A29363500F7BBE5 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
+		011F913C1A29363500F7BBE5 /* ioapi_mem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi_mem.c; sourceTree = "<group>"; };
+		011F913D1A29363500F7BBE5 /* ioapi_mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi_mem.h; sourceTree = "<group>"; };
+		011F91421A29363500F7BBE5 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
+		011F91431A29363500F7BBE5 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
 		0141819E19F06DFD00078B0C /* ElegantIcons.woff */ = {isa = PBXFileReference; lastKnownFileType = file; path = ElegantIcons.woff; sourceTree = "<group>"; };
 		0143431219A2FF5400AF7366 /* SMBezierPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMBezierPath.h; sourceTree = "<group>"; };
 		0143431319A2FF5400AF7366 /* SMBezierPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMBezierPath.m; sourceTree = "<group>"; };
@@ -105,6 +116,9 @@
 		014B8915199DA9ED00A4DE96 /* SMQuitMediaButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMQuitMediaButton.m; sourceTree = "<group>"; };
 		015771901A0D39B50032CDD5 /* SMWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMWindow.h; sourceTree = "<group>"; };
 		015771911A0D39B50032CDD5 /* SMWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMWindow.m; sourceTree = "<group>"; };
+		015BDB3F1A2A6F2000600A00 /* SnappyNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnappyNotification.h; sourceTree = "<group>"; };
+		015BDB401A2A6F2000600A00 /* SnappyNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnappyNotification.m; sourceTree = "<group>"; };
+		015BDB451A2A725400600A00 /* SnapBack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnapBack.m; sourceTree = "<group>"; };
 		015D048D19F546F800B4F461 /* AFHTTPRequestOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperation.h; sourceTree = "<group>"; };
 		015D048E19F546F800B4F461 /* AFHTTPRequestOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AFHTTPRequestOperation.m; sourceTree = "<group>"; };
 		015D048F19F546F800B4F461 /* AFHTTPRequestOperationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AFHTTPRequestOperationManager.h; sourceTree = "<group>"; };
@@ -137,7 +151,6 @@
 		01F0B61C19984B66000EF0A9 /* SnapJS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnapJS.h; sourceTree = "<group>"; };
 		01F0B61D19984B66000EF0A9 /* SnapJS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnapJS.m; sourceTree = "<group>"; usesTabs = 1; };
 		01F0B61F19985F5F000EF0A9 /* SnapBack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnapBack.h; sourceTree = "<group>"; };
-		01F0B62019985F5F000EF0A9 /* SnapBack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnapBack.m; sourceTree = "<group>"; };
 		490CE9701946635900EF2D95 /* main.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
 		4915DFE01904202400969F60 /* Snappy.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Snappy.icns; sourceTree = "<group>"; };
 		4915DFE219042FE100969F60 /* CoreMedia.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMedia.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/CoreMedia.framework; sourceTree = DEVELOPER_DIR; };
@@ -193,8 +206,6 @@
 		491D2AB818E9B8300026A755 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/QTKit.framework; sourceTree = DEVELOPER_DIR; };
 		491D2ABA18E9B8910026A755 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/SystemConfiguration.framework; sourceTree = DEVELOPER_DIR; };
 		491D2ABC18E9C4960026A755 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		49248D1418F023D3009837CD /* pacifico.woff */ = {isa = PBXFileReference; lastKnownFileType = file; path = pacifico.woff; sourceTree = "<group>"; };
-		49248D1918F023DE009837CD /* fonts.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = fonts.css; sourceTree = "<group>"; };
 		49248D1B18F025F2009837CD /* SM.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = SM.js; sourceTree = "<group>"; };
 		492A08F9192E62BF00DB0C37 /* play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = play.png; sourceTree = "<group>"; };
 		4935CBE918F3135A00BF5586 /* adb */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = adb; sourceTree = "<group>"; };
@@ -220,7 +231,6 @@
 		49E2BDEC19041A5500BC9DF3 /* About.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = About.xib; sourceTree = "<group>"; };
 		49E8A8DF1950D84200005668 /* NSData+Base64.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Base64.m"; sourceTree = "<group>"; };
 		49E8A8E01950D84200005668 /* NSData+Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+Base64.h"; sourceTree = "<group>"; };
-		49FB478B18EA6106009B74BA /* glyphish.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = glyphish.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -250,6 +260,21 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		011F91361A29363500F7BBE5 /* Minizip */ = {
+			isa = PBXGroup;
+			children = (
+				011F91371A29363500F7BBE5 /* crypt.h */,
+				011F91381A29363500F7BBE5 /* ioapi.c */,
+				011F91391A29363500F7BBE5 /* ioapi.h */,
+				011F913C1A29363500F7BBE5 /* ioapi_mem.c */,
+				011F913D1A29363500F7BBE5 /* ioapi_mem.h */,
+				011F91421A29363500F7BBE5 /* unzip.c */,
+				011F91431A29363500F7BBE5 /* unzip.h */,
+			);
+			name = Minizip;
+			path = "minizip-master";
+			sourceTree = "<group>";
+		};
 		015D048C19F546F800B4F461 /* AFNetworking */ = {
 			isa = PBXGroup;
 			children = (
@@ -341,6 +366,7 @@
 				491D2A6E18E901330026A755 /* Snappy.m */,
 				015771901A0D39B50032CDD5 /* SMWindow.h */,
 				015771911A0D39B50032CDD5 /* SMWindow.m */,
+				011F91361A29363500F7BBE5 /* Minizip */,
 				49BB97531938BD6E000EB7B5 /* Coeur */,
 				49BB97541938BD82000EB7B5 /* Bridge Interface */,
 				49BB97511938BD29000EB7B5 /* Interface */,
@@ -414,8 +440,6 @@
 			isa = PBXGroup;
 			children = (
 				0141819E19F06DFD00078B0C /* ElegantIcons.woff */,
-				49248D1418F023D3009837CD /* pacifico.woff */,
-				49248D1918F023DE009837CD /* fonts.css */,
 			);
 			name = Fonts;
 			sourceTree = "<group>";
@@ -464,7 +488,6 @@
 				49248D1B18F025F2009837CD /* SM.js */,
 				491A367B18EA5CE700285295 /* mainUI.css */,
 				497602A018EA7A7700F85C87 /* jquery-2.1.0.min.js */,
-				49FB478B18EA6106009B74BA /* glyphish.ttf */,
 			);
 			name = Documents;
 			sourceTree = "<group>";
@@ -489,12 +512,16 @@
 				015D048C19F546F800B4F461 /* AFNetworking */,
 				01F0B61C19984B66000EF0A9 /* SnapJS.h */,
 				01F0B61D19984B66000EF0A9 /* SnapJS.m */,
+				01083C151A2906BF00578661 /* SnappyOpeationQueue.h */,
+				01083C161A2906BF00578661 /* SnappyOpeationQueue.m */,
+				015BDB3F1A2A6F2000600A00 /* SnappyNotification.h */,
+				015BDB401A2A6F2000600A00 /* SnappyNotification.m */,
 				015D04AC19F5555E00B4F461 /* SMFileCollector.h */,
 				015D04AD19F5555E00B4F461 /* SMFileCollector.m */,
 				015D04A919F54EFF00B4F461 /* SMCrypto.h */,
 				015D04AA19F54EFF00B4F461 /* SMCrypto.m */,
 				01F0B61F19985F5F000EF0A9 /* SnapBack.h */,
-				01F0B62019985F5F000EF0A9 /* SnapBack.m */,
+				015BDB451A2A725400600A00 /* SnapBack.m */,
 			);
 			name = "Bridge Interface";
 			sourceTree = "<group>";
@@ -591,7 +618,6 @@
 				4935CBEA18F3135A00BF5586 /* adb in Resources */,
 				497602A118EA7A7700F85C87 /* jquery-2.1.0.min.js in Resources */,
 				492A08FA192E62BF00DB0C37 /* play.png in Resources */,
-				49FB478C18EA6106009B74BA /* glyphish.ttf in Resources */,
 				491D2A6618E901330026A755 /* InfoPlist.strings in Resources */,
 				491D2A7418E901330026A755 /* Images.xcassets in Resources */,
 				49E2BDED19041A5500BC9DF3 /* About.xib in Resources */,
@@ -599,10 +625,8 @@
 				491D2A6C18E901330026A755 /* Credits.rtf in Resources */,
 				491D2A7218E901330026A755 /* Snappy.xib in Resources */,
 				011F31DB19D9DEF1009D37DA /* SnappyJS in Resources */,
-				49248D1A18F023DE009837CD /* fonts.css in Resources */,
 				491A367C18EA5CE700285295 /* mainUI.css in Resources */,
 				491A367A18EA599400285295 /* mainUI.html in Resources */,
-				49248D1818F023D3009837CD /* pacifico.woff in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -637,6 +661,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				011F91461A29363500F7BBE5 /* ioapi.c in Sources */,
 				01F0B61E19984B66000EF0A9 /* SnapJS.m in Sources */,
 				015D04A319F546F800B4F461 /* AFNetworkReachabilityManager.m in Sources */,
 				49B517B018FC7B680050E3AD /* SMCamView.m in Sources */,
@@ -645,6 +670,7 @@
 				015D04A119F546F800B4F461 /* AFHTTPRequestOperationManager.m in Sources */,
 				4915DFE619045DAE00969F60 /* SMImage.m in Sources */,
 				015D04A819F546F800B4F461 /* AFURLSessionManager.m in Sources */,
+				011F91481A29363500F7BBE5 /* ioapi_mem.c in Sources */,
 				01A9F216199C521F003776E3 /* SMPhotoButton.m in Sources */,
 				491D2AAC18E928590026A755 /* ASIDataCompressor.m in Sources */,
 				491D2A9118E90F3E0026A755 /* SMConnection.m in Sources */,
@@ -661,13 +687,16 @@
 				4935CBF218F32D5E00BF5586 /* SMSettings.m in Sources */,
 				01B6A22A19F1B07700E2B22B /* About.m in Sources */,
 				491D2AB118E928590026A755 /* ASIInputStream.m in Sources */,
+				015BDB461A2A725400600A00 /* SnapBack.m in Sources */,
 				015D04A419F546F800B4F461 /* AFSecurityPolicy.m in Sources */,
-				01F0B62119985F5F000EF0A9 /* SnapBack.m in Sources */,
+				01083C171A2906BF00578661 /* SnappyOpeationQueue.m in Sources */,
 				015D04A719F546F800B4F461 /* AFURLResponseSerialization.m in Sources */,
 				014B8916199DA9ED00A4DE96 /* SMQuitMediaButton.m in Sources */,
 				0143431419A2FF5400AF7366 /* SMBezierPath.m in Sources */,
 				015771921A0D39B50032CDD5 /* SMWindow.m in Sources */,
+				011F914C1A29363500F7BBE5 /* unzip.c in Sources */,
 				491D2A6818E901330026A755 /* main.m in Sources */,
+				015BDB411A2A6F2000600A00 /* SnappyNotification.m in Sources */,
 				015D04A519F546F800B4F461 /* AFURLConnectionOperation.m in Sources */,
 				491D2AB218E928590026A755 /* ASINetworkQueue.m in Sources */,
 				0143431719A3066D00AF7366 /* SMFlashButton.m in Sources */,

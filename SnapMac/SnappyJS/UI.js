@@ -33,6 +33,10 @@ SnappyUI = new (function() {
 	this.use3D = function(value) {
 		toggleClass(this.body, "enable3d", value);
 	}
+	this.useParallax = function(value) {
+		toggleClass(this.body, "enableParallax", value);
+		this.updateFrame();
+	}
 	
 	this.hideSend = function() {
 		if(!this.SendPage.isVisible())
@@ -109,7 +113,7 @@ SnappyUI.init = function() {
 						
 						break;
 					case "back":
-						SnappyUI.FriendsPage.StoriesView.close();
+						SnappyUI.currentPage.close();
 						
 						break;
 				}
@@ -150,6 +154,10 @@ SnappyUI.init = function() {
 				this.content.scrollTop(0);
 		}
 		
+		_this.zoom = function(bool) {
+			this.header.leftButton.setIcon("back");
+			toggleClass(this.content, "zoom", bool);//[bool ? "addClass" : "removeClass"]("zoom");
+		}
 		_this.isVisible = function() {
 			return this.element.hasClass("active");
 		}
@@ -292,97 +300,211 @@ SnappyUI.init = function() {
 		this.content = e("div", "content").appendTo(this.element);
 		
 		this.erase = function() {
-			this.snapList = new Object();
-			this.element.children(".snap").remove();
+			this.conversations = new Object();
+			this.element.children(".conversation").remove();
 		}
 		
-		this.snapList = new Object();
+		
+		this.close = function() {	
+			this.ConversationsView.close();
+			this.content.scrollTop(this.content.data("scrollTop"));
+			this.zoom(false);
+				
+			this.header.leftButton.setIcon("update");
+			this.header.title.setTitle("Mon fil");
+		}
+		
+		
+		this.ConversationsView = new (function(parent) {
+			
+			this.parent  = parent;
+			this.element = e("div", "toolbox")
+							.appendTo(parent.content);
+			
+			this.active = false;
+			
+			this.erase = function() {
+				for(var i in this.snaps)
+					this.snaps[i].remove();
+				
+				this.snaps = new Array();
+			}
+			
+			this.close = function() {
+				this.erase();
+				this.active = false;
+			}
+			this.setConv = function(conv) {
+			
+				this.active = true;
+				
+				this.element.scrollTop(0);
+				
+				for(var k in conv.snaps) {
+					var snap = conv.snaps[k];
+					
+					var element = this.snapElement(snap)
+									  .appendTo(this.element);
+									  
+					snap.element = element;
+					
+					snap.change(function(snap) {
+						if(!snap.url)
+							snap.element.addClass("hide");
+						else
+							snap.element.css("background-image", "url('"+snap.url+"')");
+					});
+					
+					this.snaps.push(snap.element);
+				}
+				
+				
+				this.parent.header.title.setTitle("Conversation avec "+conv.users.join(","));
+					
+				var feedPage = this.parent;
+				feedPage.content.data('scrollTop', feedPage.content.scrollTop());
+				feedPage.content.scrollTop(0);
+				feedPage.zoom(true);
+			}
+			
+			this.snapElement = function(snap) {
+				var el 	 	  = e("div", "snap"),
+					friend    = SnappyUI.updates.Friends.friendByName(snap.user),
+					userText  = e("p", 0, (friend ? friend.displayName : snap.user)),
+					iconDiv	  = e("p"),
+					mediaType = snap.mediaType;
+				
+				
+				function icon(icon) {
+					return e("span", "icon", icon);
+				}
+				
+				if(mediaType.isFriendRequest)
+					iconDiv.append(icon(""));
+				else
+					iconDiv.append(icon(snap.received ? "8" : "9"));
+				
+				if(mediaType.isImage)
+					iconDiv.append(icon(""));
+				if(mediaType.isVideo)
+					iconDiv.append(icon(""));
+				if(mediaType.isAudio)
+					iconDiv.append(icon("z"));
+				
+				userText.appendTo(el);
+				iconDiv.appendTo(el);
+				
+				e("p", 0, "Il y a "+snap.date.timeSince()).appendTo(el);
+				
+				if(snap.mediaType.isFriendRequest)
+					e("p", "acceptFriend", "Accepter").appendTo(el);
+				
+				el.attr("data-media-type", snap.mediaType.id);
+				
+				if(snap.url)
+					el.css("background-image", "url('"+snap.url+"')");
+				
+				el.data("snap", snap)
+				  .click(function() {
+					  	var snap = $(this).data("snap");
+					  	if(snap)
+					  		snap.show(); 
+				  });
+			
+				return el;
+			}
+			
+			this.erase();
+			
+			return this;
+		})(this);
+
 		
 		this.setConversations = function(conversations) {
-			
-		}
-		this.conversationElement = function(conv) {
-			var el = e("div", "conversation");
-			
-			
-		}
+			this.erase();
+			for(var i in conversations.conversations) {
+				var conv = conversations.conversations[i];
 		
-		this.setSnapList = function(snapList) {
-			return;
-			for(var i in snapList.snaps) {
-				var snap = snapList.snaps[i];
-				
-				if(!this.snapList[snap.id])
-					this.snapList[snap.id] = snap;
+				this.conversations[conv.id] = conv;
 			}
+			
 			this.update();
 		}
-		
-		this.snapElement = function(snap) {
-			var el 	 	  = e("div", "snap"),
-				friend    = SnappyUI.updates.Friends.friendByName(snap.user),
-				userText  = e("p", 0, (friend ? friend.displayName : snap.user)),
-				iconDiv	  = e("p"),
-				mediaType = snap.mediaType;
+		this.conversationElement = function(conv) {
+			var el 	   	 = e("div", "conversation"),
+				nSnap  	 = conv.snaps.length,
+				nMsg   	 = conv.messages.length,
+				details = e("p", "details"),
+				snapRect = e("div", "snapRect");
 			
+			if(conv.msgUnread)
+				snapRect.addClass("messages");
+			else if(conv.snapsUnread)
+				snapRect.addClass("snaps");
 			
-			function icon(icon) {
-				return e("span", "icon", icon);
+			e("p", 0, conv.users.join(" + ")).appendTo(el);
+			snapRect.appendTo(el);
+			details.appendTo(el);
+			
+			if(nSnap) {
+				var snapEl = e("span", "snapText", nSnap).appendTo(details)
+										   				 .prepend(e("span", "icon", ""));
+				if(conv.snapsUnread)
+					snapEl.append(e("span", "new", conv.snapsUnread));
+			}
+			if(nMsg) {
+				var msgEl = e("span", "msgText", nMsg).appendTo(details)
+										  			  .prepend(e("span", "icon", "w"));
+				if(conv.msgUnread)
+					msgEl.append(e("span", "new", conv.msgUnread));
+			} 
+			if(conv.duration)
+				e("span", 0, conv.duration+"s").appendTo(details)
+										   	   .prepend(e("span", "icon", "}"));
+			
+			e("span", 0, conv.lastInteraction.timeSince()).appendTo(details)
+														  .prepend(e("span", "icon", ""));
+			
+			var snaps = conv.snaps;
+			for(var i in snaps) {
+				var snap = snaps[i];
+				
+				if(snap.url) {
+					var img = e("img").attr("src", snap.url);
+					img.appendTo(el);
+				}
+				else {
+					snap.change(function(snap) {
+						var img = e("img").attr("src", snap.url);
+						img.appendTo(el);
+					});
+				}
 			}
 			
-			if(mediaType.isFriendRequest)
-				iconDiv.append(icon(""));
-			else
-				iconDiv.append(icon(snap.received ? "8" : "9"));
+			el.data("conv", conv).click(function() {
+				var conv = $(this).data("conv");
+				
+				SnappyUI.FeedPage.ConversationsView.setConv(conv);
+				SnappyUI.FeedPage.zoom(true);
+			});
 			
-			if(mediaType.isImage)
-				iconDiv.append(icon(""));
-			if(mediaType.isVideo)
-				iconDiv.append(icon(""));
-			if(mediaType.isAudio)
-				iconDiv.append(icon("z"));
-			
-			userText.appendTo(el);
-			iconDiv.appendTo(el);
-			
-			e("p", 0, "Il y a "+snap.date.timeSince()).appendTo(el);
-			
-			if(snap.mediaType.isFriendRequest)
-				e("p", "acceptFriend", "Accepter").appendTo(el);
-			
-			el.attr("data-media-type", snap.mediaType.id);
-			
-			if(snap.url)
-				el.css("background-image", "url('"+snap.url+"')");
-			
-			el.data("snap", snap)
-			  .click(function() {
-				  	var snap = $(this).data("snap");
-				  	if(snap)
-				  		SnapJS.showMedia(snap.id); 
-			  });
-		
 			return el;
 		}
 		
 		this.update = function() {
-			for(var k in this.snapList) {
-				var snap = this.snapList[k];
+			for(var id in this.conversations) {
+				var conversation = this.conversations[id];
 				
-				if(snap.element)
+				if(conversation.element)
 					continue;
 				
-				snap.element = this.snapElement(snap);
-				snap.element.appendTo(this.content);
-				
-				snap.change(function(snap) {
-					if(!snap.url)
-						snap.element.addClass("hide");
-					else
-						snap.element.css("background-image", "url('"+snap.url+"')");
-				});
+				conversation.element = this.conversationElement(conversation);
+				conversation.element.appendTo(this.content);
 			}
+			
 		}
+		
+		this.erase();
 		
 		return this;
 	})();
@@ -398,22 +520,35 @@ SnappyUI.init = function() {
 		
 		this.content = e("div", "content").appendTo(this.element);
 		
-		this.zoom = function(bool) {
-			this.content[bool ? "addClass" : "removeClass"]("zoom");
+		this.close = function() {
+			this.StoriesView.close();
 		}
 		this.StoriesView = new (function(parent) {
 			
 			this.parent  = parent;
-			this.element = e("div", "storiesToolbox")
+			this.element = e("div", "toolbox")
 							.appendTo(parent.content);
 			
+			this.active = false;
 			this.erase = function() {
-				this.element.children(".storyBox").remove();
+				for(var i in this.boxes)
+					this.boxes[i].remove();
+				
 				this.stories = new Array();
+				this.boxes = new Array();
 			}
 			
+			this.boxes = new Array();
+			
+			this.updateFrame = function() {
+				for(var i in this.boxes) {
+					var box = this.boxes[i];
+					
+				}
+			}
 			this.close = function() {
 				this.erase();
+				this.active = false;
 			
 				this.parent.content.scrollTop(SnappyUI.FriendsPage.content.data("scrollTop"));
 				this.parent.zoom(false);
@@ -423,42 +558,43 @@ SnappyUI.init = function() {
 			}
 			this.setStories = function(stories) {
 			
-				this.parent.header.leftButton.setIcon("back");
+				this.active = true;
 				
 				this.element.scrollTop(0);
 				
-				var story,
-					storyBox,
-					storyMage,
-					dateText,
-					friendsPage;
-				
 				for(var k in stories) {
-					story = stories[k];
+					var story = stories[k],
+						storyBox = e("div", "storyBox")
+								   .data("story", story)
+								   .click(function() {
+									   var story = $(this).data("story");
+									   if(story)
+									   		story.show();
+									}),
+						storyMage = e("div", "imgStory").appendTo(storyBox);
+						thumb 	  = e("div", "thumb").appendTo(storyMage),
+						
+						
+						storyMage.append(e("span", "icon", "="))
+						e("p", 0, "Il y a "+story.date.timeSince()).appendTo(storyBox),
+						
+						e("span", "duration", story.duration+"s").appendTo(storyMage);
 					
-					storyBox = e("div", "storyBox")
-							   .data("story", story)
-							   .click(function() {
-								   	var story = $(this).data("story");
-								   	if(story)
-								   		SnapJS.showMedia(story.id);
-							   });
+					if(story.mediaType.isVideo)
+						storyMage.addClass("video");
 					
-					storyMage = e("div", "imgStory")
-								.appendTo(storyBox);
-								
-					dateText = e("p", 0, "Il y a "+story.date.timeSince())
-							   .appendTo(storyBox);
 					
-					storyBox.data("img", storyMage)
+					storyBox.data("thumb", thumb)
 							.appendTo(this.element)
 							.addClass("loading");
 					
 					story.box = storyBox;
 					var fn = function(story) {
 						story.box.removeClass("loading")
-								 .data("img")
+								 .data("thumb")
 								 .css('background-image', story.image == "" ? "" : "url('"+story.image+"')");
+						
+						SnappyUI.FriendsPage.StoriesView.boxes.push(story.box);
 					}
 					
 					if(story.state != "loaded") {
@@ -467,14 +603,15 @@ SnappyUI.init = function() {
 					}
 					else
 						fn(story);
-					
-					this.parent.header.title.setTitle("Histoires de "+story.friend.displayName);
-					
-					friendsPage = SnappyUI.FriendsPage;
-					friendsPage.content.data('scrollTop', friendsPage.content.scrollTop());
-					friendsPage.content.scrollTop(0);
-					friendsPage.zoom(true);
 				}
+				
+					
+				this.parent.header.title.setTitle("Histoires de "+story.friend.displayName);
+					
+				var friendsPage = this.parent;
+				friendsPage.content.data('scrollTop', friendsPage.content.scrollTop());
+				friendsPage.content.scrollTop(0);
+				friendsPage.zoom(true);
 			}
 			
 			return this;
@@ -487,22 +624,14 @@ SnappyUI.init = function() {
 		this.friendList = new Object();
 		
 		this.setFriends = function(friendList) {
-			var friend;
-			
-			for(var k in friendList.friends) {
-				friend = friendList.friends[k];
-				
-				if(!this.friendList[friend.name])
-					this.friendList[friend.name] = friend;
-			}
-
+			this.friendList = friendList;
 			this.update();
 		}
 		
 		
 		this.friendElement = function(friend) {
 			var el 	 	   = e("div", "friend"),
-				storiesBtn = e("p", "storiesBtn", "Voir ses histoires "),
+				storiesBtn = e("p", "storiesBtn", "Histoires "),
 				numStories = e("span", "numStories").appendTo(storiesBtn),
 				displayDiv = e("div", "displayName").appendTo(el);
 			
@@ -517,34 +646,46 @@ SnappyUI.init = function() {
 						 .keypress(function(event){
 							 if(event.keyCode == '13')
 							 	toggleClass($(this).parent(), "edit");
-						 });;
+						 });
 						 
 			e("p", 0, friend.displayName).appendTo(displayDiv)
 										 .click(function(e) {
 				toggleClass($(this).parent(), "edit"); 
 			});
-			
 			e("p", "friendName", friend.name).appendTo(el);
-			storiesBtn.appendTo(el);
 			
+			if(friend.isEvent) {
+				e("p", 0, friend.place).appendTo(el)
+									   .prepend(e("span", "icon", ""))
+									   .click(function() {
+										   var friend  = $(this).parent().data("friend");
+										   
+										   if(friend)
+										   		SnapJS.openURL(friend.mapsURL);
+										});
+			}
 			
-			storiesBtn.click(function() {
-				var friend  = $(this).parent().data("friend"),
-					stories = friend.stories;
-					
-				if(!stories) {
-					$(this).shake(3, 20, 500, true);
-					return;
-				}
-				
-				SnappyUI.FriendsPage.StoriesView.setStories(stories);				
-			});
+			storiesBtn.appendTo(el)
+					  .click(function() {
+						    var friend  = $(this).parent().data("friend"),
+								stories = friend.stories;
+							
+							if(!stories)
+						  		return;
+						  	
+						  	SnappyUI.FriendsPage.StoriesView.setStories(stories);
+						});
+			
 
 			return el;
 		}
 		this.update = function() {
-			for(var name in this.friendList) {
-				var friend = this.friendList[name];
+			console.log(this.friendList.getOnlyFriends({
+					showEvents: false,
+					hasStories: true
+				}));
+			for(var name in this.friendList.friends) {
+				var friend = this.friendList.friends[name];
 				
 				if(friend.element)
 					continue;
@@ -640,6 +781,13 @@ SnappyUI.init = function() {
 		return this;
 	})();
 	
+	this.updateFrame = function() {
+		if(!$("body").hasClass("enableParallax"))
+			return;
+			
+		SnappyUI.FriendsPage.StoriesView.updateFrame();
+		webkitRequestAnimationFrame(SnappyUI.updateFrame);
+	}
 	this.setUpdates = function(updates) {
 		
 		this.logged = true;
@@ -656,6 +804,7 @@ SnappyUI.init = function() {
 	}
 	
 	this.use3D(SnapJS.use3D());
+	this.useParallax(SnapJS.useParallax());
 	
 	this.update = function() {
 		Snappy.getUpdates(function(updates) {
@@ -721,3 +870,5 @@ SnappyUI.init = function() {
 			SnappyUI.setUpdates(updates);
 	});
 }
+
+

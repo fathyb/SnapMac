@@ -123,11 +123,12 @@ BOOL isHandlingEvent;
 }
 -(void)photo:(SMCallback)callback {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        if([[_settings objectForKey:@"SMUseFlash"] boolValue])
+        SMSettings *settings = [SMSettings sharedInstance];
+        if([[settings objectForKey:@"SMUseFlash"] boolValue])
             [self flashScreen:YES];
         
         [stillImageOutput captureStillImageAsynchronouslyFromConnection:[stillImageOutput connectionWithMediaType:AVMediaTypeVideo] completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
-            if([[_settings objectForKey:@"SMUseFlash"] boolValue])
+            if([[settings objectForKey:@"SMUseFlash"] boolValue])
                 [self flashScreen:NO];
             
             if(!error && imageSampleBuffer) {
@@ -179,9 +180,7 @@ BOOL isHandlingEvent;
         CGDisplayFade(fadeToken, duration, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal,flashColor.redComponent, flashColor.greenComponent, flashColor.blueComponent, false);
     
 }
--(void)settingsLoaded:(NSNotification*)notification {
-    _settings = notification.object;
-}
+
 -(void)awakeFromNib {
     
     for(NSLayoutConstraint *constraint in self.superview.superview.constraints) {
@@ -190,15 +189,20 @@ BOOL isHandlingEvent;
         _positionLeft.constant = 0;
     }
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(settingsLoaded:)
-                                                 name:@"SnappySettingsLoaded"
-                                               object:nil];
+    NSDictionary* notifications = @{
+        NSWindowDidResizeNotification: @"screenResize",
+                  @"SnappyShowCamera": @"showCamera:",
+                   @"SnappyShowMedia": @"showMedia:"
+    };
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(screenResize)
-                                                 name:NSWindowDidResizeNotification
-                                               object:nil];
+    NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+    
+    for(NSString *k in notifications.allKeys)
+        [center addObserver:self
+                   selector:NSSelectorFromString(notifications[k])
+                       name:k
+                     object:nil];
+    
     [self showLoading];
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error = nil;
@@ -207,16 +211,16 @@ BOOL isHandlingEvent;
         if([self respondsToSelector:useCIFilters])
             [self performSelectorInBackground:useCIFilters withObject:@YES];
     
-        session = [AVCaptureSession new];
+         session = [AVCaptureSession new];
         [session beginConfiguration];
-        [session setSessionPreset:AVCaptureSessionPresetPhoto];
+         session.sessionPreset = AVCaptureSessionPresetPhoto;
         [session commitConfiguration];
     
         for(AVCaptureDevice *device in [AVCaptureDevice devices]) {
             if([device hasMediaType:AVMediaTypeVideo] || [device hasMediaType:AVMediaTypeMuxed]) {
                 AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
                 if (error) {
-                    NSLog(@"deviceInputWithDevice failed with error %@", [error localizedDescription]);
+                    NSLog(@"deviceInputWithDevice failed with error %@", error.localizedDescription);
                 }
                 if([session canAddInput:input])
                     [session addInput:input];
@@ -244,6 +248,32 @@ BOOL isHandlingEvent;
 -(void)screenResize {
     if(_positionLeft.constant != 0)
             _positionLeft.constant = -self.bounds.size.width;
+    
+    if(!self.layer)
+        return;
+    
+    if([self.layer isKindOfClass:[AVPlayerLayer class]]) {
+        CALayer *playerLayer = self.layer;
+        CALayer *overlayLayer = playerLayer.sublayers[1];
+        
+        NSSize imageSize = ((NSImage*)overlayLayer.contents).size;
+        NSSize layerSize = playerLayer.frame.size;
+        
+        CGFloat x = layerSize.width/2 - imageSize.width/2;
+        CGFloat y = layerSize.height/2 - imageSize.height/2;
+        
+        overlayLayer.frame = NSMakeRect(x, y, imageSize.width, imageSize.height);
+    }
+}
+-(void)showCamera:(NSNotification*)notif {
+    if(!notif)
+        return;
+    
+    NSNumber* obj = notif.object;
+    if(obj.boolValue)
+        [self show];
+    else
+        [self hide];
 }
 -(void)showAndUseCamera:(BOOL)showCamera {
     _positionLeft.animator.constant = 0;
@@ -360,13 +390,11 @@ BOOL isHandlingEvent;
         [self showLoading];
         
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            //[session startRunning];
-            //[session performSelectorOnMainThread:@selector(startRunning) withObject:nil waitUntilDone:YES];
+            [session performSelectorOnMainThread:@selector(startRunning) withObject:nil waitUntilDone:YES];
             sleep(2);
             [self hideLoading];
         });
     }
-        //[session startRunning];
     
     [self resetSubviews];
 }
@@ -385,6 +413,44 @@ BOOL isHandlingEvent;
     [self showImage:sourceImage];
 }
 -(void)showImage:(NSImage*)image {
+    self.layer.contents = [image imageResizedToSize:self.bounds.size];
+}
+-(void)showVideo:(NSDictionary*)urls {
+    
+    NSString *path = urls[@"filePath"];
+    
+    AVPlayer *player = [AVPlayer playerWithURL:[NSURL fileURLWithPath:path]];
+    AVPlayerLayer *playerLayer = [AVPlayerLayer playerLayerWithPlayer:player];
+    playerLayer.frame = self.layer.bounds;
+    
+    self.layer = playerLayer;
+    
+    NSString *overlay = urls[@"overlay"];
+    
+    if(overlay.length) {
+        CALayer *overlayLayer = [CALayer new];
+        NSImage *overlayImage = [[NSImage alloc] initWithContentsOfFile:overlay];
+        overlayLayer.contents = overlayImage;
+        [playerLayer addSublayer:overlayLayer];
+        
+        [self screenResize];
+    }
+    
+    [player play];
+    
+    
+}
+-(void)showMedia:(NSNotification*)notif {
+    if(!notif)
+        return;
+    NSDictionary *urls = notif.object;
+    
+    if(!urls)
+        return;
+    
+    NSString* path = urls[@"filePath"];
+    
+    NSLog(@"Urls = %@, path %@", urls, path);
     if(_positionLeft.animator.constant != 0)
         [self showAndUseCamera:NO];
     
@@ -393,9 +459,15 @@ BOOL isHandlingEvent;
     self.showPhotoBtn   =
     self.showFilterList =
     self.showPhotoTools = NO;
-    self.layer.contents = [image imageResizedToSize:self.bounds.size];
+    
+    if([path hasSuffix:@"jpg"] || [path hasSuffix:@"jpeg"] || [path hasSuffix:@"png"])
+        [self showImageFile:path];
+    else if([path hasSuffix:@"mp4"])
+        [self showVideo:urls];
+    
     [self resetSubviews];
 }
+
 
 +(BOOL)isSelectorExcludedFromWebScript:(SEL)aSelector {
     return NO;

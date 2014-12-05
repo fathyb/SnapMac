@@ -15,7 +15,6 @@
 IB_DESIGNABLE @interface SMPhotoToolsView : NSView
 
 @property (nonatomic) IBInspectable CGFloat cornerRadius;
-@property (nonatomic) SMSettings* settings;
 
 -(void)hide;
 -(void)show;

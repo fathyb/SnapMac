@@ -23,7 +23,6 @@
 @property (nonatomic) BOOL showPhotoBtn;
 @property (nonatomic) BOOL showFilterList;
 @property (nonatomic) BOOL showPhotoTools;
-@property (nonatomic) SMSettings* settings;
 @property (nonatomic) NSLayoutConstraint *positionLeft;
 
 -(void)setFilter:(CIFilter*)filter;

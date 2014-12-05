@@ -25,10 +25,10 @@
 -(void)setObject:(id)object forKey:(NSString*)key;
 -(id)objectForKey:(NSString*)key;
 
-@property (nonatomic) SnapJS* snapJs;
 @property (strong) IBOutlet NSPanel *settingsWindow;
 @property (weak) IBOutlet NSPopUpButton *themeBtn;
 @property (weak) IBOutlet NSTextField *themeTxt;
 @property (weak) IBOutlet NSButton *checkbox3D;
+@property (weak) IBOutlet NSButton *checkboxParallax;
 
 @end

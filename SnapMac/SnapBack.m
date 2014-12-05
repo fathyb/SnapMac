@@ -12,62 +12,9 @@
 #define iObject(T) _Generic( (T), id: YES, default: NO)
 #define isObject(x) ( strchr("@#", @encode(typeof(x))[0]) != NULL )
 
-WebView* SBWebView = nil;
-
-#pragma mark JSON
+JSContextRef ContexteJS = nil;
 
 
-NSString* snapback_quoter(NSString* string) {
-    string = [string stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
-    return [NSString stringWithFormat:@"\"%@\"", string];
-}
-NSString* objectToJSON(id object) {
-    NSError* error;
-    NSData *data = [NSJSONSerialization dataWithJSONObject:object options:0 error:&error];
-    return [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-}
-id objectToJS(id object) {
-    id data = object;
-    
-    NSDictionary* actions = @{
-        @"NSString": ^(id o) {
-            return snapback_quoter(o);
-        },
-        @"NSURL": ^(id o) {
-            return snapback_quoter([((NSURL*)o) absoluteString]);
-        },
-        @"NSDictionary": ^(id o) {
-            return [NSString stringWithFormat:@"JSON.parse(%@)", snapback_quoter(objectToJSON(o))];
-        },
-        @"NSArray": ^(id o) {
-            return [NSString stringWithFormat:@"JSON.parse(%@)", snapback_quoter(objectToJSON(o))];
-        }
-    };
-    
-    NSString* (^block)()  = nil;
-    
-    for(id key in actions.allKeys)
-        if([object isKindOfClass:NSClassFromString(key)])
-            block = actions[key];
-    
-    if(block) data = block(object);
-    
-    return data;
-}
-id jsonToObject(NSString* data) {
-    NSError* error;
-    id obj = [NSJSONSerialization JSONObjectWithData:[data dataUsingEncoding:NSUTF8StringEncoding] options:0 error:&error];
-    return obj;
-}
-
-#pragma mark SnapCall
-
-
-void evalJS(NSString* JS) {
-    [SBWebView.windowScriptObject performSelectorOnMainThread:@selector(evaluateWebScript:)
-                                                   withObject:JS
-                                                waitUntilDone:NO];
-}
 
 JSValueRef NStoJS(id ns) {
     if(!ns)
@@ -78,7 +25,7 @@ JSValueRef NStoJS(id ns) {
     NSDictionary* actions = @{
         @"String": ^(NSString *o) {
             JSStringRef jsString = JSStringCreateWithUTF8CString(o.UTF8String);
-            JSValueRef  jsValue  = JSValueMakeString(SBWebView.mainFrame.globalContext,
+            JSValueRef  jsValue  = JSValueMakeString(ContexteJS,
                                                      jsString);
             JSStringRelease(jsString);
             
@@ -86,18 +33,18 @@ JSValueRef NStoJS(id ns) {
         },
         @"URL": ^(NSURL *o) {
             JSStringRef jsString = JSStringCreateWithUTF8CString(o.absoluteString.UTF8String);
-            JSValueRef  jsValue  = JSValueMakeString(SBWebView.mainFrame.globalContext,
+            JSValueRef  jsValue  = JSValueMakeString(ContexteJS,
                                                      jsString);
             JSStringRelease(jsString);
             
             return jsValue;
         },
         @"Dictionary": ^(NSDictionary *o) {
-            JSObjectRef object = JSObjectMake(SBWebView.mainFrame.globalContext, nil, nil);
+            JSObjectRef object = JSObjectMake(ContexteJS, nil, nil);
             
             for(NSString *key in o.allKeys) {
                 JSStringRef k     = JSStringCreateWithUTF8CString(key.UTF8String);
-                JSObjectSetProperty(SBWebView.mainFrame.globalContext,
+                JSObjectSetProperty(ContexteJS,
                                     object,
                                     k,
                                     NStoJS(o[key]),
@@ -110,7 +57,7 @@ JSValueRef NStoJS(id ns) {
         },
         @"Array": ^(NSArray *o) {
             if(!o.count)
-                return JSObjectMakeArray(SBWebView.mainFrame.globalContext,
+                return JSObjectMakeArray(ContexteJS,
                                          0,
                                          nil,
                                          nil);
@@ -120,7 +67,7 @@ JSValueRef NStoJS(id ns) {
             for(int i = 0; i < o.count; i++)
                 values[i] = NStoJS(o[i]);
             
-            JSObjectRef jsArray = JSObjectMakeArray(SBWebView.mainFrame.globalContext,
+            JSObjectRef jsArray = JSObjectMakeArray(ContexteJS,
                                                     o.count,
                                                     values,
                                                     nil);
@@ -128,10 +75,10 @@ JSValueRef NStoJS(id ns) {
             return jsArray;
         },
         @"Number": ^(NSNumber* o) {
-            return JSValueMakeNumber(SBWebView.mainFrame.globalContext, o.doubleValue);
+            return JSValueMakeNumber(ContexteJS, o.doubleValue);
         },
         @"Boolean": ^(NSNumber *o) {
-            return JSValueMakeBoolean(SBWebView.mainFrame.globalContext, o.boolValue);
+            return JSValueMakeBoolean(ContexteJS, o.boolValue);
         }
     };
         
@@ -157,31 +104,6 @@ JSValueRef NStoJS(id ns) {
     return jsObject;
 }
 
-void SnapCall(NSString* identifier, id firstArg, ...) {
-    va_list argumentList;
-    va_start(argumentList, firstArg);
-    
-    NSMutableString *callStr = [NSMutableString stringWithFormat:@"SnapCall(%@).call(%@", snapback_quoter(identifier), objectToJS(firstArg)];
-    
-    id currentObj;
-    
-    while((currentObj = va_arg(argumentList, id)))
-        if(currentObj)
-            [callStr appendString:[NSString stringWithFormat:@", %@", objectToJS(currentObj)]];
-    
-    [callStr appendString:@");"];
-    
-    evalJS(callStr);
-    
-    va_end(argumentList);
-    
-}
-
-
-
-
-
-
 
 @implementation WebScriptObject(Snappy)
 
@@ -189,9 +111,8 @@ void SnapCall(NSString* identifier, id firstArg, ...) {
     return [self call:nil];
 }
 -(void)call:(id)firstArg, ... {
-    NSLog(@"Connecting to JavaSciptCore Runtime");
     if(!firstArg) {
-        JSObjectCallAsFunction(SBWebView.mainFrame.globalContext,
+        JSObjectCallAsFunction(ContexteJS,
                                self.JSObject,
                                nil,
                                0,
@@ -222,7 +143,7 @@ void SnapCall(NSString* identifier, id firstArg, ...) {
     
     va_end(argumentList);
     
-    JSObjectCallAsFunction(SBWebView.mainFrame.globalContext,
+    JSObjectCallAsFunction(ContexteJS,
                            self.JSObject,
                            nil,
                            length,

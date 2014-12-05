@@ -9,16 +9,25 @@
 #import <Cocoa/Cocoa.h>
 #import <WebKit/WebKit.h>
 #import "SnapBack.h"
+#import "SnappyNotification.h"
+
 
 enum {
-    SnappyErrorUnknowError = 0,
-    SnappyErrorBadPassword = 1,
-    SnappyErrorBadUsername = 2,
-    SnappyErrorNoConnection = 3,
-    SnappyErrorFailedToConnect = 4,
-    SnappyErrorNotAuthorized = 5
+    SnappyMethodGET  = 0,
+    SnappyMethodPOST = 1
 };
-typedef NSInteger SnappyError;
+typedef NSInteger SnappyMethod;
+
+
+typedef NS_ENUM(NSUInteger, SnappyError) {
+    SnappyErrorUnknowError     = 0,
+    SnappyErrorBadPassword     = 1,
+    SnappyErrorBadUsername     = 2,
+    SnappyErrorNoConnection    = 3,
+    SnappyErrorFailedToConnect = 4,
+    SnappyErrorNotAuthorized   = 5
+};
+
 
 #define SNAPCHAT_VERSION "7.1.0.10"
 
@@ -26,11 +35,13 @@ typedef NSInteger SnappyError;
 
 -(id)script:(NSString*)command;
 -(void)scriptTS:(NSString*)command;
--(void)setUse3D:(BOOL)use3D;
 
 @property (nonatomic) NSString* authToken;
 @property (nonatomic) NSString* username;
 @property (nonatomic) WebView* webView;
+@property (nonatomic) NSOperationQueue* opQueue;
 @property (nonatomic) BOOL logged;
+@property (nonatomic) BOOL use3D;
+@property (nonatomic) BOOL useParallax;
 
 @end

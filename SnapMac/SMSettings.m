@@ -21,8 +21,7 @@ static SMSettings *sharedInstance;
             [_themeBtn removeFromSuperview];
             [_themeTxt removeFromSuperview];
         }
-        _snapJs = [SnapJS new];
-        [self set3D];
+        [self propageSettings];
         [self setTheme];
         
         sharedInstance = self;
@@ -34,15 +33,17 @@ static SMSettings *sharedInstance;
 +(SMSettings*)sharedInstance {
     return sharedInstance;
 }
--(void)set3D {
+-(void)propageSettings {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        BOOL use3D = [[self objectForKey:@"SMUse3D"] boolValue];
-        [_snapJs setUse3D:use3D];
-        [_checkbox3D setState:(use3D ? NSOnState : NSOffState)];
+        NSNumber* use3D = [self objectForKey:@"SMUse3D"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyUse3D" object:use3D];
+        [_checkbox3D setState:(use3D.boolValue ? NSOnState : NSOffState)];
+        
+        NSNumber* useParallax = [self objectForKey:@"SMUseParallax"];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyUseParallax" object:useParallax];
+        [_checkboxParallax setState:(useParallax.boolValue ? NSOnState : NSOffState)];
+        
     });
-}
--(IBAction)switch3D:(id)sender {
-    [self setObject:@([sender state] == NSOnState) forKey:@"SMUse3D"];
 }
 -(id)objectForKey:(NSString*)key {
     id object = [[NSUserDefaults standardUserDefaults] objectForKey:key];
@@ -56,7 +57,9 @@ static SMSettings *sharedInstance;
         object = (@{
             @"SMDefaultTheme": @"NSAppearanceNameVibrantLight",
             @"SMUse3D": @YES,
-            @"SMUseFlash": @YES
+            @"SMUseFlash": @YES,
+            @"SMUseParallax": @NO,
+            @"SMMaxPDL": @5
         }[key]);
         if(object)
             [self setObject:object forKey:key];
@@ -66,7 +69,12 @@ static SMSettings *sharedInstance;
 -(void)setObject:(id)object forKey:(NSString*)key {
     NSDictionary* actions = @{
         @"SMUse3D": ^{
-            [_snapJs setUse3D:[object boolValue]];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyUse3D"
+                                                                object:object];
+        },
+        @"SMUseParallax": ^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyUseParallax"
+                                                                object:object];
         }
     };
     if(actions[key]) {
@@ -88,6 +96,12 @@ static SMSettings *sharedInstance;
         };
         [_themeBtn selectItemAtIndex:[themes[theme] integerValue]];
     }
+}
+- (IBAction)switchParallax:(id)sender {
+    [self setObject:@([sender state] == NSOnState) forKey:@"SMUseParallax"];
+}
+-(IBAction)switch3D:(id)sender {
+    [self setObject:@([sender state] == NSOnState) forKey:@"SMUse3D"];
 }
 - (IBAction)changeTheme:(id)sender {
     if(!isYosemite())

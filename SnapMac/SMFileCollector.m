@@ -10,56 +10,154 @@
 #import "SMImage.h"
 #import <AVFoundation/AVFoundation.h>
 
+#import "unzip.h"
+#import <sys/stat.h>
+
+#define dir_delimter '/'
+#define MAX_FILENAME 512
+#define READ_SIZE 8192
+
+NSOperationQueue *thumbQueue;
+
 @implementation SMFileCollector
 
-+(void)generateImageForFile:(NSString*)file andCallback:(SMCallback)callback {
-    
-    NSImage __block *thumb = nil;
-    AVURLAsset      *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:file]
-                                                     options:nil];
-
-    AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
-    generator.appliesPreferredTrackTransform = YES;
-    generator.maximumSize                    = NSMakeSize(500, 500);
-    
-    
-    CMTime time = [asset duration];
-    time.value  = 1000;
-
++(void)parseZip:(NSString*)path withCallback:(SMCallback)callback {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSError    *error   = nil;
-        CGImageRef imageRef = [generator copyCGImageAtTime:time actualTime:nil error:&error];
+        NSString *identifier = path.stringByDeletingPathExtension.lastPathComponent;
+        NSMutableDictionary *files = [NSMutableDictionary new];
         
-        if(error || !imageRef)
-            callback(error);
-        else {
-            thumb = [[NSImage alloc] initWithCGImage:imageRef size:NSZeroSize];
-            CGImageRelease(imageRef);
+        unzFile *zipfile = unzOpen(path.UTF8String);
+        const char *zipDir = [path.stringByDeletingPathExtension stringByAppendingString:@".snpy"].UTF8String;
+        BOOL error = mkdir(zipDir, S_IRWXU);
+        
+        error = chdir(zipDir);
+        
+        if(!zipfile) {
+            callback(nil);
         }
         
-        if(!thumb)
+        
+        unz_global_info global_info;
+        if (unzGetGlobalInfo(zipfile, &global_info) != UNZ_OK) {
+            printf("could not read file global info\n");
+            unzClose(zipfile);
             callback(nil);
-        else
-            callback(thumb);
+        }
+        
+        
+        char read_buffer[ READ_SIZE ];
+        
+        
+        uLong i;
+        for(i = 0; i < global_info.number_entry; ++i) {
+            
+            unz_file_info file_info;
+            char filename[MAX_FILENAME];
+            if(unzGetCurrentFileInfo(zipfile,
+                                     &file_info,
+                                     filename,
+                                     MAX_FILENAME,
+                                     NULL, 0, NULL, 0) != UNZ_OK) {
+                printf("could not read file info\n");
+                unzClose(zipfile);
+                callback(nil);
+            }
+            
+            const size_t filename_length = strlen(filename);
+            if(filename[filename_length-1] == dir_delimter) {
+                printf("dir:%s\n", filename);
+                mkdir(filename, S_IWOTH);
+            }
+            else {
+                printf("file:%s\n", filename);
+                NSString *nsFilename = [NSString stringWithCString:filename
+                                                          encoding:NSUTF8StringEncoding];
+                BOOL isMedia = [nsFilename hasPrefix:@"media"];
+                BOOL isOverlay = [nsFilename hasPrefix:@"overlay"];
+                if(isMedia || isOverlay) {
+                    if (unzOpenCurrentFile(zipfile) != UNZ_OK) {
+                        printf("could not open file\n");
+                        unzClose(zipfile);
+                        callback(nil);
+                    }
+                    nsFilename = [(isMedia ? @"media_" : @"overlay_") stringByAppendingString:identifier];
+                    FILE *out = fopen(nsFilename.UTF8String, "wb" );
+                    int error = UNZ_OK;
+                    
+                    do {
+                        error = unzReadCurrentFile(zipfile, read_buffer, READ_SIZE);
+                        if (error < 0) {
+                            printf("error %d\n", error);
+                            unzCloseCurrentFile(zipfile);
+                            unzClose(zipfile);
+                            callback(nil);
+                        }
+                        
+                        if (error > 0) {
+                            fwrite(read_buffer, error, 1, out);
+                        }
+                    } while(error > 0);
+                    
+                    files[isMedia ? @"media" : @"overlay"] = nsFilename;
+                    
+                    fclose(out);
+                }
+                
+            }
+            
+            unzCloseCurrentFile(zipfile);
+            
+            if((i+1) < global_info.number_entry) {
+                if(unzGoToNextFile(zipfile) != UNZ_OK) {
+                    printf("cound not read next file\n");
+                    unzClose(zipfile);
+                    callback(nil);
+                }
+            }
+        }
+        
+        unzClose(zipfile);
+        callback(files);
     });
-    /*
-    [generator generateCGImagesAsynchronouslyForTimes:@[
-                                                        [NSValue valueWithCMTime:CMTimeMakeWithSeconds(0, duration)]
-                                                      ]
-                                    completionHandler:^(CMTime requestedTime, CGImageRef im, CMTime actualTime, AVAssetImageGeneratorResult result, NSError *error) {
-                                        
-                                        
-                                        if (result != AVAssetImageGeneratorSucceeded)
-                                            callback(nil);
-                                        else {
-                                            thumb = [[NSImage alloc] initWithCGImage:im size:NSZeroSize];
-                                            CGImageRelease(im);
-                                            if(!thumb || !im)
-                                                callback(nil);
-                                            
-                                            callback(thumb);
-                                        }
-    }];*/
+}
++(void)generateImageForFile:(NSString*)file andCallback:(SMCallback)callback {
+    if(!thumbQueue) {
+        thumbQueue = [NSOperationQueue new];
+        thumbQueue.maxConcurrentOperationCount = 1;
+    }
+    [thumbQueue addOperationWithBlock:^{
+        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:file]
+                                                    options:nil];
+
+        AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+        generator.appliesPreferredTrackTransform = YES;
+        generator.maximumSize                    = NSMakeSize(500, 500);
+    
+    
+        CMTime time = [asset duration];
+        time.value  = 1000;
+        
+        NSError *error = nil;
+        CGImageRef imageRef = [generator copyCGImageAtTime:time
+                                                actualTime:nil
+                                                     error:&error];
+        
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            
+            NSImage *thumb = nil;
+            if(error || !imageRef)
+                callback(error);
+            else {
+                thumb = [[NSImage alloc] initWithCGImage:imageRef size:NSZeroSize];
+                CGImageRelease(imageRef);
+            }
+        
+            if(!thumb)
+                callback(nil);
+            else
+                callback(thumb);
+        }];
+    }];
     
 }
 +(NSString*)mimeTypeForFileAtPath:(NSString *) path {
@@ -83,30 +181,33 @@
     NSString* dirPath   = [NSString stringWithFormat:@"%@/Snappy", NSHomeDirectory()];
     NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:dirPath];
     
-    NSString *thumb,
-             *filePath,
-             *filename;
+    NSString *thumb    = nil,
+             *filePath = nil,
+             *path = nil,
+             *filename = nil,
+             *overlay = nil;
     
-    media = [media substringWithRange:NSMakeRange(0, media.length -1)];
+    media = [media substringWithRange:NSMakeRange(0, media.length)];
     
-    while ((filename = [dirEnum nextObject])) {
-        if([filename hasPrefix:[NSString stringWithFormat:@"%@_thumb", media]])
-            thumb = filename;
-        else if([filename hasPrefix:media])
-            filePath = filename;
+    while ((path = dirEnum.nextObject)) {
+        filename = path.lastPathComponent;
+        if([filename hasSuffix:@"zip"])
+            continue;
+        
+        if([filename hasPrefix:[NSString stringWithFormat:@"%@_thumb", media]] || [filename hasPrefix:[NSString stringWithFormat:@"media_%@_thumb", media]])
+            thumb = path;
+        else if([filename hasPrefix:[NSString stringWithFormat:@"%@.", media]] || [filename hasPrefix:[NSString stringWithFormat:@"media_%@.", media]])
+            filePath = path;
+        else if([filename hasPrefix:[NSString stringWithFormat:@"overlay_%@", media]])
+            overlay = path;
     }
     
     if(!filePath)
         return callback(nil);
     
     filePath = [NSString stringWithFormat:@"%@/%@", dirPath, filePath];
-    
-    if(thumb)
-        thumb = [NSString stringWithFormat:@"%@/%@", dirPath, thumb];
-    else if([filePath hasSuffix:@"png"] || [filePath hasSuffix:@"jpg"] || [filePath hasSuffix:@"jpeg"])
-        thumb = filePath;
-    else
-        thumb = @"";
+    thumb    = thumb ? [NSString stringWithFormat:@"%@/%@", dirPath, thumb] : filePath;
+    overlay = overlay ? [NSString stringWithFormat:@"%@/%@", dirPath, overlay] : @"";
     
     if(!thumb && [filePath hasSuffix:@"mp4"]) {
         [SMFileCollector generateImageForFile:filePath
@@ -114,7 +215,8 @@
             if(!image)
                 return callback(@{
                            @"thumb": thumb,
-                           @"filePath": filePath
+                           @"filePath": filePath,
+                           @"overlay": overlay
                            });
             NSString *thumbUrl = [NSString stringWithFormat:@"%@/%@_thumb.png", dirPath, media];
             [image saveAsFileType:NSPNGFileType
@@ -122,14 +224,16 @@
                 
             callback(@{
                         @"thumb": thumbUrl,
-                        @"filePath": filePath
+                        @"filePath": filePath,
+                        @"overlay": overlay
                     });
         }];
     }
     else
         callback(@{
                 @"thumb": thumb,
-                @"filePath": filePath
+                @"filePath": filePath,
+                @"overlay": overlay
             });
 }
 +(NSDictionary*)fileTypeForFile:(NSString*)path {
@@ -148,35 +252,61 @@
     NSString *returned = [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
     NSMutableArray *results = [[returned componentsSeparatedByString:@"/"] mutableCopy];
     NSString *extension = results[1];
-    if([extension isEqualToString:@"jpeg"]) extension = @"jpg";
+    if([extension isEqualToString:@"jpeg"])
+        extension = @"jpg";
     return @{
              @"type": results[0],
              @"extension": extension
              };
     
 }
-+(void)save:(NSString*)identifier withData:(NSData*)data andCallback:(SMCallback)callback {
+
++(void)save:(NSString*)identifier withData:(NSData*)data andCallback:(SMCallback)callbackBlock {
+    
+    SMCallback __block callback = callbackBlock;
     
     NSString*      directory   = [NSString stringWithFormat:@"%@/Snappy", NSHomeDirectory()];
-    BOOL           isDir       = NO;
     NSFileManager* fileManager = [NSFileManager defaultManager];
     
-    if(![fileManager fileExistsAtPath:directory isDirectory:&isDir])
-        if(![fileManager createDirectoryAtPath:directory withIntermediateDirectories:YES attributes:nil error:NULL])
+    if(![fileManager fileExistsAtPath:directory])
+        if(![fileManager createDirectoryAtPath:directory
+                   withIntermediateDirectories:YES
+                                    attributes:nil
+                                         error:nil])
             NSLog(@"Error while creating SnapMac directory");
     
-    NSString* file    = [NSString stringWithFormat:@"%@/%@", directory, identifier];
-    BOOL      written = [data writeToFile:file atomically:YES];
+    BOOL overlay = [identifier hasPrefix:@"overlay"],
+         media   = [identifier hasPrefix:@"media"],
+         writeFile = YES;
+    NSString *file = nil;
     
-    if(!written) {
-        callback(nil);
-        return;
+    if(overlay || media) {
+        NSString *realId  = [identifier stringByReplacingOccurrencesOfString:overlay ? @"overlay_" : @"media_"
+                                                                  withString:@""];
+        
+        file = [NSString stringWithFormat:@"%@/%@.snpy/%@", directory, realId, identifier];
+        if([fileManager fileExistsAtPath:file])
+            writeFile = NO;
+    }
+    if(writeFile) {
+        file = [NSString stringWithFormat:@"%@/%@", directory, identifier];
+        BOOL written = [data writeToFile:file
+                               atomically:YES];
+        
+        if(!written) {
+            callback(nil);
+            return;
+        }
     }
     
-    NSString *extension = [SMFileCollector fileTypeForFile:file][@"extension"];
-    NSString *newPath   = [NSString stringWithFormat:@"%@.%@", file, extension];
+    NSString *extension = [SMFileCollector fileTypeForFile:file][@"extension"],
+             *newPath = overlay || media ?
+                    [file stringByAppendingString:[@"." stringByAppendingString:extension]] :
+                    [NSString stringWithFormat:@"%@.%@", file, extension];
     
-    [[NSFileManager defaultManager] moveItemAtPath:file toPath:newPath error:nil];
+    [fileManager moveItemAtPath:file
+                         toPath:newPath
+                          error:nil];
     
     if([extension isEqualToString:@"mp4"]) {
         [SMFileCollector generateImageForFile:newPath
@@ -195,6 +325,28 @@
                            @"thumb": thumb,
                            @"filePath": newPath
                            });
+            }
+        }];
+    }
+    else if([extension isEqualToString:@"zip"]) {
+        [self parseZip:newPath withCallback:^(NSDictionary *files) {
+            int __block filesTreated = 0;
+            
+            for(NSString *key in files.allKeys) {
+                [SMFileCollector save:[NSString stringWithFormat:@"%@_%@", key, identifier]
+                             withData:nil
+                          andCallback:^(NSDictionary* urls) {
+                              filesTreated++;
+                              if(filesTreated == files.count) {
+                                  
+                                  [SMFileCollector urlsForMedia:identifier
+                                                    andCallback:^(NSDictionary* urls) {
+                                                        NSLog(@"Urls = %@", urls);
+                                                        callback(urls);
+                                  }];
+                                  [fileManager removeItemAtPath:newPath error:nil];
+                              }
+                }];
             }
         }];
     }

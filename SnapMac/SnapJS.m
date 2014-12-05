@@ -19,7 +19,6 @@
 
 
 static SnapJS *SnapJSSharedInstance;
-BOOL use3D;
 
 NSString *api(NSString *url) {
 	return [NSString stringWithFormat:@"https://feelinsonice-hrd.appspot.com%@", url];
@@ -30,19 +29,6 @@ NSString *UUID() {
 	NSString *uuidString = (__bridge_transfer NSString *)CFUUIDCreateString(kCFAllocatorDefault, uuid);
 	CFRelease(uuid);
 	return uuidString;
-}
-
-NSData *padData(NSData *data) {
-	NSMutableData *tmpData		= data.mutableCopy;
-	int blockSize				= 16;
-	int charDiv					= blockSize - ((tmpData.length + 1) % blockSize);
-	NSMutableString *padding	= [[NSMutableString alloc] initWithFormat:@"%c", (unichar)10];
-
-	for (int c = 0; c < charDiv; c++) {
-		[padding appendFormat:@"%c",(unichar)charDiv];
-	}
-	[tmpData appendData:[padding dataUsingEncoding:NSUTF8StringEncoding]];
-	return tmpData;
 }
 
 NSError *nserror(NSInteger code, NSString *message) {
@@ -90,29 +76,24 @@ BOOL isError(id obj) {
 	if(SnapJSSharedInstance)
 		return SnapJSSharedInstance;
 	if(self = [super init]) {
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(showingCamera)
-													 name:@"ShowingCamera"
-												   object:nil];
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(closingCamera)
-													 name:@"ClosingCamera"
-												   object:nil];
+		NSDictionary *dict = @{
+							   @"ShowingCamera": @"showingCamera",
+							   @"ClosingCamera": @"closingCamera",
+							   @"SnappySettingsLoaded": @"settingsLoaded:",
+							   @"SnappyUse3D": @"use3D:",
+							   @"SnappyUseParallax": @"useParallax:",
+							   };
+		NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+		for(NSString* notifName in dict.allKeys)
+			[center addObserver:self
+					   selector:NSSelectorFromString(dict[notifName])
+						   name:notifName
+						 object:nil];
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(settingsLoaded:)
-													 name:@"SnappySettingsLoaded"
-												   object:nil];
+		_opQueue = [NSOperationQueue new];
 	}
 	SnapJSSharedInstance = self;
 	return self;
-}
-
-#pragma mark Outils
-
--(SMCamView*)camView {
-	Snappy *delegate = (Snappy*)[[NSApplication sharedApplication] delegate];
-	return [delegate performSelector:@selector(camView) withObject:nil];
 }
 
 #pragma mark Comptes et connection
@@ -127,6 +108,10 @@ BOOL isError(id obj) {
 -(void)settingsLoaded:(NSNotification*)notification {
 	_username = [[SMSettings sharedInstance] objectForKey:@"SMUsername"];
 	_authToken = [[SMSettings sharedInstance] objectForKey:@"SMAuthToken"];
+	int maxPdl = [[[SMSettings sharedInstance] objectForKey:@"SMMaxPDL"] intValue];
+	_opQueue.maxConcurrentOperationCount = maxPdl > 1 ? maxPdl : 5;
+	
+	NSLog(@"_opQueue max = %d", _opQueue.maxConcurrentOperationCount);
 }
 -(void)loginWithUser:(NSString*)user password:(NSString*)password andCallback:(WebScriptObject*)callback {
 	[self testLogin:user
@@ -184,7 +169,7 @@ BOOL isError(id obj) {
 #pragma mark WebKit
 -(void)setWebView:(SMWebUI*)webView {
 	_webView = webView;
-	SBWebView = webView;
+	ContexteJS = webView.mainFrame.globalContext;
 }
 +(NSString*)webScriptNameForSelector:(SEL)sel {
 	NSDictionary *selectors = @{
@@ -192,12 +177,14 @@ BOOL isError(id obj) {
 		@"showInFinder:": @"showInFinder",
 		@"getKeychainWithCallback:": @"getKeychain",
 		@"showMedia:": @"showMedia",
-        @"getStory:withKey:iv:andCallback:": @"getStory",
+		@"getStory:withKey:iv:andCallback:": @"getStory",
 		@"getUpdates:": @"getUpdates",
 		@"getStories:": @"getStories",
 		@"sendSnapTo:withMedia:": @"sendSnap",
 		@"loginWithUser:password:andCallback:": @"login",
-		@"testCallback:": @"testCallback"
+		@"openURL:": @"openURL",
+		@"testCallback:": @"testCallback",
+		@"notification:withMessage:andCallback:": @"notification"
 	};
 	for(NSString *selName in selectors) {
 		if(NSSelectorFromString(selName) == sel) return selectors[selName];
@@ -212,27 +199,48 @@ BOOL isError(id obj) {
 #pragma mark HTTPS
 
 -(void)requestTo:(NSString*)url withCallback:(SMCallback)callback {
-	[self requestTo:url withData:nil andCallback:callback asData:NO];
+	[self requestTo:url
+		   withData:nil
+		andCallback:callback
+			 asData:NO
+			 method:SnappyMethodPOST];
 }
 -(void)requestTo:(NSString*)url withData:(NSDictionary*)data andCallback:(SMCallback)callback {
-	
-	[self requestTo:url withData:data andCallback:callback asData:NO];
+	[self requestTo:url
+		   withData:data
+		andCallback:callback
+			 asData:NO
+			 method:SnappyMethodPOST];
 }
 -(void)requestTo:(NSString*)url withData:(NSDictionary*)data andCallback:(SMCallback)callback asData:(BOOL)asData {
+	[self requestTo:url
+		   withData:data
+		andCallback:callback
+			 asData:asData
+			 method:SnappyMethodPOST];
+}
+-(void)requestTo:(NSString*)url withData:(NSDictionary*)data andCallback:(SMCallback)callback asData:(BOOL)asData method:(SnappyMethod)method{
 	
 	if(!_username)
 		_username = @"";
 	
-	NSMutableDictionary *parameters				 = [SMConnection genericDataWithToken:_authToken];
-						 parameters[@"username"] = _username;
+	NSMutableDictionary *parameters = nil;
 	
-	if(data) {
-		if(data[@"username"])
-			parameters = [SMConnection genericData];
+	if(method == SnappyMethodPOST) {
+		parameters = [SMConnection genericDataWithToken:_authToken];
+		parameters[@"username"] = _username;
+		
+		
+		if(data) {
+			if(data[@"username"])
+				parameters = [SMConnection genericData];
 			
-		for(NSString *key in data.allKeys)
-			parameters[key] = data[key];
+			for(NSString *key in data.allKeys)
+				parameters[key] = data[key];
+		}
 	}
+	else
+		parameters = data.mutableCopy;
 	
 	void (^successBlock)() = ^(AFHTTPRequestOperation *operation, NSData *responseObject) {
 		
@@ -249,13 +257,14 @@ BOOL isError(id obj) {
 		}
 	};
 	void (^failureBlock)() = ^(AFHTTPRequestOperation *operation, NSError *error) {
+		
 		callback(AFError(error, YES));
 	};
 	
 	
 	
 	NSError				*error	 = nil;
-	NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] requestWithMethod:@(data ? "POST" : "GET")
+	NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] requestWithMethod:@(method == SnappyMethodPOST ? "POST" : "GET")
 																				 URLString:api(url)
 																				parameters:parameters
 																					 error:&error];
@@ -269,29 +278,30 @@ BOOL isError(id obj) {
 	[manager setCompletionBlockWithSuccess:successBlock
 								   failure:failureBlock];
 	
-	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[manager start];
-	});
+	[_opQueue addOperation:manager];
 	
 }
 
 #pragma mark API
 
 -(void)showCamera {
-	[[self camView] show];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyShowCamera"
+														object:@YES];
 }
 -(void)hideCamera {
-	[[self camView] hide];
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyShowCamera"
+														object:@NO];
 }
 -(void)showMedia:(NSString*)media {
 	[SMFileCollector urlsForMedia:media andCallback:^(NSDictionary* urls) {
 		if(!urls)
 			return;
 		
-		[[self camView] showImageFile:urls[@"filePath"]];
+		[[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyShowMedia"
+															object:urls];
 	}];
 }
--(void)sendSnapTo:(NSString*)to withMedia:(NSString*)mediaPath andCallback:(Callback)callback {
+-(void)sendSnapTo:(NSString*)to withMedia:(NSString*)mediaPath andCallback:(WebScriptObject*)callback {
 	
 	NSImage *media = [[NSImage alloc] initWithContentsOfFile:mediaPath];
 	
@@ -311,7 +321,7 @@ BOOL isError(id obj) {
 							}
 				andCallback:^(NSString *result) {
 								if(isError(result))
-									SnapCall(callback, jsError(result), nil);
+									[callback call:jsError(result), nil];
 								else if(!result.length || [result isEqualToString:@""]) {
 								   
 									[self requestTo:@"/bq/send"
@@ -323,7 +333,7 @@ BOOL isError(id obj) {
 													}
 									   andCallback:^(NSString *result) {
 										   if(isError(result)) {
-											   SnapCall(callback, jsError(result), nil);
+											   [callback call:jsError(result), nil];
 										   }
 										   
 										   if(!result.length || [result isEqualToString:@""]) {
@@ -378,12 +388,13 @@ BOOL isError(id obj) {
 		if(urls)
 			return [callback call:urls, nil];
 		
-		NSString *storyPath = [NSString stringWithFormat:@"/bq/story_blob?story_id=%@", identifier];
-		NSData	 *key		= [NSData dataFromBase64String:keyString];
-		NSData	 *iv		= [NSData dataFromBase64String:ivString];
+		NSData *key = [NSData dataFromBase64String:keyString];
+		NSData *iv	= [NSData dataFromBase64String:ivString];
 		
-		[self requestTo:storyPath
-			   withData:nil
+		[self requestTo:@"/bq/story_blob"
+			   withData:@{
+						  @"story_id": identifier
+						  }
 			andCallback:^(NSData *result) {
 				
 				if(isError(result)) {
@@ -403,7 +414,9 @@ BOOL isError(id obj) {
 									  [callback call:urls, nil];
 								  }];
 				}
-			} asData:YES];
+			}
+				 asData:YES
+				 method:SnappyMethodGET];
 	}];
 
 }
@@ -416,16 +429,6 @@ BOOL isError(id obj) {
 		else
 			[callback call:result, nil];
 	}];
-}
--(void)getStories:(Callback)callback {
-	[self requestTo:@"/bq/stories"
-		   withData:@{}
-		andCallback:^(id result) {
-			if(!isError(result))
-				SnapCall(callback, result, nil);
-			else
-				SnapCall(callback, AFError(result, YES), nil);
-		}];
 }
 
 -(void)getKeychainWithCallback:(WebScriptObject*)callback {
@@ -452,9 +455,26 @@ BOOL isError(id obj) {
 						 inFileViewerRootedAtPath:url.stringByDeletingLastPathComponent];
 	});
 }
+-(void)openURL:(NSString*)urlString {
+	NSURL* url = [NSURL URLWithString:urlString];
+	[[NSWorkspace sharedWorkspace] openURL:url];
+}
 
+-(void)notification:(NSString*)title withMessage:(NSString*)message andCallback:(WebScriptObject*)callback {
+	SnappyNotification *notif = [SnappyNotification new];
+	notif.title = @"Snappy";
+	notif.subtitle = title;
+	notif.informativeText = message;
+	notif.hasActionButton = YES;
+	notif.actionButtonTitle = @"Test";
+	
+	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:notif];
+}
 -(BOOL)use3D {
-	return use3D;
+	return _use3D;
+}
+-(BOOL)useParallax {
+	return _useParallax;
 }
 -(void)switchToPhotoMode {
 	SMCamView *camView = [[[NSApplication sharedApplication] delegate] performSelector:@selector(camView)];
@@ -482,9 +502,14 @@ BOOL isError(id obj) {
 											   waitUntilDone:NO];
 }
 
--(void)setUse3D:(BOOL)use3d {
-	use3D = use3d;
-	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.use3D(%@);", @(use3D ? "true" : "false")];
+-(void)use3D:(NSNotification*)notif {
+	_use3D = [[notif object] boolValue];
+	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.use3D(%@);", @(_use3D ? "true" : "false")];
+	[self scriptTS:cmd];
+}
+-(void)useParallax:(NSNotification*)notif {
+	_useParallax = [[notif object] boolValue];
+	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.useParallax(%@);", @(_useParallax ? "true" : "false")];
 	[self scriptTS:cmd];
 }
 

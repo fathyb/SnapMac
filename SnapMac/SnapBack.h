@@ -17,14 +17,7 @@
 
 @end
 #define Callback NSString*
-extern WebView* SBWebView;
+extern JSContextRef ContexteJS;
 
 typedef WebScriptObject JSCallback;
 
-void SnapCall(NSString* identifier, id firstArg, ...) NS_REQUIRES_NIL_TERMINATION;
-void SnappyCallback(JSCallback *object, ...) NS_REQUIRES_NIL_TERMINATION;
-
-#pragma mark JSON
-NSString* objectToJSON(id object);
-id objectToJS(id object);
-id jsonToObject(NSString* data);

@@ -27,9 +27,9 @@
     self.cornerRadius = 20;
 }
 -(void)settingsLoaded:(NSNotification*)notification {
-    _settings = notification.object;
+    SMSettings *settings = notification.object;
     SMFlashButton *flashBtn = [self flashBtn];
-    flashBtn.flashState = [[_settings objectForKey:@"SMUseFlash"] boolValue];
+    flashBtn.flashState = [[settings objectForKey:@"SMUseFlash"] boolValue];
 }
 -(void)setCornerRadius:(CGFloat)cornerRadius {
     _cornerRadius = cornerRadius;
@@ -61,7 +61,7 @@
     return ((NSView*)self.subviews[0]).subviews[1];
 }
 -(void)toggleFlash:(SMFlashButton*)sender {
-    [_settings setObject:@(sender.flashState) forKey:@"SMUseFlash"];
+    [[SMSettings sharedInstance] setObject:@(sender.flashState) forKey:@"SMUseFlash"];
 }
 
 -(void)hide {

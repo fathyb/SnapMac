@@ -226,10 +226,10 @@ BOOL hideDivider = NO;
     thumbnailRect.size.width = scaledWidth;
     thumbnailRect.size.height = scaledHeight;
     
-    [sourceImage drawInRect: thumbnailRect
-                   fromRect: NSZeroRect
-                  operation: NSCompositeSourceOver
-                   fraction: 1.0];
+    [sourceImage drawInRect:thumbnailRect
+                   fromRect:NSZeroRect
+                  operation:NSCompositeSourceOver
+                   fraction:1.0];
     
     [newImage unlockFocus];
     
@@ -250,7 +250,7 @@ BOOL hideDivider = NO;
         filter = nil;
     else
         filter = [CIFilter filterWithName:effet];
-    //[self.camView performSelectorOnMainThread:@selector(setFilter:) withObject:filter waitUntilDone:YES];
+    
     [self.camView setFilter:filter];
 }
 
@@ -274,9 +274,9 @@ BOOL hideDivider = NO;
 }
 -(void)setEffects {
     [effectList addItemWithTitle:@"Aucun effet"];
-    for(NSString* effect in _effects) {
-        if([CIFilter filterWithName:_effects[effect]] != nil) [effectList addItemWithTitle:effect];
-    }
+    for(NSString* effect in _effects)
+        if([CIFilter filterWithName:_effects[effect]] != nil)
+            [effectList addItemWithTitle:effect];
 }
 
 @end
