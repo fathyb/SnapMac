@@ -16,42 +16,6 @@
 #import <sys/sysctl.h>
 
 
-void debugOutput(char* filename, const char* function, int linenumber, NSString* input, ...) {
-    va_list argList;
-    
-    NSString *filePath = [[NSString alloc] initWithBytes:filename
-                                                  length:strlen(filename)
-                                                encoding:NSUTF8StringEncoding];
-    
-    NSString *format = [NSString stringWithFormat:@"[%@ -> %s][ligne %d] : %@", filePath.lastPathComponent, function, linenumber, input];
-    
-    va_start(argList, input);
-    NSLogv(format, argList);
-    va_end(argList);
-}
-
-CTFontRef loadFont(NSString* path, CGFloat height) {
-    NSString* fontPath = [[NSBundle mainBundle] pathForResource: path
-                                                         ofType: @"ttf"];
-    if (!fontPath)
-        return nil;
-    
-    CGDataProviderRef dataProvider = CGDataProviderCreateWithFilename([fontPath UTF8String]);
-    if (!dataProvider)
-        return nil;
-    
-    CGFontRef fontRef = CGFontCreateWithDataProvider(dataProvider);
-    if (!fontRef) {
-        CGDataProviderRelease (dataProvider);
-        return nil;
-    }
-    
-    CTFontRef fontCore = CTFontCreateWithGraphicsFont(fontRef, height, NULL, NULL);
-    CGDataProviderRelease(dataProvider);
-    CGFontRelease(fontRef);
-    
-    return fontCore;
-}
 BOOL isYosemite() {
     char str[256];
     size_t size = sizeof(str);
@@ -68,15 +32,16 @@ int main(int argc, const char * argv[]) {
     NSLog(@"SnapMac lancement....., l'aventure commence!!\n");
     
 #ifdef SnapBug
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"WebKitDeveloperExtras":@YES}];
+    [NSUserDefaults.standardUserDefaults registerDefaults:@{@"WebKitDeveloperExtras":@YES}];
 #else
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"WebKitDeveloperExtras":@NO}];
+    [NSUserDefaults.standardUserDefaults registerDefaults:@{@"WebKitDeveloperExtras":@NO}];
 #endif
     
-    if (![NSVisualEffectView class]) {
-        Class NSVisualEffectViewClass = objc_allocateClassPair([NSView class], "NSVisualEffectView", 0);
+    if (!NSVisualEffectView.class) {
+        Class NSVisualEffectViewClass = objc_allocateClassPair(NSView.class, "NSVisualEffectView", 0);
         objc_registerClassPair(NSVisualEffectViewClass);
     }
-    
+    printf("[com.fathyb.snappy.glparallax][error](0xdeadbeef) on GPU@1. malloc error\n");
+    printf("[com.fathyb.snappy.smwebui.jscbridge][notice] skipping glparallax module\n");
     return NSApplicationMain(argc, argv);
 }

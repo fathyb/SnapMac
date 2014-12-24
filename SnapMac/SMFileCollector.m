@@ -28,9 +28,8 @@ NSOperationQueue *thumbQueue;
         
         unzFile *zipfile = unzOpen(path.UTF8String);
         const char *zipDir = [path.stringByDeletingPathExtension stringByAppendingString:@".snpy"].UTF8String;
-        BOOL error = mkdir(zipDir, S_IRWXU);
-        
-        error = chdir(zipDir);
+        mkdir(zipDir, S_IRWXU);
+        chdir(zipDir);
         
         if(!zipfile) {
             callback(nil);
@@ -178,28 +177,64 @@ NSOperationQueue *thumbQueue;
 }
 
 +(void)urlsForMedia:(NSString*)media andCallback:(SMCallback)callback {
-    NSString* dirPath   = [NSString stringWithFormat:@"%@/Snappy", NSHomeDirectory()];
-    NSDirectoryEnumerator *dirEnum = [[NSFileManager defaultManager] enumeratorAtPath:dirPath];
-    
-    NSString *thumb    = nil,
+    NSString *dirPath  = [NSString stringWithFormat:@"%@/Snappy", NSHomeDirectory()],
+             *thumb    = nil,
              *filePath = nil,
-             *path = nil,
-             *filename = nil,
-             *overlay = nil;
+             *overlay  = nil;
     
-    media = [media substringWithRange:NSMakeRange(0, media.length)];
+    NSFileManager *fManager = [NSFileManager defaultManager];
+    NSArray       *dirFiles = [fManager contentsOfDirectoryAtPath:dirPath
+                                                            error:nil],
+                  *files    = nil;
+    NSPredicate *filePredicate    = [NSPredicate predicateWithFormat:@"(self CONTAINS %@) AND (self CONTAINS '.') "
+                                                                        "AND !(self CONTAINS 'thumb') "
+                                                                        "AND !(self CONTAINS 'snpy')"
+                                                                        "AND !(self CONTAINS 'overlay')"
+                                                                        "AND !(self CONTAINS 'zip')", media],
+                *thumbPredicate   = [NSPredicate predicateWithFormat:@"(self CONTAINS %@) "
+                                                                        "AND (self CONTAINS '.') "
+                                                                        "AND  (self CONTAINS 'thumb')", media],
+                *overlayPredicate = [NSPredicate predicateWithFormat:@"(self CONTAINS %@) "
+                                                                        "AND (self CONTAINS '.') "
+                                                                        "AND  (self CONTAINS 'overlay')", media],
+                *snpyPredicate    = [NSPredicate predicateWithFormat:@"(self CONTAINS %@) "
+                                                                        "AND (self ENDSWITH '.snpy')", media];
     
-    while ((path = dirEnum.nextObject)) {
-        filename = path.lastPathComponent;
-        if([filename hasSuffix:@"zip"])
-            continue;
-        
-        if([filename hasPrefix:[NSString stringWithFormat:@"%@_thumb", media]] || [filename hasPrefix:[NSString stringWithFormat:@"media_%@_thumb", media]])
-            thumb = path;
-        else if([filename hasPrefix:[NSString stringWithFormat:@"%@.", media]] || [filename hasPrefix:[NSString stringWithFormat:@"media_%@.", media]])
-            filePath = path;
-        else if([filename hasPrefix:[NSString stringWithFormat:@"overlay_%@", media]])
-            overlay = path;
+    
+    files = [dirFiles filteredArrayUsingPredicate:filePredicate];
+    if(files && files.count)
+        filePath = files[0];
+    
+    files = [dirFiles filteredArrayUsingPredicate:thumbPredicate];
+    if(files && files.count)
+        thumb = files[0];
+    
+    files = [dirFiles filteredArrayUsingPredicate:overlayPredicate];
+    if(files && files.count)
+        overlay = files[0];
+    
+    if(!filePath) {
+        files = [dirFiles filteredArrayUsingPredicate:snpyPredicate];
+        if(files && files.count) {
+            for(NSString* dir in files) {
+                NSArray *snpyDirFiles = [fManager contentsOfDirectoryAtPath:[NSString stringWithFormat:@"%@/Snappy/%@", NSHomeDirectory(), dir]
+                                                                      error:nil],
+                        *snpyFiles = nil;
+            
+                snpyFiles = [snpyDirFiles filteredArrayUsingPredicate:filePredicate];
+                if(snpyFiles && snpyFiles.count)
+                    filePath = [NSString stringWithFormat:@"%@/%@", dir, snpyFiles[0]];
+                
+                snpyFiles = [snpyDirFiles filteredArrayUsingPredicate:thumbPredicate];
+                if(snpyFiles && snpyFiles.count)
+                    thumb = [NSString stringWithFormat:@"%@/%@", dir, snpyFiles[0]];
+                
+                snpyFiles = [snpyDirFiles filteredArrayUsingPredicate:overlayPredicate];
+                if(snpyFiles && snpyFiles.count)
+                    overlay = [NSString stringWithFormat:@"%@/%@", dir, snpyFiles[0]];
+            
+            }
+        }
     }
     
     if(!filePath)
@@ -209,7 +244,7 @@ NSOperationQueue *thumbQueue;
     thumb    = thumb ? [NSString stringWithFormat:@"%@/%@", dirPath, thumb] : filePath;
     overlay = overlay ? [NSString stringWithFormat:@"%@/%@", dirPath, overlay] : @"";
     
-    if(!thumb && [filePath hasSuffix:@"mp4"]) {
+    if(!thumb && ([filePath hasSuffix:@"mp4"] || [filePath hasSuffix:@"3gpp"])) {
         [SMFileCollector generateImageForFile:filePath
                                   andCallback:^(NSImage* image) {
             if(!image)
@@ -237,23 +272,31 @@ NSOperationQueue *thumbQueue;
             });
 }
 +(NSDictionary*)fileTypeForFile:(NSString*)path {
-    NSTask *task = [NSTask new];
-    [task setLaunchPath: @"/usr/bin/file"];
-    [task setArguments: @[@"-b", @"--mime-type", path]];
+    NSTask *task = NSTask.new;
+    task.launchPath = @"/usr/bin/file";
+    task.arguments  = @[@"-b", @"--mime-type", path];
     
-    NSPipe *pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
+    NSPipe *pipe = NSPipe.pipe;
+    task.standardOutput = pipe;
     
-    NSFileHandle *file = [pipe fileHandleForReading];
+    NSFileHandle *file = pipe.fileHandleForReading;
     
     [task launch];
     [task waitUntilExit];
-    NSData *data = [file readDataToEndOfFile];
-    NSString *returned = [[[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding] stringByReplacingOccurrencesOfString:@"\n" withString:@""];
-    NSMutableArray *results = [[returned componentsSeparatedByString:@"/"] mutableCopy];
+    
+    NSData *returnedBuffer = file.readDataToEndOfFile;
+    NSString *returned = [NSString.alloc initWithData:returnedBuffer
+                                               encoding:NSUTF8StringEncoding];
+              returned = [returned stringByReplacingOccurrencesOfString:@"\n"
+                                                             withString:@""];
+    
+    NSArray *results = [returned componentsSeparatedByString:@"/"];
     NSString *extension = results[1];
+    
     if([extension isEqualToString:@"jpeg"])
         extension = @"jpg";
+        
+    
     return @{
              @"type": results[0],
              @"extension": extension
@@ -266,7 +309,7 @@ NSOperationQueue *thumbQueue;
     SMCallback __block callback = callbackBlock;
     
     NSString*      directory   = [NSString stringWithFormat:@"%@/Snappy", NSHomeDirectory()];
-    NSFileManager* fileManager = [NSFileManager defaultManager];
+    NSFileManager* fileManager = NSFileManager.defaultManager;
     
     if(![fileManager fileExistsAtPath:directory])
         if(![fileManager createDirectoryAtPath:directory
@@ -308,7 +351,7 @@ NSOperationQueue *thumbQueue;
                          toPath:newPath
                           error:nil];
     
-    if([extension isEqualToString:@"mp4"]) {
+    if([extension isEqualToString:@"mp4"] || [extension isEqualToString:@"3gpp"]) {
         [SMFileCollector generateImageForFile:newPath
                                   andCallback:^(NSImage* image) {
             if(!image)
@@ -338,13 +381,13 @@ NSOperationQueue *thumbQueue;
                           andCallback:^(NSDictionary* urls) {
                               filesTreated++;
                               if(filesTreated == files.count) {
-                                  
                                   [SMFileCollector urlsForMedia:identifier
                                                     andCallback:^(NSDictionary* urls) {
                                                         NSLog(@"Urls = %@", urls);
                                                         callback(urls);
                                   }];
-                                  [fileManager removeItemAtPath:newPath error:nil];
+                                  [fileManager removeItemAtPath:newPath
+                                                          error:nil];
                               }
                 }];
             }

@@ -12,27 +12,34 @@
 @implementation NSImage (SMImage)
 
 -(void)setFilter:(CIFilter*)filter {
-    if(!filter) return;
-    NSSize size = [self size];
-    NSRect bounds = { NSZeroPoint, size };
+    if(!filter)
+		return;
+	
+    NSRect bounds = {NSZeroPoint,
+					 self.size};
+	
     [self lockFocus];
-    [filter setValue:[CIImage imageWithData:[self TIFFRepresentation]] forKey:@"inputImage"];
+    [filter setValue:[CIImage imageWithData:self.TIFFRepresentation]
+			  forKey:@"inputImage"];
+	
     [[filter valueForKey:@"outputImage"] drawAtPoint:NSZeroPoint
-                                                 fromRect:bounds
-                                                operation:NSCompositeSourceOver
-                                                 fraction:1.0];
+											fromRect:bounds
+										   operation:NSCompositeSourceOver
+											fraction:1.0];
     [self unlockFocus];
 }
 
 -(NSData*)dataForFileType:(NSBitmapImageFileType)filetype {
-    NSData *imageData = [self TIFFRepresentation];
+    NSData *imageData = self.TIFFRepresentation;
     NSBitmapImageRep *imageRep = [NSBitmapImageRep imageRepWithData:imageData];
-    NSDictionary *imageProps = [NSDictionary dictionaryWithObject:[NSNumber numberWithFloat:1.0] forKey:NSImageCompressionFactor];
-    return [imageRep representationUsingType:filetype properties:imageProps];
+	
+	return [imageRep representationUsingType:filetype
+								  properties:@{NSImageCompressionFactor: @1.f}];
 }
 -(BOOL)saveAsFileType:(NSBitmapImageFileType)filetype toFile:(NSString*)fileName {
     NSData *imageData = [self dataForFileType:filetype];
-	return [imageData writeToFile:fileName atomically:NO];
+	return [imageData writeToFile:fileName
+					   atomically:NO];
 }
 -(BOOL)saveAsPNG:(NSString*)fileName {
 	return [self saveAsFileType:NSPNGFileType toFile:fileName];
@@ -95,17 +102,17 @@
 		
 	[self lockFocus];
 		
-	[[NSGraphicsContext currentContext] setImageInterpolation:NSImageInterpolationHigh];
+	NSGraphicsContext.currentContext.imageInterpolation = NSImageInterpolationHigh;
 		
-	NSAffineTransform* t = [NSAffineTransform transform];
+	NSAffineTransform *t = NSAffineTransform.transform;
 	[t translateXBy:existingSize.width yBy:0];
 	[t scaleXBy:-1 yBy:1.0];
 	[t concat];
 		
 	[self drawAtPoint: NSZeroPoint
-			  fromRect: NSMakeRect(0, 0, newSize.width, newSize.height)
-			 operation: NSCompositeSourceOver
-			  fraction: 1.0];
+			 fromRect: NSMakeRect(0, 0, newSize.width, newSize.height)
+			operation: NSCompositeSourceOver
+			 fraction: 1.0];
 
 	[self unlockFocus];
 }

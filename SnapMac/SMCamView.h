@@ -23,6 +23,8 @@
 @property (nonatomic) BOOL showPhotoBtn;
 @property (nonatomic) BOOL showFilterList;
 @property (nonatomic) BOOL showPhotoTools;
+@property (nonatomic) BOOL showRefreshBtn;
+@property (nonatomic) BOOL showPhotoOptions;
 @property (nonatomic) NSLayoutConstraint *positionLeft;
 
 -(void)setFilter:(CIFilter*)filter;
@@ -32,5 +34,6 @@
 -(void)resetSubviews;
 -(void)showImageFile:(NSString*)path;
 -(void)showImage:(NSImage*)image;
+-(void)showImage:(NSImage*)image withTools:(BOOL)useOpts;
 -(void)photo:(SMCallback)callback;
 @end

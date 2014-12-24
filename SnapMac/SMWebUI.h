@@ -8,11 +8,10 @@
 
 #import <Foundation/Foundation.h>
 #import <WebKit/WebKit.h>
-#import "SnapJS.h"
+#import <Webkit/WebFrameLoadDelegate.h>
 
 @interface SMWebUI : WebView
 
-@property SnapJS* SnapJS;
 
 -(void)script:(NSString*)commande;
 

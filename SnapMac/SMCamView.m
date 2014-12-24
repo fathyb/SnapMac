@@ -10,7 +10,8 @@
 #import "SMImage.h"
 #import "SMLoadingView.h"
 #import "SMPhotoButton.h"
-#import "SMPhotoToolsView.h"
+#import "SMphotoOptsView.h"
+#import "SMRefreshBouton.h"
 
 #define kSwipeMinimumLength 0.15
 
@@ -18,8 +19,9 @@
 
 @synthesize showCancelBtn,
             showPhotoBtn,
+            showRefreshBtn,
             showFilterList,
-            showPhotoTools,
+            showPhotoOptions,
             previewLayer,
             session,
             twoFingerTouches,
@@ -43,30 +45,31 @@ BOOL isHandlingEvent;
     return YES;
 }
 -(BOOL)recognizeTwoFingerGestures {
-    NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
+    NSUserDefaults* defaults = NSUserDefaults.standardUserDefaults;
     return [defaults boolForKey:@"AppleEnableSwipeNavigateWithScrolls"];
 }
 
--(void)scrollWheel:(NSEvent *)event {
-    if (twoFingerTouches) return;
-    if(![NSEvent isSwipeTrackingFromScrollEventsEnabled]) {
+-(void)scrollWheel:(NSEvent*)event {
+    if (twoFingerTouches)
+        return;
+    if(!NSEvent.isSwipeTrackingFromScrollEventsEnabled) {
         [super scrollWheel:event];
         return;
     }
-    if([event phase] == NSEventPhaseBegan) {
+    if(event.phase == NSEventPhaseBegan) {
         currentSum = 0;
         scrollDeltaX = 0;
         scrollDeltaY = 0;
         isHandlingEvent = YES;
     }
-    else if([event phase] == NSEventPhaseChanged) {
+    else if(event.phase == NSEventPhaseChanged) {
         if(!isHandlingEvent) {
             if(currentSum != 0)
                 currentSum = 0;
         }
         else {
-            scrollDeltaX += [event scrollingDeltaX];
-            scrollDeltaY += [event scrollingDeltaY];
+            scrollDeltaX += event.scrollingDeltaX;
+            scrollDeltaY += event.scrollingDeltaY;
             
             float absoluteSumX = fabsf(scrollDeltaX);
             float absoluteSumY = fabsf(scrollDeltaY);
@@ -88,14 +91,16 @@ BOOL isHandlingEvent;
             }
         }
     }
-    else if([event phase] == NSEventPhaseEnded) {
+    else if(event.phase == NSEventPhaseEnded) {
         
         float absoluteSum = fabsf(currentSum);
         
-        if (absoluteSum < kSwipeMinimumLength) return;
+        if (absoluteSum < kSwipeMinimumLength)
+            return;
         
-        if(!currentSum) return;
-        id delegate = [[NSApplication sharedApplication] delegate];
+        if(!currentSum)
+            return;
+        id delegate = NSApplication.sharedApplication.delegate;
         SEL selector = NSSelectorFromString(currentSum > 0 ? @"prevFilter" : @"nextFilter");
         if([delegate respondsToSelector:selector]) {
             [delegate performSelectorInBackground:selector withObject:nil];
@@ -104,7 +109,7 @@ BOOL isHandlingEvent;
         if(currentSum != 0)
             currentSum = 0;
     }
-    else if([event phase] == NSEventPhaseMayBegin || [event phase] == NSEventPhaseCancelled) {
+    else if(event.phase == NSEventPhaseMayBegin || event.phase == NSEventPhaseCancelled) {
         isHandlingEvent = NO;
         if(currentSum != 0)
             currentSum = 0;
@@ -183,16 +188,13 @@ BOOL isHandlingEvent;
 
 -(void)awakeFromNib {
     
-    for(NSLayoutConstraint *constraint in self.superview.superview.constraints) {
-        if(constraint.constant == -256.f)
-            _positionLeft = constraint;
-        _positionLeft.constant = 0;
-    }
-    
     NSDictionary* notifications = @{
         NSWindowDidResizeNotification: @"screenResize",
-                  @"SnappyShowCamera": @"showCamera:",
-                   @"SnappyShowMedia": @"showMedia:"
+        @"SnappyShowCamera": @"showCamera:",
+        @"SnappyShowMedia": @"showMedia:",
+        @"SnappyRefreshVideo": @"refreshVideo",
+        @"SnappyNeedPhoto": @"needPhoto",
+        @"IGotCamPosConstraint": @"setPosConstraint:"
     };
     
     NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
@@ -245,25 +247,76 @@ BOOL isHandlingEvent;
         [self hideLoading];
     });
 }
+NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
+    
+    float width		 = imageSize.width;
+    float height	 = imageSize.height;
+    
+    float newWidth  = layerSize.width;
+    float newHeight = layerSize.height;
+    
+    float scaleFactor  = 0.0;
+    float scaledWidth  = newWidth;
+    float scaledHeight = newHeight;
+    
+    NSPoint thumbnailPoint = NSZeroPoint;
+    
+    if(!NSEqualSizes(imageSize, layerSize)) {
+        float widthFactor  = newWidth / width;
+        float heightFactor = newHeight / height;
+        
+        if (widthFactor < heightFactor)
+            scaleFactor = widthFactor;
+        else
+            scaleFactor = heightFactor;
+        
+        scaledWidth  = width  * scaleFactor;
+        scaledHeight = height * scaleFactor;
+        
+        if (widthFactor < heightFactor)
+            thumbnailPoint.y = (newHeight - scaledHeight) * 0.5;
+        
+        else if (widthFactor > heightFactor)
+            thumbnailPoint.x = (newWidth - scaledWidth) * 0.5;
+    }
+    
+    CGFloat x = layerSize.width/2 - scaledWidth/2;
+    CGFloat y = layerSize.height/2 - scaledHeight/2;
+
+    return NSMakeRect(x, y, scaledWidth, scaledHeight);
+    
+}
 -(void)screenResize {
+    [CATransaction begin];
+    [CATransaction setValue:(id)kCFBooleanTrue
+                     forKey:kCATransactionDisableActions];
+    
     if(_positionLeft.constant != 0)
             _positionLeft.constant = -self.bounds.size.width;
-    
-    if(!self.layer)
-        return;
-    
-    if([self.layer isKindOfClass:[AVPlayerLayer class]]) {
+
+    if(self.layer && [self.layer isKindOfClass:[AVPlayerLayer class]]) {
         CALayer *playerLayer = self.layer;
-        CALayer *overlayLayer = playerLayer.sublayers[1];
+        if(playerLayer.sublayers.count > 1) {
+            CALayer *overlayLayer = playerLayer.sublayers[1];
+            NSImage *overlayImage = overlayLayer.contents;
+            NSSize imageSize = overlayImage.size;
+            NSSize layerSize = playerLayer.frame.size;
         
-        NSSize imageSize = ((NSImage*)overlayLayer.contents).size;
-        NSSize layerSize = playerLayer.frame.size;
+            NSRect rect = getPerfectRect(imageSize, layerSize);
         
-        CGFloat x = layerSize.width/2 - imageSize.width/2;
-        CGFloat y = layerSize.height/2 - imageSize.height/2;
-        
-        overlayLayer.frame = NSMakeRect(x, y, imageSize.width, imageSize.height);
+            overlayLayer.frame = rect;
+        }
     }
+    
+    [CATransaction commit];
+}
+-(void)needPhoto {
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyIGotPhoto"
+                                                        object:self.layer.contents];
+}
+-(void)setPosConstraint:(NSNotification*)notif {
+    self.positionLeft = notif.object;
 }
 -(void)showCamera:(NSNotification*)notif {
     if(!notif)
@@ -306,8 +359,8 @@ BOOL isHandlingEvent;
 }
 
 
--(SMPhotoToolsView*)photoToolsView {
-    return [self photoToolsSubview:[SMPhotoToolsView class]];
+-(SMPhotoOptsView*)photoOptsView {
+    return [self photoToolsSubview:[SMPhotoOptsView class]];
 }
 -(NSPopUpButton*)filterList {
     return [self photoToolsSubview:[NSPopUpButton class]];
@@ -317,6 +370,10 @@ BOOL isHandlingEvent;
 }
 -(SMQuitMediaButton*)cancelBtn {
     return [self photoTools].subviews[2];
+}
+
+-(SMButton*)refreshBtn {
+    return [self photoToolsSubview:[SMRefreshBouton class]];
 }
 
 
@@ -338,12 +395,26 @@ BOOL isHandlingEvent;
     else
         [[self cancelBtn] hide];
 }
--(void)setShowPhotoTools:(BOOL)val {
-    showPhotoTools = val;
+-(void)setShowPhotoOptions:(BOOL)val {
+    showPhotoOptions = val;
     if(val)
-        [[self photoToolsView] show];
+        [[self photoOptsView] show];
     else
-        [[self photoToolsView] hide];
+        [[self photoOptsView] hide];
+}
+-(void)setShowPhotoTools:(BOOL)val {
+    showPhotoOptions = val;
+    if(val)
+        [[self photoOptsView] show];
+    else
+        [[self photoOptsView] hide];
+}
+-(void)setShowRefreshBtn:(BOOL)val {
+    showRefreshBtn = val;
+    if(val)
+        [[self refreshBtn] show];
+    else
+        [[self refreshBtn] hide];
 }
 
 
@@ -380,11 +451,14 @@ BOOL isHandlingEvent;
 
 -(void)cleanStart {
     currentImage        = nil;
+    if(self.layer.contents)
+        self.layer.contents = nil;
     self.layer          = previewLayer;
-    self.showCancelBtn  = NO;
-    self.showPhotoBtn   = YES;
-    self.showFilterList = YES;
-    self.showPhotoTools = YES;
+    self.showCancelBtn    =
+    self.showRefreshBtn   = NO;
+    self.showPhotoBtn     =
+    self.showFilterList   =
+    self.showPhotoOptions = YES;
     
     if(!session.isRunning) {
         [self showLoading];
@@ -399,23 +473,46 @@ BOOL isHandlingEvent;
     [self resetSubviews];
 }
 -(void)cleanStop {
-    self.layer = [CALayer new];
+    self.layer = CALayer.new;
     if(session.isRunning)
             [session stopRunning];
     [self resetSubviews];
 }
 -(void)resetSubviews {
     NSView* photoTools = [self photoTools];
-    photoTools.layer = [CALayer new];
+    photoTools.layer = CALayer.new;
 }
 -(void)showImageFile:(NSString*)path {
-    NSImage *sourceImage = [[NSImage alloc] initWithContentsOfFile:path];
+    NSImage *sourceImage = [NSImage.alloc initWithContentsOfFile:path];
     [self showImage:sourceImage];
 }
 -(void)showImage:(NSImage*)image {
+    [self showImage:image withTools:NO];
+}
+-(void)showImage:(NSImage*)image withTools:(BOOL)useOpts {
+    
+    self.showPhotoTools   = useOpts;
+    self.showCancelBtn    = !(
+    self.showRefreshBtn   =
+    self.showPhotoBtn     =
+    self.showFilterList   =
+    self.showPhotoOptions = NO);
+    
     self.layer.contents = [image imageResizedToSize:self.bounds.size];
 }
+
+-(void)refreshVideo {
+    if([self.layer isKindOfClass:AVPlayerLayer.class]) {
+        AVPlayerLayer *playerLayer = (AVPlayerLayer*)self.layer;
+        AVPlayer *player = playerLayer.player;
+        
+        [player seekToTime:CMTimeMake(0, 1)];
+        [player play];
+    }
+}
 -(void)showVideo:(NSDictionary*)urls {
+    
+    self.showRefreshBtn = YES;
     
     NSString *path = urls[@"filePath"];
     
@@ -428,12 +525,16 @@ BOOL isHandlingEvent;
     NSString *overlay = urls[@"overlay"];
     
     if(overlay.length) {
-        CALayer *overlayLayer = [CALayer new];
-        NSImage *overlayImage = [[NSImage alloc] initWithContentsOfFile:overlay];
+        CALayer *overlayLayer = CALayer.new;
+        NSImage *overlayImage = [NSImage.alloc initWithContentsOfFile:overlay];
         overlayLayer.contents = overlayImage;
-        [playerLayer addSublayer:overlayLayer];
         
-        [self screenResize];
+        NSSize imageSize = overlayImage.size;
+        NSSize layerSize = playerLayer.frame.size;
+        
+        overlayLayer.frame = getPerfectRect(imageSize, layerSize);
+        
+        [playerLayer addSublayer:overlayLayer];
     }
     
     [player play];
@@ -443,6 +544,7 @@ BOOL isHandlingEvent;
 -(void)showMedia:(NSNotification*)notif {
     if(!notif)
         return;
+    
     NSDictionary *urls = notif.object;
     
     if(!urls)
@@ -450,19 +552,21 @@ BOOL isHandlingEvent;
     
     NSString* path = urls[@"filePath"];
     
-    NSLog(@"Urls = %@, path %@", urls, path);
     if(_positionLeft.animator.constant != 0)
         [self showAndUseCamera:NO];
     
     [self cleanStop];
+    
     self.showCancelBtn  = YES;
+    
+    self.showRefreshBtn =
     self.showPhotoBtn   =
     self.showFilterList =
-    self.showPhotoTools = NO;
+    self.showPhotoOptions = NO;
     
     if([path hasSuffix:@"jpg"] || [path hasSuffix:@"jpeg"] || [path hasSuffix:@"png"])
         [self showImageFile:path];
-    else if([path hasSuffix:@"mp4"])
+    else if([path hasSuffix:@"mp4"] || [path hasSuffix:@"3gpp"])
         [self showVideo:urls];
     
     [self resetSubviews];

@@ -36,6 +36,7 @@
 @property (assign) IBOutlet SMWindow* window;
 @property (weak) IBOutlet NSLayoutConstraint *photoToolsYPos;
 @property (weak) IBOutlet NSView *photoToolsView;
+@property (weak) IBOutlet NSLayoutConstraint *camPosConstraint;
 @property (nonatomic) About* about;
 
 @end

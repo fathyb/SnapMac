@@ -226,7 +226,17 @@ var Snappy = new (function() {
 			}
 		}
 		
-		
+		this.searchFriend = function(str) {
+			var friends = [];
+			for(var i in this.friends) {
+				var friend = this.friends[i];
+				
+				if(~(friend.name.toLowerCase().indexOf(str)) || ~(friend.displayName.toLowerCase().indexOf(str)))
+					friends.push(friend);
+			}
+			
+			return friends;
+		}
 		this.addFriend = function(friend) {
 			this.friends.push(friend);
 		}

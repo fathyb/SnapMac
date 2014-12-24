@@ -5,6 +5,18 @@
     src: url('ElegantIcons.woff') format('woff');
 }
 
+@-webkit-keyframes alert {
+    0% {
+        color: white;
+    }
+    50% {
+        color: red;
+    }
+	100% {
+        color: white;
+	}
+}
+
 @-webkit-keyframes spin {
     from {
         -webkit-transform: rotate(0);
@@ -15,19 +27,13 @@
     }
 }
 
-@-webkit-keyframes storySpin {
-    0% {
-        border-top: 2px solid rgba(255, 255, 255, 0.5);
+@-webkit-keyframes unspin {
+    from {
         -webkit-transform: rotate(0);
     }
 
-    50% {
-        border-top: 2px solid transparent;
-    }
-
-    100% {
-        border-top: 2px solid rgba(255, 255, 255, 0.5);
-        -webkit-transform: rotate(359deg);
+    to {
+        -webkit-transform: rotate(-359deg);
     }
 }
 
@@ -200,21 +206,30 @@ section header .leftButton {
 }
 
 section {
-    -webkit-transition: all 0.5s, -webkit-transform 1s ease-in-out, -webkit-perspective-origin-x 0, -webkit-perspective-origin-y 0;
     position: absolute;
     height: 100%;
     width: -webkit-calc(100% - 40px);
     right: 0;
     top: 0;
-    -webkit-transform: translate(-110%) scale(0.7);
+    -webkit-filter: blur(0px);
     box-shadow: 0px 0px 10px black;
     overflow: auto;
     padding: 0 20px;
     overflow: hidden;
+    opacity: 0;
+    -webkit-transition: all 0.5s, -webkit-transform 1s ease-in-out, -webkit-perspective-origin-x 0, -webkit-perspective-origin-y 0;
 }
+section.active {
+    opacity: 1;
+}
+section.blur {
+    -webkit-filter: blur(10px);
+}
+
 body.enable3d section {
     -webkit-transform: translate(-110%) scale(0.7);
 }
+
 body:not(.enable3d) section {
     -webkit-transform: translate(-110%);
 }
@@ -222,6 +237,7 @@ body:not(.enable3d) section {
 body.enable3d section.active {
     -webkit-transform: translate(0) scale(1);
 }
+
 body:not(.enable3d) section.active {
     -webkit-transform: translate(0) scale(1);
 }
@@ -234,7 +250,6 @@ section .zoom {
 section .zoom .friend {
     opacity: 0;
 }
-
 
 section .content {
     height: -webkit-calc(100% - 75px);
@@ -252,7 +267,6 @@ section.sendPage {
     padding: 0;
     width: 100%;
 }
-
 
 div.offlinePage {
     -webkit-transition: all 0.5s;
@@ -293,17 +307,20 @@ div.friend {
 }
 
 div.snap {
-	width: 250px;
-	height: 150px;
+    width: 250px;
+    height: 150px;
     cursor: pointer;
-	opacity: 0.5;
+    opacity: 0.5;
     -webkit-transition: 0.5s;
+    background-position: center;
 }
+
 div.snap:hover {
-	opacity: 1;
+    opacity: 1;
 }
+
 div.snap>p {
-	padding-left: 50px !important;
+    padding-left: 50px !important;
 }
 
 div.snap .icon {
@@ -462,7 +479,7 @@ section input[type=search]::-webkit-input-placeholder {
     border: none;
     cursor: pointer;
     -webkit-transition: 0.5s;
-    color: white;
+    color: white !important;
     font-size: 20px;
     text-transform: uppercase;
     vertical-align: top;
@@ -532,11 +549,15 @@ section input[type=search]::-webkit-input-placeholder {
     margin: 0;
 }
 
+.sendPage .friendList>div>div p:first-child:last-child {
+    line-height: 50px;
+}
+
 .sendPage .friendList>div>div p:first-child {
     color: rgb(97, 175, 223);
 }
 
-.sendPage .friendList>div>div p:last-child {
+.sendPage .friendList>div>div p:last-child:not(:first-child) {
     color: rgb(208, 215, 65);
     font-size: 12px;
 }
@@ -602,7 +623,7 @@ div.toolbox {
 }
 
 .storyBox {
-	margin: auto;
+    margin: auto;
     margin-top: 20px;
     -webkit-transition: .5s;
     width: 140px;
@@ -633,11 +654,11 @@ div.toolbox {
     margin: 0;
     float: right;
     padding-right: 10px;
-	color: white;
+    color: white;
     -webkit-transition: 0.25s;
-	margin-left: -100px;
-	text-shadow: 0 0 1px black;
-	text-align: left;
+    margin-left: -100px;
+    text-shadow: 0 0 1px black;
+    text-align: left;
 }
 
 .storyBox:hover .imgStory .duration {
@@ -652,25 +673,29 @@ div.toolbox {
     display: inline-block;
     -webkit-transform-origin: center;
     -webkit-transform: rotate(135deg);
-	margin-left: -100px;
-	text-shadow: 0 0 1px black;
+    margin-left: -100px;
+    text-shadow: 0 0 1px black;
 }
 
 .storyBox:hover .imgStory .icon {
     color: black;
-	margin-left: -140px;
-	text-shadow: 0 0 1px rgba(255, 255, 255, 0.4);
+    margin-left: -140px;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.4);
     -webkit-transform: rotate(0deg);
 }
+
 .storyBox.loading .imgStory * {
-	opacity: 0;
+    opacity: 0;
 }
+
 .storyBox:not(.loading) .imgStory * {
-	opacity: 1;
+    opacity: 1;
 }
+
 .storyBox.loading .imgStory {
-	width: 70px !important;
-    -webkit-animation: storySpin 1s linear infinite;
+    width: 70px !important;
+    -webkit-animation: spin 1s linear infinite;
+    border-top-color: white;
 }
 
 .storyBox:hover .imgStory {
@@ -740,7 +765,6 @@ body>.toggleCam {
 
 body>.toggleCam:hover, body>.toggleCam:active {
     background-color: rgba(255, 255, 255, 0.9);
-    box-shadow: 0 0 10px rgba(49, 49, 49, 0.2);
     color: black;
 }
 
@@ -748,106 +772,200 @@ body>.toggleCam:hover, body>.toggleCam:active {
     display: block;
     margin: auto;
 }
+
 .feedPage .content {
-	padding: 0;
-	margin: 0;
-	height: -webkit-calc(100% - 50px);
-	width: -webkit-calc(100% + 40px);
-	margin-left: -20px;
-	overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+    height: -webkit-calc(100% - 50px);
+    width: -webkit-calc(100% + 40px);
+    margin-left: -20px;
+    overflow-x: hidden;
 }
+
 .conversation {
-	width: 100%;
-	text-align: left;
-	margin: 0;
-	display: block;
-	color: white;
-	height: 120px;
-	overflow: hidden;
-	background-position: 0px;
-	-webkit-transition: 0.25s;
+    width: 100%;
+    text-align: left;
+    margin: 0;
+    display: block;
+    color: white;
+    height: 120px;
+    overflow: hidden;
+    background-position: 0px;
+    -webkit-transition: 0.25s;
 }
 
 .conversation:nth-child(odd) {
-	background-color: rgba(50, 50, 50, 0.5);
+    background-color: rgba(50, 50, 50, 0.5);
 }
+
 .conversation:nth-child(even) {
-	background-color: rgba(100, 100, 100, 0.5);
+    background-color: rgba(100, 100, 100, 0.5);
 }
 
 .conversation:nth-child(odd):hover {
-	background-color: rgba(50, 50, 50, 0.7);
+    background-color: rgba(50, 50, 50, 0.7);
 }
+
 .conversation:nth-child(even):hover {
-	background-color: rgba(100, 100, 100, 0.7);
+    background-color: rgba(100, 100, 100, 0.7);
 }
+
 .conversation:hover {
-	margin-left: 50px;
+    margin-left: 50px;
 }
+
 .conversation>p {
-	margin: 0;
-	padding: 5px 10px;
+    margin: 0;
+    padding: 5px 10px;
+    min-height: 15px;
 }
+
 .conversation p.details {
-	width: 200px;
-	margin: 0;
-	display: inline-block;
+    width: 200px;
+    margin: 0;
+    display: inline-block;
 }
+
 .conversation p.details>span {
-	display: block;
-	padding: 5px;
+    display: block;
+    padding: 5px;
 }
+
 .conversation .icon {
-	margin-right: 5px;
+    margin-right: 5px;
 }
+
 .snapRect {
-	width: 50px;
-	height: 50px;
-	border: 2px solid rgba(255, 43, 53, 0.76);
-	vertical-align: top;
-	display: inline-block;
-	margin: 10px 0 0 10px;
-	border-radius: 5px;
+    width: 50px;
+    height: 50px;
+    border: 2px solid rgba(255, 43, 53, 0.76);
+    vertical-align: top;
+    display: inline-block;
+    margin: 10px 0 0 10px;
+    border-radius: 5px;
 }
+
 .snapRect.snaps {
-	background-color: rgba(255, 43, 53, 0.76);
+    background-color: rgba(255, 43, 53, 0.76);
 }
+
 .snapRect.messages {
-	background-color: rgba(52, 175, 255, 0.76);
-	border-color: rgba(52, 175, 255, 0.76);
+    background-color: rgba(52, 175, 255, 0.76);
+    border-color: rgba(52, 175, 255, 0.76);
 }
 
 .conversation .snapText .new {
-	width: 10px;
-	height: 10px;
-	color: black;
-	border-radius: 100%;
-	display: inline-block;
-	background-color: rgba(255, 253, 39, 0.95);
-	line-height: 10px;
-	padding: 0;
-	font-size: 8px;
-	display: inline-block;
-	margin-top: -5px;
-	vertical-align: top;
-	text-align: center;
-	content: attr(nbr);
+    width: 10px;
+    height: 10px;
+    color: black;
+    border-radius: 100%;
+    display: inline-block;
+    background-color: rgba(255, 253, 39, 0.95);
+    line-height: 10px;
+    padding: 0;
+    font-size: 8px;
+    display: inline-block;
+    margin-top: -5px;
+    vertical-align: top;
+    text-align: center;
+    content: attr(nbr);
 }
+
 .conversation:hover {
-	opacity: 1;
+    opacity: 1;
 }
+
 .conversation img {
-	max-width: 100px;
-	vertical-align: top;
-	max-height: 70px;
-	-webkit-mask-box-image: -webkit-linear-gradient(transparent, black, transparent);
-	opacity: 0.7;
+    max-width: 100px;
+    vertical-align: top;
+    max-height: 70px;
+    -webkit-mask-box-image: -webkit-linear-gradient(transparent, black, transparent);
+    opacity: 0.7;
+    -webkit-transition: 0.5s;
 }
 
-
-.feedPage .zoom .conversation{
-	opacity: 0;
+body.hideFeedPics .conversation img {
+    display: none;
 }
 
+.feedPage .zoom .conversation {
+    opacity: 0;
+}
 
+.loadingView {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    -webkit-transition: 0.25s ease-in-out;
+    -webkit-transform: translateY(-100%);
+}
 
+.loadingView.active {
+    -webkit-transform: translateY(0%);
+}
+
+.loadingView .iconContent {
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background-color: rgba(0, 0, 0, 0.1);
+    margin-left: -50px;
+    margin-top: -50px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-top-color: white;
+    border-radius: 100px;
+    -webkit-animation: unspin infinite 0.5s linear;
+}
+
+.loadingView .iconContent .icon {
+    height: 100px;
+    color: white;
+    line-height: 100px;
+    margin: 0;
+    padding: 0;
+    font-size: 35px;
+    -webkit-animation: spin infinite .25s linear;
+}
+
+.errorView {
+	position: fixed;
+	top: -350px;
+	left: 0;
+	width: 100%;
+	height: 40px;
+	z-index: 9999999;
+	background-color: black;
+	position: absolute;
+	width: 100%;
+	height: 50px;
+	color: white;
+	-webkit-transition: 0.25s;
+}
+.errorView.show {
+	top: 0;
+}
+
+.errorView.show .icon:first-child {
+	-webkit-animation: alert 1s infinite;
+}
+.errorView .icon:first-child {
+	float: left;
+}
+.errorView .icon:last-child {
+	float: right;
+}
+.errorView .text {
+	padding: 0 10px;
+	margin: 0;
+	line-height: 50px;
+	text-align: left;
+	display: inline-block;
+}
+.errorView span {
+	line-height: 50px;
+	padding: 0 10px;
+}

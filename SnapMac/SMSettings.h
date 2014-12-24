@@ -30,5 +30,6 @@
 @property (weak) IBOutlet NSTextField *themeTxt;
 @property (weak) IBOutlet NSButton *checkbox3D;
 @property (weak) IBOutlet NSButton *checkboxParallax;
+@property (weak) IBOutlet NSButton *checkboxFeedPics;
 
 @end

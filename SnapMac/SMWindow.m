@@ -14,7 +14,7 @@ NSView* c(NSWindow* window) {
 @implementation SMWindow
 
 -(void)setAppearance:(NSAppearance *)appearance {
-    [super setAppearance:appearance];
+    super.appearance = appearance;
     
     if(self.contentView)
         c(self).appearance = appearance;

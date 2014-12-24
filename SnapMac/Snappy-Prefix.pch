@@ -23,15 +23,10 @@ typedef void (^SMCallback)(id);
 
 #import "main.h"
 
-#define SnapBug 1
+#define SnapBug
 
 #define LogRect(RECT) NSLog(@"%s: (%0.0f, %0.0f) %0.0f x %0.0f", #RECT, RECT.origin.x, RECT.origin.y, RECT.size.width, RECT.size.height)
 
 #define SnapVer   "Beta"
 #define SnapAbout "Beta 1 (" CFBundleVersion ")"
 
-#if SnapBug
-#   define NSLog(format,...) debugOutput(__FILE__, __func__, __LINE__, format, ##__VA_ARGS__)
-#else
-#   //define NSLog(format,...) 1;
-#endif

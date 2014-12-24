@@ -10,7 +10,9 @@
 #import "SMBlockItem.h"
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <objc/runtime.h>
+#import "SnapJS.h"
 
+SnapJS* snapJS;
 @implementation SMWebUI
 
 
@@ -21,26 +23,22 @@
     if(isYosemite()) {
         if([self respondsToSelector:@selector(setOpaque:)] && [self respondsToSelector:@selector(setBackgroundColor:)]) {
             [self performSelector:@selector(setOpaque:) withObject:@NO];
-            [self performSelector:@selector(setBackgroundColor:) withObject:[NSColor clearColor]];
-        }
-        SEL setAllowsVibrancy = NSSelectorFromString(@"setAllowsVibrancy");
-        if([self respondsToSelector:setAllowsVibrancy]) {
-            [self performSelector:setAllowsVibrancy withObject:@YES];
+            [self performSelector:@selector(setBackgroundColor:) withObject:NSColor.clearColor];
         }
     }
+    snapJS   = [SnapJS new];
     
-    NSString *resourcesPath = [NSBundle mainBundle].resourcePath;
+    self.frameLoadDelegate = self;
+    
+    NSString *resourcesPath = NSBundle.mainBundle.resourcePath;
     NSString *htmlPath      = [resourcesPath stringByAppendingString:@"/mainUI.html"];
     [self.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:htmlPath]]];
-    
-    self.SnapJS   = [SnapJS new];
-    self.SnapJS.webView   = self;
-    
-    [self.windowScriptObject setValue:self.SnapJS   forKey:@"SnapJS"];
-    
-    
-    NSScrollView* scrollView = (NSScrollView *)(self.mainFrame.frameView.subviews[0]);
-    scrollView.verticalScrollElasticity = NSScrollElasticityAllowed;
+}
+
+-(void)webView:(WebView *)sender didCommitLoadForFrame:(WebFrame *)frame {
+    snapJS.webView   = self;
+    [sender.windowScriptObject setValue:snapJS
+                                 forKey:@"SnapJS"];
 }
 
 -(NSArray*)webView:(WebView *)sender contextMenuItemsForElement:(NSDictionary *)element defaultMenuItems:(NSArray *)defaultMenuItems {
@@ -48,14 +46,15 @@
         return defaultMenuItems;
     
     WebScriptObject *el     = element[@"WebElementDOMNode"];
-    NSMutableArray *items   = [NSMutableArray new];
+    NSMutableArray *items   = NSMutableArray.new;
+    
     WebScriptObject *result = [self.windowScriptObject callWebScriptMethod:@"SnappyRClickHandler"
                                                              withArguments:@[el]];
     
-    if(![result isKindOfClass:[WebUndefined class]]) {
-        JSContextRef       jsContext = self.mainFrame.globalContext;
+    if(![result isKindOfClass:WebUndefined.class]) {
+        JSContextRef       jsContext = self.webFrame.globalContext;
         JSObjectRef         jsObject = result.JSObject;
-        if(JSValueIsNull(self.mainFrame.globalContext, jsObject))
+        if(JSValueIsNull(self.webFrame.globalContext, jsObject))
             goto quit;
         
         JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(jsContext, jsObject);
@@ -70,10 +69,10 @@
             JSStringRelease(k);
             
             if([title isEqualToString:@"separator"])
-                item = [NSMenuItem separatorItem];
+                item = NSMenuItem.separatorItem;
             else
-                item = [[SMBlockItem alloc] initWithTitle:title
-                                                    block:^(NSMenuItem* item) {
+                item = [SMBlockItem.alloc initWithTitle:title
+                                                  block:^(NSMenuItem* item) {
                                                         JSObjectRef object = el.JSObject;
                                                         JSObjectCallAsFunction(jsContext,
                                                                   (JSObjectRef)vval,
@@ -98,6 +97,7 @@ quit:
 
 
 -(void)script:(NSString*)commande {
+    
     [self.windowScriptObject performSelectorOnMainThread:@selector(evaluateWebScript:) withObject:commande waitUntilDone:NO];
 }
 @end

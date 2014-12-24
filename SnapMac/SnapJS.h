@@ -10,6 +10,7 @@
 #import <WebKit/WebKit.h>
 #import "SnapBack.h"
 #import "SnappyNotification.h"
+#import "SMWebUI.h"
 
 
 enum {
@@ -33,15 +34,15 @@ typedef NS_ENUM(NSUInteger, SnappyError) {
 
 @interface SnapJS : NSObject
 
--(id)script:(NSString*)command;
--(void)scriptTS:(NSString*)command;
+-(void)script:(NSString*)command;
 
 @property (nonatomic) NSString* authToken;
 @property (nonatomic) NSString* username;
-@property (nonatomic) WebView* webView;
+@property (nonatomic) SMWebUI* webView;
 @property (nonatomic) NSOperationQueue* opQueue;
 @property (nonatomic) BOOL logged;
 @property (nonatomic) BOOL use3D;
 @property (nonatomic) BOOL useParallax;
+@property (nonatomic) BOOL hideFeedPics;
 
 @end

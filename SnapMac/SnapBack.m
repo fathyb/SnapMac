@@ -5,16 +5,13 @@
 //  Created by Fathy Boundjadj  on 11/08/2014.
 //  Copyright (c) 2014 Fathy B. All rights reserved.
 //
+
 #import <JavaScriptCore/JavaScriptCore.h>
+#import <JavaScriptCore/JSContext.h>
 #import "SnapBack.h"
 #import <objc/runtime.h>
 
-#define iObject(T) _Generic( (T), id: YES, default: NO)
-#define isObject(x) ( strchr("@#", @encode(typeof(x))[0]) != NULL )
-
-JSContextRef ContexteJS = nil;
-
-
+JSContextRef SMJSContext = nil;
 
 JSValueRef NStoJS(id ns) {
     if(!ns)
@@ -25,7 +22,7 @@ JSValueRef NStoJS(id ns) {
     NSDictionary* actions = @{
         @"String": ^(NSString *o) {
             JSStringRef jsString = JSStringCreateWithUTF8CString(o.UTF8String);
-            JSValueRef  jsValue  = JSValueMakeString(ContexteJS,
+            JSValueRef  jsValue  = JSValueMakeString(SMJSContext,
                                                      jsString);
             JSStringRelease(jsString);
             
@@ -33,18 +30,18 @@ JSValueRef NStoJS(id ns) {
         },
         @"URL": ^(NSURL *o) {
             JSStringRef jsString = JSStringCreateWithUTF8CString(o.absoluteString.UTF8String);
-            JSValueRef  jsValue  = JSValueMakeString(ContexteJS,
+            JSValueRef  jsValue  = JSValueMakeString(SMJSContext,
                                                      jsString);
             JSStringRelease(jsString);
             
             return jsValue;
         },
         @"Dictionary": ^(NSDictionary *o) {
-            JSObjectRef object = JSObjectMake(ContexteJS, nil, nil);
+            JSObjectRef object = JSObjectMake(SMJSContext, nil, nil);
             
             for(NSString *key in o.allKeys) {
                 JSStringRef k     = JSStringCreateWithUTF8CString(key.UTF8String);
-                JSObjectSetProperty(ContexteJS,
+                JSObjectSetProperty(SMJSContext,
                                     object,
                                     k,
                                     NStoJS(o[key]),
@@ -57,7 +54,7 @@ JSValueRef NStoJS(id ns) {
         },
         @"Array": ^(NSArray *o) {
             if(!o.count)
-                return JSObjectMakeArray(ContexteJS,
+                return JSObjectMakeArray(SMJSContext,
                                          0,
                                          nil,
                                          nil);
@@ -67,7 +64,7 @@ JSValueRef NStoJS(id ns) {
             for(int i = 0; i < o.count; i++)
                 values[i] = NStoJS(o[i]);
             
-            JSObjectRef jsArray = JSObjectMakeArray(ContexteJS,
+            JSObjectRef jsArray = JSObjectMakeArray(SMJSContext,
                                                     o.count,
                                                     values,
                                                     nil);
@@ -75,18 +72,15 @@ JSValueRef NStoJS(id ns) {
             return jsArray;
         },
         @"Number": ^(NSNumber* o) {
-            return JSValueMakeNumber(ContexteJS, o.doubleValue);
+            return JSValueMakeNumber(SMJSContext, o.doubleValue);
         },
         @"Boolean": ^(NSNumber *o) {
-            return JSValueMakeBoolean(ContexteJS, o.boolValue);
+            return JSValueMakeBoolean(SMJSContext, o.boolValue);
         }
     };
         
-    JSObjectRef (^block)()  = nil;
-    
-    
-    
-    NSString *clsString = NSStringFromClass([ns class]);
+    JSObjectRef (^block)() = nil;
+    NSString    *clsString = NSStringFromClass([ns class]);
     
     if(!clsString)
         return nil;
@@ -99,20 +93,83 @@ JSValueRef NStoJS(id ns) {
     if(block)
         jsObject = block(ns);
     else
-        NSLog(@"unknown class %@", clsString);
+        NSLog(@"__jsValue_to_id(runtime) : unknown class [%@ class]", clsString);
     
     return jsObject;
 }
 
+id JSToNS(JSValueRef object) {
+    
+    JSType type = JSValueGetType(SMJSContext, object);
+    id   result = nil;
+    
+    
+    switch(type) {
+        case kJSTypeObject:
+            result = NSMutableDictionary.new;
+            
+            JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(SMJSContext, (JSObjectRef)object);
+            ssize_t            arraySize = JSPropertyNameArrayGetCount(props);
+        
+            for(ssize_t i = 0; i < arraySize; i++) {
+                JSStringRef   k = JSPropertyNameArrayGetNameAtIndex(props, i);
+                JSValueRef vval = JSObjectGetProperty(SMJSContext, (JSObjectRef)object, k, nil);
+                NSString   *key = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, k));
+            
+                result[key] = JSToNS(vval);
+            
+                JSStringRelease(k);
+            }
+            
+            
+            break;
+    
+        case kJSTypeString:
+            nil;
+            
+            JSStringRef jsStr = JSValueToStringCopy(SMJSContext, object, nil);
+            result = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, jsStr));
+            JSStringRelease(jsStr);
+            
+            break;
+        
+        case kJSTypeBoolean:
+            result = @(JSValueToBoolean(SMJSContext, object));
+            break;
+            
+        case kJSTypeNumber:
+            result = @(JSValueToNumber(SMJSContext, object, nil));
+            break;
+            
+        case kJSTypeNull:
+            result = @"nil";
+            break;
+            
+        case kJSTypeUndefined:
+            result = @"nil";
+            break;
+            
+        default:
+            NSLog(@"__id_to_jsValue(runtime) : unknown kJSType : %d", type);
+            break;
+    }
+    
+    return result;
+}
+
 
 @implementation WebScriptObject(Snappy)
+
+-(id)toObjCObject {
+    return JSToNS(self.JSObject);
+}
 
 -(void)call {
     return [self call:nil];
 }
 -(void)call:(id)firstArg, ... {
     if(!firstArg) {
-        JSObjectCallAsFunction(ContexteJS,
+        JSObjectCallAsFunction(SMJSContext,
                                self.JSObject,
                                nil,
                                0,
@@ -143,7 +200,7 @@ JSValueRef NStoJS(id ns) {
     
     va_end(argumentList);
     
-    JSObjectCallAsFunction(ContexteJS,
+    JSObjectCallAsFunction(SMJSContext,
                            self.JSObject,
                            nil,
                            length,

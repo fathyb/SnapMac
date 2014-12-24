@@ -13,11 +13,11 @@
 @interface WebScriptObject(Snappy)
 
 -(void)call:(id)firstArg, ... NS_REQUIRES_NIL_TERMINATION;
-
+-(id)toObjCObject;
 
 @end
-#define Callback NSString*
-extern JSContextRef ContexteJS;
+
+extern JSContextRef SMJSContext;
 
 typedef WebScriptObject JSCallback;
 

@@ -8,11 +8,11 @@
 
 #import "SMBezierPath.h"
 
-@implementation NSBezierPath (Snapmac)
+@implementation NSBezierPath (Snappy)
 
 -(CGPathRef)quartzPath {
     NSInteger i,
-    numElements             = [self elementCount];
+              numElements = [self elementCount];
     
     if (numElements > 0) {
         NSPoint points[3];
@@ -23,16 +23,16 @@
         for (i = 0; i < numElements; i++) {
             switch ([self elementAtIndex:i associatedPoints:points]) {
                 case NSMoveToBezierPathElement:
-                    CGPathMoveToPoint(path, NULL, points[0].x, points[0].y);
+                    CGPathMoveToPoint(path, nil, points[0].x, points[0].y);
                     break;
                     
                 case NSLineToBezierPathElement:
-                    CGPathAddLineToPoint(path, NULL, points[0].x, points[0].y);
+                    CGPathAddLineToPoint(path, nil, points[0].x, points[0].y);
                     didClosePath = NO;
                     break;
                     
                 case NSCurveToBezierPathElement:
-                    CGPathAddCurveToPoint(path, NULL, points[0].x, points[0].y,
+                    CGPathAddCurveToPoint(path, nil, points[0].x, points[0].y,
                                           points[1].x, points[1].y,
                                           points[2].x, points[2].y);
                     didClosePath = NO;

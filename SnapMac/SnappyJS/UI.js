@@ -26,7 +26,7 @@ function e(tag, cls, text, css) {
 }
 
 function toggleClass(el, cls, bool) {
-	el[(arguments.length == 3 ? bool : !el.hasClass(cls)) ? "addClass" : "removeClass"](cls);
+	$(el)[(arguments.length == 3 ? bool : !$(el).hasClass(cls)) ? "addClass" : "removeClass"](cls);
 }
 SnappyUI = new (function() {
 	
@@ -36,6 +36,12 @@ SnappyUI = new (function() {
 	this.useParallax = function(value) {
 		toggleClass(this.body, "enableParallax", value);
 		this.updateFrame();
+	}
+	this.uhfp = function() {
+		this.hideFeedPics(SnapJS.hideFeedPics());
+	}
+	this.hideFeedPics = function(value) {
+		toggleClass(this.body, "hideFeedPics", value);
 	}
 	
 	this.hideSend = function() {
@@ -51,6 +57,9 @@ SnappyUI = new (function() {
 		this.FriendsPage.erase();
 		this.logged = false;
 		this.updateKeychain();
+		this.updates = new Object();
+		
+		SnapJS.logout();
 	}
 	
 	$(document).ready(function() {
@@ -66,6 +75,45 @@ SnappyUI.init = function() {
 	this.body = $("body");
 	this.updates = new Object();
 	
+	this.ErrorView = new(function() {
+		this.element = e("div", "errorView").appendTo("body");
+		this.errorIcon = e("span", "icon", "r").appendTo(this.element);
+		this.errorText = e("p", "text").appendTo(this.element);
+		this.closeBtn = e("span", "icon", "M").appendTo(this.element);
+		
+		this.closeBtn.click(function() {
+			SnappyUI.ErrorView.hide();
+		});
+		this.unblur = false;
+		this.show = function() {
+			this.element.addClass("show");
+		}
+		this.hide = function() {
+			this.element.removeClass("show");
+			
+			if(this.timeout) {
+				clearTimeout(this.timeout);
+			}
+			if(this.unblur) {
+				SnappyUI.currentPage.blur(false);
+				this.unblur = false;
+			}
+		}
+		this.showError = function(error) {
+			if(error.code == 5) {
+				error.message = "Vous avez été déconnecté.";
+			}
+			this.errorText.text(error.message);
+			if(error.blur) {
+				SnappyUI.currentPage.blur(true);
+				this.unblur = true;
+			}
+			this.show();
+			this.timeout = setTimeout(function() {
+				SnappyUI.ErrorView.hide();
+			}, 10000);
+		}
+	})();
 	this.Header = function(parent) {
 		this.element = e("header").appendTo(parent.element);
 		
@@ -136,15 +184,27 @@ SnappyUI.init = function() {
 		
 		
 		_this.hide = function() {
+			if(SnappyUI.currentPage != this)
+				return;
+				
+			SnappyUI.currentPage = null;
+			
+			if(this.hidden)
+				this.hidden();
+				
 			this.element.removeClass("active");
 		}
 	
-		_this.show = function() {
-			if((!SnappyUI.logged && this.onlyShowIfLogged) || $(".zoom").length)
+		_this.show = function(force) {
+			var currentPage = SnappyUI.currentPage;
+			if(((!SnappyUI.logged && this.onlyShowIfLogged) || $(".zoom").length || currentPage == SnappyUI.SendPage) && !force)
 				return;
 			
-			if(SnappyUI.currentPage)
-				SnappyUI.currentPage.hide();
+			if(this.showed)
+				this.showed();
+				
+			if(currentPage)
+				currentPage.hide();
 
 			SnappyUI.currentPage = this;
 			this.element.addClass("active");
@@ -154,9 +214,12 @@ SnappyUI.init = function() {
 				this.content.scrollTop(0);
 		}
 		
+		_this.blur = function(bool) {
+			toggleClass(this.element, "blur", bool);
+		}
 		_this.zoom = function(bool) {
 			this.header.leftButton.setIcon("back");
-			toggleClass(this.content, "zoom", bool);//[bool ? "addClass" : "removeClass"]("zoom");
+			toggleClass(this.content, "zoom", bool);
 		}
 		_this.isVisible = function() {
 			return this.element.hasClass("active");
@@ -214,11 +277,9 @@ SnappyUI.init = function() {
 			leftButton.spin(true);
 				
 			Snappy.login(username, password, function(r) {
-				console.log("login", r);
-				
 				
 				if(r.error) {
-					console.error(r.error);
+					SnappyUI.ErrorView.showError(r.error);
 					SnappyUI.logged = false;
 					leftButton.spin(false);
 					leftButton.setIcon(null);
@@ -301,7 +362,7 @@ SnappyUI.init = function() {
 		
 		this.erase = function() {
 			this.conversations = new Object();
-			this.element.children(".conversation").remove();
+			this.content.children(".conversation").remove();
 		}
 		
 		
@@ -523,6 +584,7 @@ SnappyUI.init = function() {
 		this.close = function() {
 			this.StoriesView.close();
 		}
+		
 		this.StoriesView = new (function(parent) {
 			
 			this.parent  = parent;
@@ -619,11 +681,12 @@ SnappyUI.init = function() {
 		
 		this.erase = function() {
 			this.friendList = new Object();
-			this.element.children(".friend").remove();
+			this.content.children(".friend").remove();
 		}
 		this.friendList = new Object();
 		
 		this.setFriends = function(friendList) {
+			this.erase();
 			this.friendList = friendList;
 			this.update();
 		}
@@ -706,6 +769,30 @@ SnappyUI.init = function() {
 		return this;
 	})();
 	
+	this.LoadingPage = new(function() {
+		
+		this.element = e("div", "loadingView").appendTo("body");
+		this.iconContent = e("div", "iconContent").appendTo(this.element);
+		this.content = e("div", "content").appendTo(this.element);
+		e("p", "icon", "").appendTo(this.iconContent);
+		
+		this.show = function() {
+			this.element.addClass("active");
+			SnappyUI.currentPage.blur(true);
+		}
+		this.hide = function() {
+			this.element.removeClass("active");
+			SnappyUI.currentPage.blur(false);
+		}
+		
+		this.setTitle = function(title) {
+			this.title.text(title);
+		}
+		this.title = function(title) {
+			this.title.text(title);
+		}
+	})();
+	
 	this.SendPage = new (function() {
 		
 		this.onlyShowIfLogged = true;
@@ -714,6 +801,18 @@ SnappyUI.init = function() {
 		
 		this.header.element.hide();
 		
+		this.showed = function() {
+			this.precPage = SnappyUI.currentPage;
+			SnappyUI.toggleCam.element.hide();
+		}
+		this.hidden = function() {
+			if(this.precPage)
+				this.precPage.show(true);
+			
+			console.log("precPage", this.precPage);
+			SnappyUI.toggleCam.element.show();
+		}
+		
 		this.searchInput = e("input");
 		this.searchInput.appendTo(this.element)
 						.attr({
@@ -721,19 +820,87 @@ SnappyUI.init = function() {
 							results: "results",
 							type: "search"
 						})
-						.on('input', function() {/////IMPLMETATIOOOOOOON
+						.on('input', function() {
 							var searchVal = $.trim($(this).val()).toLowerCase();
 							
-							SnappyUI.SendPage.friendList.hide();
-							
-							$.each(window.SMFriends, function() {
-								if(~(this.name.toLowerCase().indexOf(searchVal)) || ~(friendDisplayName(this.name).toLowerCase().indexOf(searchVal)))
-									$(".sendFriend[data-username='"+this.name+"']").parent().show();
-							});
+							SnappyUI.SendPage.search(searchVal);
 						});
 		
 		this.friendList = e("div", "friendList");
 		this.friendList.appendTo(this.element);
+		
+		var el = e("div").addClass("story")
+						 .data("friend", "story"),
+			check = e("div", "check").appendTo(el),
+			sendFriend = e("div", "sendFriend").appendTo(el);
+					
+		
+		el.click(function() {
+			toggleClass($(this).children(".check"), "clicked");
+			var nbrAmis = $(".friendList .clicked").length;
+			$('.selectedFriendNum').text(nbrAmis);
+		});
+					
+		e("p", 0, "Mon histoire").appendTo(sendFriend);
+					
+		el.appendTo(this.friendList);
+		this.erase = function() {
+			for(var i in this.friendElements)
+				this.friendElements[i].remove();
+			
+			this.friends 	= new Object();
+			this.friendElements = new Object();
+		}
+		this.setFriends = function(friends) {
+			this.erase();
+			this.friends = friends;
+			this.update();
+		}
+		
+		this.search = function(str) {
+			var friends = this.friends.searchFriend(str);
+			
+			if(!str)
+				return this.friendList.children("div").show();
+				
+			this.friendList.children("div").hide();
+		
+			var jFriends = new Object();
+			
+			for(var i in friends) {
+				var friend = friends[i];
+				
+				this.friendElements[friend.name].show();
+			}
+			
+		}
+		
+		this.update = function() {
+			for(var i in this.friends.friends) {
+				var friend = this.friends.friends[i];
+				
+				if(!this.friendElements[friend.name]) {
+					var el = e("div").data("friend", friend),
+						check = e("div", "check").appendTo(el),
+						sendFriend = e("div", "sendFriend").appendTo(el);
+					
+					el.click(function() {
+						toggleClass($(this).children(".check"), "clicked");
+						var nbrAmis = $(".friendList .clicked").length;
+						$('.selectedFriendNum').text(nbrAmis);
+					});
+					
+					e("p", 0, friend.displayName).appendTo(sendFriend);
+					e("p", 0, friend.name).appendTo(sendFriend);
+					
+					el.appendTo(this.friendList);
+					this.friendElements[friend.name] = el;
+				}
+					
+			}
+		}
+		
+		this.erase();
 		
 		this.SendActions = new (function() {
 			
@@ -752,11 +919,27 @@ SnappyUI.init = function() {
 						.append(")");
 			
 			this.cancelBtn.click(function() {
-				SnappyUI.FeedPage.show();
-				SnapJS.camView().cleanStart();
+				SnappyUI.SendPage.hide();
+				SnapJS.switchToPhotoMode();
 			});
 			this.sendBtn.click(function() {
-				SMClient.sendPhoto();
+				var friends = new Array();
+				
+				SnappyUI.SendPage.friendList.children("div").each(function() {
+					if($(this).children(".check").hasClass("clicked")) {
+						var friend = $(this).data("friend");
+						
+						friends.push(friend == "story" ? "story" : friend.name);
+					}
+				});
+				
+				SnappyUI.LoadingPage.show();
+				SnapJS.sendSnap(friends, function(result) {
+					SnappyUI.LoadingPage.hide();
+					if(result) {
+						SnappyUI.SendPage.SendActions.cancelBtn.click();
+					}
+				});
 			});
 			this.selectBtn.click(function() {
 				
@@ -801,15 +984,18 @@ SnappyUI.init = function() {
 		}
 		
 		this.FriendsPage.setFriends(updates.Friends);
+		this.SendPage.setFriends(updates.Friends);
 	}
 	
 	this.use3D(SnapJS.use3D());
 	this.useParallax(SnapJS.useParallax());
+	this.hideFeedPics(SnapJS.hideFeedPics());
 	
 	this.update = function() {
 		Snappy.getUpdates(function(updates) {
+			SnappyUI.LoadingPage.hide();
 			if(updates.error)
-				console.log(updates.error);
+				SnappyUI.ErrorView.showError(updates.error);
 			else {
 				SnappyUI.FeedPage.header.leftButton.spin(false);
 				SnappyUI.FriendsPage.header.leftButton.spin(false);
@@ -848,6 +1034,17 @@ SnappyUI.init = function() {
 		return items;
 	}
 	
+	this.updateInterval = null;
+	this.setUpdateInterval = function(time) {
+		if(this.updateInterval)
+			clearInterval(this.updateInterval);
+		
+		this.updateInterval = setInterval(function() {
+			if(SnappyUI.logged)
+				SnappyUI.update();
+		}, time*1000);
+	}
+	
 	this.updateKeychain = function() {
 		Snappy.getKeychain(function(account) {
 			if(!account)
@@ -860,15 +1057,9 @@ SnappyUI.init = function() {
 		});
 	}
 	
-	Snappy.getUpdates(function(updates) {
-		console.log("updates", updates);
-		if(updates.error) {
-			SnappyUI.updateKeychain();
-			SnappyUI.LoginPage.show();
-		}
-		else
-			SnappyUI.setUpdates(updates);
-	});
+	this.update();
+	
+	this.setUpdateInterval(60);
+	this.LoginPage.show();
+	this.LoadingPage.show();
 }
-
-

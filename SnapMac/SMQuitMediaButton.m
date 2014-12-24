@@ -11,7 +11,9 @@
 @implementation SMQuitMediaButton
 
 -(void)drawRect:(NSRect)dirtyRect {
-    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:dirtyRect xRadius:5.f yRadius:5.f];
+    NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:dirtyRect
+                                                         xRadius:5.f
+                                                         yRadius:5.f];
     [path addClip];
     
     [super drawRect:dirtyRect];

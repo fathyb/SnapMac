@@ -8,7 +8,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface NSBezierPath (Snapmac)
+@interface NSBezierPath (Snappy)
 
 -(CGPathRef)quartzPath;
 

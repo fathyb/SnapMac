@@ -21,9 +21,21 @@ NSString *domain     = @"com.fathyb.snappy";
   options:(CCOptions)options
 operation:(CCOperation)operation {
     
-    id     result        = nil;
-    void  *buffer        = malloc(data.length);
+    BOOL         encrypt = operation == kCCEncrypt;
+    id            result = nil;
+    void      *strBuffer = nil;
     size_t decryptedSize = 0;
+    ssize_t   bufferSize = data.length;
+    
+    if(encrypt) {
+        bufferSize += 16;
+         strBuffer  = malloc(bufferSize);
+        
+        bzero(strBuffer, bufferSize);
+        [data getBytes:strBuffer];
+    }
+    
+    void *buffer = malloc(bufferSize);
     
     CCCryptorStatus cryptStatus = CCCrypt(operation,
                                           kCCAlgorithmAES128,
@@ -31,16 +43,22 @@ operation:(CCOperation)operation {
                                           key.bytes,
                                           key.length,
                                           iv.bytes,
-                                          data.bytes,
-                                          data.length,
+                                          encrypt ? strBuffer : data.bytes,
+                                          bufferSize,
                                           buffer,
-                                          data.length,
+                                          bufferSize,
                                           &decryptedSize);
-                                   
+    
+    if(strBuffer)
+        free(strBuffer);
+    
     if(cryptStatus == kCCSuccess)
-        result = [NSData dataWithBytesNoCopy:buffer length:decryptedSize];
+        result = [NSData dataWithBytesNoCopy:buffer
+                                      length:decryptedSize];
     else {
-        result = [NSError errorWithDomain:domain code:cryptStatus userInfo:nil];
+        result = [NSError errorWithDomain:domain
+                                     code:cryptStatus
+                                 userInfo:nil];
         free(buffer);
     }
     
@@ -50,14 +68,26 @@ operation:(CCOperation)operation {
 
 +(id)decryptSnap:(NSData*)data {
     return [SMCrypto AES:data
-                     key:[encryptKey dataUsingEncoding:NSASCIIStringEncoding]
+                     key:[encryptKey dataUsingEncoding:NSUTF8StringEncoding]
                       iv:nil
                  options:kCCOptionECBMode
                operation:kCCDecrypt];
 }
 +(id)encryptSnap:(NSData*)data {
-    return [SMCrypto AES:data
-                     key:[encryptKey dataUsingEncoding:NSASCIIStringEncoding]
+    
+    NSMutableData *tmpData		= data.mutableCopy;
+    int blockSize				= 16;
+    int charDiv					= blockSize-((tmpData.length + 1) % blockSize);
+    NSMutableString *padding	= [NSMutableString.alloc initWithFormat:@"%c", (unichar)10];
+        
+    for (int i = 0; i < charDiv; i++)
+        [padding appendFormat:@"%c", (unichar)charDiv];
+    
+    [tmpData appendData:[padding dataUsingEncoding:NSUTF8StringEncoding]];
+
+    
+    return [SMCrypto AES:tmpData
+                     key:[encryptKey dataUsingEncoding:NSUTF8StringEncoding]
                       iv:nil
                  options:kCCOptionECBMode
                operation:kCCEncrypt];

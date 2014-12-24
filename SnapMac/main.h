@@ -13,5 +13,5 @@
 #import <Cocoa/Cocoa.h>
 void debugOutput(char* filename, const char* function, int linenumber, NSString* input, ...);
 BOOL isYosemite();
-CTFontRef loadFont(NSString* path, CGFloat height);
+
 #endif

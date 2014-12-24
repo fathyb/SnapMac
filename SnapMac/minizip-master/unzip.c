@@ -608,7 +608,7 @@ local int unzGoToNextDisk(unzFile file)
 {
     unz64_s* s;
     file_in_zip64_read_info_s* pfile_in_zip_read_info;
-    int number_disk_next;
+    unsigned long number_disk_next;
 
     s = (unz64_s*)file;
     if (s == NULL)
@@ -635,7 +635,7 @@ local int unzGoToNextDisk(unzFile file)
         }
         else
         {
-            s->filestream = ZOPENDISK64(s->z_filefunc, s->filestream_with_CD, number_disk_next,
+            s->filestream = ZOPENDISK64(s->z_filefunc, s->filestream_with_CD, (int)number_disk_next,
                 ZLIB_FILEFUNC_MODE_READ | ZLIB_FILEFUNC_MODE_EXISTING);
         }
 
@@ -1148,14 +1148,7 @@ extern int ZEXPORT unzOpenCurrentFile3(unzFile file, int* method, int* level, in
           case 2 : *level = 9; break;
         }
     }
-
-    if ((compression_method != 0) &&
-#ifdef HAVE_BZIP2
-        (compression_method != Z_BZIP2ED) &&
-#endif
-        (compression_method != Z_DEFLATED))
-        err = UNZ_BADZIPFILE;
-
+    
     pfile_in_zip_read_info->crc32_wait = s->cur_file_info.crc;
     pfile_in_zip_read_info->crc32 = 0;
     pfile_in_zip_read_info->total_out_64 = 0;
@@ -1352,8 +1345,8 @@ extern int ZEXPORT unzReadCurrentFile(unzFile file, voidp buf, unsigned len)
             uInt total_bytes_read = 0;
 
             if (pfile_in_zip_read_info->stream.next_in != NULL)
-                bytes_not_read = pfile_in_zip_read_info->read_buffer + UNZ_BUFSIZE -
-                    pfile_in_zip_read_info->stream.next_in;
+                bytes_not_read = (int)(pfile_in_zip_read_info->read_buffer + UNZ_BUFSIZE -
+                    pfile_in_zip_read_info->stream.next_in);
             bytes_to_read -= bytes_not_read;
             if (bytes_not_read > 0)
                 memcpy(pfile_in_zip_read_info->read_buffer, pfile_in_zip_read_info->stream.next_in, bytes_not_read);
@@ -1367,7 +1360,7 @@ extern int ZEXPORT unzReadCurrentFile(unzFile file, voidp buf, unsigned len)
                         ZLIB_FILEFUNC_SEEK_SET) != 0)
                     return UNZ_ERRNO;
 
-                bytes_read = ZREAD64(pfile_in_zip_read_info->z_filefunc, pfile_in_zip_read_info->filestream,
+                bytes_read = (int)ZREAD64(pfile_in_zip_read_info->z_filefunc, pfile_in_zip_read_info->filestream,
                           pfile_in_zip_read_info->read_buffer + bytes_not_read + total_bytes_read,
                           bytes_to_read - total_bytes_read);
 

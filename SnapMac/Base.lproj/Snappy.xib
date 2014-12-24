@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6206.8" systemVersion="14B23" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14C81f" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6206.8"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="6206.8"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
@@ -15,12 +15,13 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Voe-Tx-rLC" customClass="Snappy">
             <connections>
+                <outlet property="camPosConstraint" destination="sK9-A0-qPY" id="rjc-B0-o24"/>
                 <outlet property="camView" destination="h1g-yp-uEh" id="5qn-WC-eIq"/>
                 <outlet property="effectList" destination="eSi-cs-lQi" id="MKq-bp-yeI"/>
                 <outlet property="photoButton" destination="US1-JY-dFX" id="xYe-ib-kDH"/>
                 <outlet property="photoToolsView" destination="icl-4Q-qX0" id="NaS-rn-pdn"/>
                 <outlet property="photoToolsYPos" destination="Sk4-5c-hgp" id="0Nw-BL-VXb"/>
-                <outlet property="webView" destination="Esd-G5-ST8" id="X2h-fU-HiY"/>
+                <outlet property="webView" destination="P10-EU-aeZ" id="ghC-ly-9mX"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -682,14 +683,14 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" unifiedTitleAndToolbar="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="355" y="178" width="856" height="513"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
             <value key="minSize" type="size" width="480" height="300"/>
             <view key="contentView" appearanceType="aqua" id="EiT-Mj-1SZ" customClass="NSVisualEffectView">
                 <rect key="frame" x="0.0" y="0.0" width="856" height="513"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <customView wantsLayer="YES" appearanceType="aqua" translatesAutoresizingMaskIntoConstraints="NO" id="bda-iR-1S7" userLabel="Part2 Container">
-                        <rect key="frame" x="-256" y="0.0" width="342" height="513"/>
+                        <rect key="frame" x="0.0" y="0.0" width="342" height="513"/>
                         <subviews>
                             <customView appearanceType="aqua" translatesAutoresizingMaskIntoConstraints="NO" id="h1g-yp-uEh" userLabel="Camera View" customClass="SMCamView">
                                 <rect key="frame" x="0.0" y="0.0" width="342" height="513"/>
@@ -738,7 +739,7 @@
                                         </connections>
                                     </button>
                                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="KEB-3x-jqR" customClass="SMLoadingView">
-                                        <rect key="frame" x="90" y="209" width="163" height="96"/>
+                                        <rect key="frame" x="90" y="208" width="163" height="96"/>
                                         <subviews>
                                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="aVk-qP-SPP">
                                                 <rect key="frame" x="18" y="59" width="127" height="17"/>
@@ -757,7 +758,7 @@
                                             <constraint firstAttribute="height" constant="96" id="hqB-FY-eVr"/>
                                         </constraints>
                                     </customView>
-                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="237-u2-DLU" customClass="SMPhotoToolsView">
+                                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="237-u2-DLU" customClass="SMPhotoOptsView">
                                         <rect key="frame" x="0.0" y="0.0" width="88" height="130"/>
                                         <subviews>
                                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="icl-4Q-qX0">
@@ -813,10 +814,26 @@
                                             <constraint firstItem="icl-4Q-qX0" firstAttribute="leading" secondItem="237-u2-DLU" secondAttribute="leading" id="YlK-Yh-mhE"/>
                                         </constraints>
                                     </customView>
+                                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VCD-aC-fdP" customClass="SMRefreshBouton">
+                                        <rect key="frame" x="297" y="466" width="25" height="28"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="25" id="GNy-u3-4hy"/>
+                                            <constraint firstAttribute="width" constant="25" id="SoQ-bA-9tF"/>
+                                        </constraints>
+                                        <buttonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" image="NSRefreshTemplate" imagePosition="only" alignment="center" state="on" borderStyle="border" inset="2" id="qw2-au-98V">
+                                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="cancelPhotoView:" target="Voe-Tx-rLC" id="sy7-m6-LCi"/>
+                                        </connections>
+                                    </button>
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="Y6H-mp-sf2" firstAttribute="leading" secondItem="hEA-9b-rPf" secondAttribute="leading" constant="20" id="3HL-Mf-Ryd"/>
                                     <constraint firstAttribute="trailing" secondItem="eSi-cs-lQi" secondAttribute="trailing" constant="20" id="BZg-lX-Agu"/>
+                                    <constraint firstItem="VCD-aC-fdP" firstAttribute="top" secondItem="hEA-9b-rPf" secondAttribute="top" constant="20" id="DrQ-Pg-Ohe"/>
+                                    <constraint firstAttribute="trailing" secondItem="VCD-aC-fdP" secondAttribute="trailing" constant="20" id="GEM-OW-Vqw"/>
                                     <constraint firstAttribute="bottom" secondItem="eSi-cs-lQi" secondAttribute="bottom" constant="20" id="Pca-5w-ZZC"/>
                                     <constraint firstAttribute="bottom" secondItem="237-u2-DLU" secondAttribute="bottom" id="Sk4-5c-hgp"/>
                                     <constraint firstAttribute="centerX" secondItem="KEB-3x-jqR" secondAttribute="centerX" id="Wac-cz-K2V"/>
@@ -840,22 +857,21 @@
                             <constraint firstItem="hEA-9b-rPf" firstAttribute="leading" secondItem="bda-iR-1S7" secondAttribute="leading" id="vmM-Lo-XHs"/>
                         </constraints>
                     </customView>
-                    <webView wantsLayer="YES" maintainsBackForwardList="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Esd-G5-ST8" customClass="SMWebUI">
-                        <rect key="frame" x="86" y="0.0" width="770" height="513"/>
-                        <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" minimumFontSize="3" plugInsEnabled="NO" javaEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
-                            <nil key="identifier"/>
-                        </webPreferences>
-                    </webView>
+                    <customView translatesAutoresizingMaskIntoConstraints="NO" id="P10-EU-aeZ" customClass="SMWebUI">
+                        <rect key="frame" x="342" y="0.0" width="514" height="513"/>
+                        <connections>
+                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="self.webUI" id="7Wt-tE-mHH"/>
+                        </connections>
+                    </customView>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="Esd-G5-ST8" firstAttribute="leading" secondItem="bda-iR-1S7" secondAttribute="trailing" id="74C-tn-oAU"/>
+                    <constraint firstItem="P10-EU-aeZ" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="8Y0-e2-eti"/>
                     <constraint firstAttribute="bottom" secondItem="bda-iR-1S7" secondAttribute="bottom" id="MtP-ra-Hui"/>
-                    <constraint firstItem="Esd-G5-ST8" firstAttribute="leading" secondItem="bda-iR-1S7" secondAttribute="trailing" id="Yhy-V6-84R"/>
+                    <constraint firstItem="P10-EU-aeZ" firstAttribute="leading" secondItem="bda-iR-1S7" secondAttribute="trailing" id="X3t-Ay-dNz"/>
+                    <constraint firstAttribute="bottom" secondItem="P10-EU-aeZ" secondAttribute="bottom" id="Zp4-Bq-E2G"/>
                     <constraint firstItem="bda-iR-1S7" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="gEv-mv-YfE"/>
-                    <constraint firstAttribute="bottom" secondItem="Esd-G5-ST8" secondAttribute="bottom" id="gnc-3i-qa2"/>
-                    <constraint firstItem="Esd-G5-ST8" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" id="nNR-tL-dmQ"/>
-                    <constraint firstAttribute="trailing" secondItem="Esd-G5-ST8" secondAttribute="trailing" id="oZm-uC-6zT"/>
-                    <constraint firstItem="bda-iR-1S7" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-256" id="sK9-A0-qPY"/>
+                    <constraint firstItem="bda-iR-1S7" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="sK9-A0-qPY"/>
+                    <constraint firstAttribute="trailing" secondItem="P10-EU-aeZ" secondAttribute="trailing" id="tEb-yT-CQZ"/>
                 </constraints>
             </view>
             <toolbar key="toolbar" implicitIdentifier="697692A9-FCB9-480E-A8B8-DE4D7A2EFB28" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="small" id="dgx-zJ-p57">
@@ -935,13 +951,14 @@
                     <toolbarItem reference="ffh-cg-wro"/>
                 </defaultToolbarItems>
             </toolbar>
-            <point key="canvasLocation" x="-1583" y="-319.5"/>
+            <point key="canvasLocation" x="-1583" y="-319.50000764429547"/>
         </window>
     </objects>
     <resources>
         <image name="Amis" width="32" height="21"/>
         <image name="CameraBtn" width="251" height="250"/>
         <image name="Deconnection" width="14" height="27"/>
+        <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSStatusAvailable" width="16" height="16"/>
         <image name="NSStopProgressTemplate" width="11" height="11"/>
         <image name="Réglages" width="26" height="28"/>

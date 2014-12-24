@@ -1,5 +1,5 @@
 //
-//  SMPhotoToolsView.h
+//  SMPhotoOptsView.h
 //  SnapMac
 //
 //  Created by Fathy Boundjadj  on 17/08/2014.
@@ -12,7 +12,7 @@
 #import <QuartzCore/QuartzCore.h>
 
 
-IB_DESIGNABLE @interface SMPhotoToolsView : NSView
+IB_DESIGNABLE @interface SMPhotoOptsView : NSView
 
 @property (nonatomic) IBInspectable CGFloat cornerRadius;
 
