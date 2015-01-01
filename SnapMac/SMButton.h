@@ -11,6 +11,9 @@
 IB_DESIGNABLE
 @interface SMButton : NSButton
 
+@property (nonatomic) NSColor *backgroundColor;
+@property (nonatomic) NSAppearance *smAppearance;
+
 -(BOOL)visible;
 -(void)show;
 -(void)hide;

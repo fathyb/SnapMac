@@ -79,12 +79,15 @@ BOOL isError(id obj) {
 		return SnapJSSharedInstance;
 	if(self = [super init]) {
 		NSDictionary *dict = @{
-							   @"ShowingCamera": @"showingCamera",
-							   @"ClosingCamera": @"closingCamera",
+							   @"ShowingCamera": @"showingCamera:",
+							   @"ClosingCamera": @"closingCamera:",
 							   @"SnappySettingsLoaded": @"settingsLoaded:",
 							   @"SnappyUse3D": @"use3D:",
 							   @"SnappyUseParallax": @"useParallax:",
 							   @"SnappyHideFeedPics": @"hideFeedPics:",
+							   @"SnappyTakePhoto": @"showSend:",
+							   @"SnappyChangeAppearance": @"changeAppearance:",
+							   @"SnappyClearUserFeed": @"clearUserFeed:"
 							   };
 		NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
 		for(NSString* notifName in dict.allKeys)
@@ -101,21 +104,12 @@ BOOL isError(id obj) {
 
 #pragma mark Comptes et connection
 -(void)setUsername:(NSString *)username {
-	[SMSettings.sharedInstance setObject:username forKey:@"SMUsername"];
+	[Settings.sharedInstance setObject:username forKey:@"SMUsername"];
 	_username = username;
 }
 -(void)setAuthToken:(NSString *)authToken {
-	[SMSettings.sharedInstance setObject:authToken forKey:@"SMAuthToken"];
+	[Settings.sharedInstance setObject:authToken forKey:@"SMAuthToken"];
 	_authToken = authToken;
-}
--(void)settingsLoaded:(NSNotification*)notification {
-	SMSettings *settings = SMSettings.sharedInstance;
-	_username = [settings objectForKey:@"SMUsername"];
-	_authToken = [settings objectForKey:@"SMAuthToken"];
-	int maxPdl = [[settings objectForKey:@"SMMaxPDL"] intValue];
-	_opQueue.maxConcurrentOperationCount = maxPdl > 1 ? maxPdl : 5;
-	
-	NSLog(@"_opQueue max = %ld", (long)_opQueue.maxConcurrentOperationCount);
 }
 -(void)loginWithUser:(NSString*)user password:(NSString*)password andCallback:(WebScriptObject*)callback {
 	[self testLogin:user
@@ -540,39 +534,66 @@ BOOL isError(id obj) {
 	SMCamView *camView = [[[NSApplication sharedApplication] delegate] performSelector:@selector(camView)];
 	[camView cleanStart];
 }
-
-#pragma mark API Objective-C
--(void)hideSend {
-	[self script:@"SnappyUI.hideSend();"];
+-(void)clearFeed {
+	[NSNotificationCenter.defaultCenter postNotificationName:@"SnappyShowClearFeedDialog"
+													  object:nil];
 }
 
--(void)showingCamera {
+
+#pragma mark Notification Center
+-(void)clearUserFeed:(NSNotification*)notif {
+	[self requestTo:@"/ph/clear"
+	   withCallback:^(id result) {
+		   [self script:@"SnappyUI.update();"];
+	}];
+}
+-(void)changeAppearance:(NSNotification*)notif {
+	NSAppearance *appearance = notif.object;
+	self.darkTheme = [appearance.name containsString:@"Dark"];
+	[self script:[NSString stringWithFormat:@"SnappyUI.setTheme('%@');", self.darkTheme ? @"dark" : @"light"]];
+}
+-(void)showingCamera:(NSNotification*)notif {
 	[self script:@"SnappyUI.toggleCam.setIcon('hide');"];
 }
--(void)closingCamera {
+-(void)closingCamera:(NSNotification*)notif {
 	[self script:@"SnappyUI.toggleCam.setIcon('show');"];
 }
-
--(void)script:(NSString*)command {
-	dispatch_async(dispatch_get_main_queue(), ^{
-		[_webView script:command];
-	});
+-(void)showSend:(NSNotification*)notif {
+	[self script:@"SnappyUI.SendPage.show(true);"];
 }
-
+-(void)settingsLoaded:(NSNotification*)notification {
+	Settings *settings = Settings.sharedInstance;
+	_username = [settings objectForKey:@"SMUsername"];
+	_authToken = [settings objectForKey:@"SMAuthToken"];
+	int maxPdl = [[settings objectForKey:@"SMMaxPDL"] intValue];
+	_opQueue.maxConcurrentOperationCount = maxPdl > 1 ? maxPdl : 5;
+	
+}
 -(void)use3D:(NSNotification*)notif {
 	_use3D = [[notif object] boolValue];
 	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.use3D(%@);", @(_use3D ? "true" : "false")];
 	[self script:cmd];
 }
 -(void)useParallax:(NSNotification*)notif {
-	_useParallax = [[notif object] boolValue];
+	_useParallax = [notif.object boolValue];
 	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.useParallax(%@);", @(_useParallax ? "true" : "false")];
 	[self script:cmd];
 }
 -(void)hideFeedPics:(NSNotification*)notif {
-	_hideFeedPics = [[notif object] boolValue];
+	_hideFeedPics = [notif.object boolValue];
 	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.hideFeedPics(%@);", @(_hideFeedPics ? "true" : "false")];
 	[self script:cmd];
 }
+
+#pragma mark API Objective-C
+-(void)script:(NSString*)command {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		[_webView script:command];
+	});
+}
+-(void)hideSend {
+	[self script:@"SnappyUI.hideSend();"];
+}
+
 
 @end

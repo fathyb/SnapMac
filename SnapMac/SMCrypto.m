@@ -32,7 +32,8 @@ operation:(CCOperation)operation {
          strBuffer  = malloc(bufferSize);
         
         bzero(strBuffer, bufferSize);
-        [data getBytes:strBuffer];
+        [data getBytes:strBuffer
+                length:bufferSize];
     }
     
     void *buffer = malloc(bufferSize);

@@ -9,12 +9,14 @@
     0% {
         color: white;
     }
+
     50% {
         color: red;
     }
-	100% {
+
+    100% {
         color: white;
-	}
+    }
 }
 
 @-webkit-keyframes spin {
@@ -76,11 +78,10 @@ body {
     width: -webkit-calc(100% - 1px);
     height: 100%;
     line-height: 1;
-    font-family: Helvetica Neue; /*'Oswald', sans-serif;*/
+    font-family: Helvetica Neue;
     text-align: center;
-    background: transparent; /*url(bgsnap.png) center repeat;*/
+    background: transparent;
     background-size: 100%;
-    border-left: 1px solid black;
     overflow: hidden;
 }
 
@@ -161,10 +162,9 @@ body.loading section, body.offline section {
 }
 
 section header {
-    background-color: rgba(0, 0, 0, 0.31);
-    margin: -20px 0 0 -20px;
-    color: white;
-    width: -webkit-calc(100% + 40px);
+	margin: 0;
+	margin-top: -20px;
+    width: 100%;
     height: 50px;
     line-height: 50px;
     box-shadow: 0 0 10px gray;
@@ -184,7 +184,6 @@ section header>span {
     text-transform: none;
     line-height: 50px;
     font-size: 20px;
-    color: white;
     opacity: 0.7;
     -webkit-transition: all 0.5s, font-size 0;
     position: absolute;
@@ -201,6 +200,17 @@ section header .leftButton {
     left: 10px;
 }
 
+section header .rightButton {
+    float: right;
+    margin-right: 15px;
+    right: 10px;
+	display: block;
+	-webkit-perspective-origin: 10px center;
+}
+section header .rightButton:hover {
+	-webkit-transform: rotate(-90deg);
+}
+
 .iOSSync, .androSync {
     padding: 20px 0;
 }
@@ -208,20 +218,24 @@ section header .leftButton {
 section {
     position: absolute;
     height: 100%;
-    width: -webkit-calc(100% - 40px);
+    width: 100%;
     right: 0;
     top: 0;
     -webkit-filter: blur(0px);
     box-shadow: 0px 0px 10px black;
     overflow: auto;
-    padding: 0 20px;
     overflow: hidden;
     opacity: 0;
-    -webkit-transition: all 0.5s, -webkit-transform 1s ease-in-out, -webkit-perspective-origin-x 0, -webkit-perspective-origin-y 0;
+    -webkit-transition: all 0.5s, 
+    					-webkit-transform 1s ease-in-out,
+    					-webkit-perspective-origin-x 0,
+    					-webkit-perspective-origin-y 0;
 }
+
 section.active {
     opacity: 1;
 }
+
 section.blur {
     -webkit-filter: blur(10px);
 }
@@ -235,11 +249,13 @@ body:not(.enable3d) section {
 }
 
 body.enable3d section.active {
-    -webkit-transform: translate(0) scale(1);
+    -webkit-transform: translate(0)
+    				   scale(1);
 }
 
 body:not(.enable3d) section.active {
-    -webkit-transform: translate(0) scale(1);
+    -webkit-transform: translate(0)
+    				   scale(1);
 }
 
 section .zoom {
@@ -307,28 +323,55 @@ div.friend {
 }
 
 div.snap {
-    width: 250px;
-    height: 150px;
+    width: 400px;
+    height: 200px;
+	padding-left: 50px;
+	margin: 20px auto;
     cursor: pointer;
     opacity: 0.5;
     -webkit-transition: 0.5s;
     background-position: center;
+    background-size: cover;
 }
-
+div.snap .img {
+	height: 200px;
+	width: 200px;
+	border-radius: 100%;
+	float: left;
+    background-position: center;
+    background-size: cover;
+	background-color: white;
+    box-shadow: inset 0 0 10px transparent, 0 0 10px black;
+	-webkit-transition: .5s;
+	position: absolute;
+}
+div.snap:hover .img {
+    box-shadow: inset 0 0 10px black, 0 0 10px black;
+}
 div.snap:hover {
     opacity: 1;
 }
-
-div.snap>p {
-    padding-left: 50px !important;
+div.snap p {
+	text-align: right !important;
+	width: 200px;
+	margin-left: 100px !important;
+	padding-right: 10px !important;
 }
-
+div.snap p:first-of-type {
+	-webkit-transition-delay: .2s;
+}
+div.snap p:last-child {
+	-webkit-transition-delay: .4s;
+}
+div.snap:hover p {
+	width: 250px;
+}
 div.snap .icon {
     font-size: 17px;
     padding: 0 5px;
 }
 
-body.enable3d div.snap:hover, body.enable3d div.friend:hover {
+body.enable3d div.friend:hover {
     -webkit-transform: rotateX(0deg);
 }
 
@@ -336,23 +379,21 @@ div.snap *, div.friend * {
     cursor: pointer;
 }
 
-div.snap.hide, div.friend.hide {
-    opacity: 0.5;
+div.snap.hide, div.friend {
+    opacity: 0.6;
 }
 
-div.snap.hide:hover, div.friend.hide:hover {
+div.snap.hide:hover, div.friend:hover {
     opacity: 1;
 }
 
 div.snap:hover p, div.friend:hover p {
     background-color: rgba(255, 255, 255, 0.8);
 }
-
 div.snap p, div.friend p {
     text-align: left;
     padding: 10px;
     -webkit-transition: all 0.5s;
-    background-color: rgba(255, 255, 255, 0.5);
     max-height: 10px;
     margin: 0;
     word-wrap: break-word;
@@ -398,7 +439,7 @@ div.snap>*, div.friend>* {
     font-size: 13px;
 }
 
-body.enable3d div.snap, body.enable3d div.friend {
+body.enable3d div.friend {
     -webkit-transform: rotateX(-20deg) translateY(-5px);
 }
 
@@ -742,11 +783,10 @@ body>.toggleCam {
     width: 40px;
     height: 50px;
     display: inline-block;
-    background-color: rgba(0, 0, 0, 0.2);
     position: fixed;
     text-align: center;
     top: 50%;
-    left: 0;
+    left: -15px;
     border-radius: 0px 10px 10px 0px;
     margin-top: -10px;
     z-index: 11;
@@ -763,11 +803,6 @@ body>.toggleCam {
     -webkit-transform: rotate(0deg);
 }
 
-body>.toggleCam:hover, body>.toggleCam:active {
-    background-color: rgba(255, 255, 255, 0.9);
-    color: black;
-}
-
 .loginForm input {
     display: block;
     margin: auto;
@@ -777,8 +812,7 @@ body>.toggleCam:hover, body>.toggleCam:active {
     padding: 0;
     margin: 0;
     height: -webkit-calc(100% - 50px);
-    width: -webkit-calc(100% + 40px);
-    margin-left: -20px;
+    width: 100%;
     overflow-x: hidden;
 }
 
@@ -786,32 +820,21 @@ body>.toggleCam:hover, body>.toggleCam:active {
     width: 100%;
     text-align: left;
     margin: 0;
+    opacity: .7;
     display: block;
-    color: white;
     height: 120px;
     overflow: hidden;
     background-position: 0px;
     -webkit-transition: 0.25s;
 }
 
-.conversation:nth-child(odd) {
-    background-color: rgba(50, 50, 50, 0.5);
-}
-
-.conversation:nth-child(even) {
-    background-color: rgba(100, 100, 100, 0.5);
-}
-
-.conversation:nth-child(odd):hover {
-    background-color: rgba(50, 50, 50, 0.7);
-}
-
-.conversation:nth-child(even):hover {
-    background-color: rgba(100, 100, 100, 0.7);
+.conversation:not(:last-child) {
+    border-bottom: 1px solid gray;
 }
 
 .conversation:hover {
-    margin-left: 50px;
+    opacity: 1;
+    padding-left: 50px;
 }
 
 .conversation>p {
@@ -932,40 +955,147 @@ body.hideFeedPics .conversation img {
 }
 
 .errorView {
-	position: fixed;
-	top: -350px;
-	left: 0;
-	width: 100%;
-	height: 40px;
-	z-index: 9999999;
-	background-color: black;
-	position: absolute;
-	width: 100%;
-	height: 50px;
-	color: white;
-	-webkit-transition: 0.25s;
+    position: fixed;
+    top: -350px;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    z-index: 9999999;
+    background-color: black;
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    color: white;
+    -webkit-transition: 0.25s;
 }
+
 .errorView.show {
-	top: 0;
+    top: 0;
 }
 
 .errorView.show .icon:first-child {
-	-webkit-animation: alert 1s infinite;
+    -webkit-animation: alert 1s infinite;
 }
+
 .errorView .icon:first-child {
-	float: left;
+    float: left;
 }
+
 .errorView .icon:last-child {
-	float: right;
+    float: right;
 }
+
 .errorView .text {
-	padding: 0 10px;
-	margin: 0;
-	line-height: 50px;
-	text-align: left;
-	display: inline-block;
+    padding: 0 10px;
+    margin: 0;
+    line-height: 50px;
+    text-align: left;
+    display: inline-block;
 }
+
 .errorView span {
-	line-height: 50px;
-	padding: 0 10px;
+    line-height: 50px;
+    padding: 0 10px;
+}
+
+body.dark section header {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+body.light section header {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: black;
+}
+
+body.dark section header>span {
+    color: white;
+}
+
+body.light section header>span {
+    color: black;
+}
+
+body.light .conversation {
+    color: rgb(74, 74, 74);
+}
+
+body.dark .conversation {
+    color: white;
+}
+
+body.dark .conversation:nth-child(odd) {
+    background-color: rgba(50, 50, 50, 0.5);
+}
+
+body.dark .conversation:nth-child(even) {
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
+body.light .conversation:nth-child(odd) {
+    background-color: rgba(200, 200, 200, 0.3);
+}
+
+body.light .conversation:nth-child(even) {
+    background-color: rgba(220, 220, 220, 0.3);
+}
+
+body.light>.toggleCam {
+    color: black;
+    background-color: rgba(232, 232, 232, 0.7);
+}
+
+body.dark>.toggleCam {
+    color: white;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+body>.toggleCam:hover, body>.toggleCam:active {
+    left: 0;
+}
+
+body.dark>.toggleCam:hover, body>.toggleCam:active {
+    background-color: white;
+    color: black;
+}
+
+body.light>.toggleCam:hover, body>.toggleCam:active {
+    background-color: rgba(0, 0, 0, 0.76);
+    color: white;
+}
+
+body.light .storyBox .imgStory {
+    border-color: rgba(0, 0, 0, 0.5);
+}
+
+body.light .storyBox.loading .imgStory {
+    border-top-color: black;
+}
+
+
+body.dark div.snap p, body.dark div.friend p {
+	color: white;
+
+}
+body.dark div.snap p {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+body.dark div.friend p {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+body.dark div.friend .storiesBtn:hover {
+	color: black;
+}
+body.light div.snap p, body.light div.friend p {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+.friendsPage .search {
+	position: absolute;
+	background-color: white;
+	width: 100%;
+	height: 250px;
+	top: -250px;
+}
+.friendsPage .search.active {
+	top: 0;
 }

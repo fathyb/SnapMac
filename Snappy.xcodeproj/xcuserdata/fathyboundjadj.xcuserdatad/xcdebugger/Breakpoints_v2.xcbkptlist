@@ -111,7 +111,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "40"
             endingLineNumber = "40"
-            landmarkName = "-showAbout"
+            landmarkName = "-init"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -122,11 +122,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/Snappy.m"
-            timestampString = "441151791.599423"
+            timestampString = "441510680.875992"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "127"
+            endingLineNumber = "127"
             landmarkName = "-nextFilter"
             landmarkType = "5">
          </BreakpointContent>
@@ -175,7 +175,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "43"
             endingLineNumber = "43"
-            landmarkName = "-showAbout"
+            landmarkName = "-changeAppearance:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -202,11 +202,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "481"
-            endingLineNumber = "481"
+            startingLineNumber = "474"
+            endingLineNumber = "474"
             landmarkName = "-getUpdates:"
             landmarkType = "5">
          </BreakpointContent>
@@ -218,12 +218,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "479"
-            endingLineNumber = "479"
-            landmarkName = "-getUpdates:"
+            startingLineNumber = "472"
+            endingLineNumber = "472"
+            landmarkName = "-getStory:withKey:iv:andCallback:"
             landmarkType = "5">
             <Locations>
                <Location
@@ -264,11 +264,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "480"
-            endingLineNumber = "480"
+            startingLineNumber = "473"
+            endingLineNumber = "473"
             landmarkName = "-getUpdates:"
             landmarkType = "5">
          </BreakpointContent>
@@ -280,11 +280,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "280"
-            endingLineNumber = "280"
+            startingLineNumber = "273"
+            endingLineNumber = "273"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -312,12 +312,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "550"
-            endingLineNumber = "550"
-            landmarkName = "-showingCamera"
+            startingLineNumber = "556"
+            endingLineNumber = "556"
+            landmarkName = "-showingCamera:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -328,12 +328,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "553"
-            endingLineNumber = "553"
-            landmarkName = "-closingCamera"
+            startingLineNumber = "559"
+            endingLineNumber = "559"
+            landmarkName = "-closingCamera:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -344,11 +344,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "505"
-            endingLineNumber = "505"
+            startingLineNumber = "498"
+            endingLineNumber = "498"
             landmarkName = "-getKeychainWithCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -360,12 +360,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SMWebUI.m"
-            timestampString = "441151763.289959"
+            timestampString = "441156213.197223"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "39"
-            endingLineNumber = "39"
-            landmarkName = "-webView:didCommitLoadForFrame:"
+            startingLineNumber = "37"
+            endingLineNumber = "37"
+            landmarkName = "-awakeFromNib"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -376,12 +376,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "549"
-            endingLineNumber = "549"
-            landmarkName = "-showingCamera"
+            startingLineNumber = "555"
+            endingLineNumber = "555"
+            landmarkName = "-showingCamera:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -440,11 +440,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "259"
-            endingLineNumber = "259"
+            startingLineNumber = "252"
+            endingLineNumber = "252"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -456,11 +456,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "277"
-            endingLineNumber = "277"
+            startingLineNumber = "270"
+            endingLineNumber = "270"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -472,11 +472,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "257"
-            endingLineNumber = "257"
+            startingLineNumber = "250"
+            endingLineNumber = "250"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
             <Locations>
@@ -518,11 +518,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "155"
-            endingLineNumber = "155"
+            startingLineNumber = "148"
+            endingLineNumber = "148"
             landmarkName = "-testLogin:password:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -534,11 +534,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "138"
-            endingLineNumber = "138"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
             landmarkName = "-testLogin:password:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -550,11 +550,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "124"
-            endingLineNumber = "124"
+            startingLineNumber = "117"
+            endingLineNumber = "117"
             landmarkName = "-loginWithUser:password:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -566,11 +566,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440880648.927518"
+            timestampString = "441578043.048148"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
+            startingLineNumber = "93"
+            endingLineNumber = "93"
             landmarkName = "NStoJS()"
             landmarkType = "7">
          </BreakpointContent>
@@ -598,11 +598,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440880648.927518"
+            timestampString = "441578043.048148"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "87"
-            endingLineNumber = "87"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
             landmarkName = "NStoJS()"
             landmarkType = "7">
          </BreakpointContent>
@@ -614,11 +614,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440880648.927518"
+            timestampString = "441578043.048148"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
+            startingLineNumber = "92"
+            endingLineNumber = "92"
             landmarkName = "NStoJS()"
             landmarkType = "7">
          </BreakpointContent>
@@ -630,11 +630,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440880648.927518"
+            timestampString = "441578043.048148"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "97"
-            endingLineNumber = "97"
+            startingLineNumber = "100"
+            endingLineNumber = "100"
             landmarkName = "NStoJS()"
             landmarkType = "7">
          </BreakpointContent>
@@ -646,11 +646,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440880648.927518"
+            timestampString = "441578043.048148"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "98"
+            endingLineNumber = "98"
             landmarkName = "NStoJS()"
             landmarkType = "7">
          </BreakpointContent>
@@ -662,11 +662,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440959311.835372"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "180"
-            endingLineNumber = "180"
+            startingLineNumber = "177"
+            endingLineNumber = "177"
             landmarkName = "-call:"
             landmarkType = "5">
          </BreakpointContent>
@@ -678,11 +678,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440959311.835372"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "186"
-            endingLineNumber = "186"
+            startingLineNumber = "183"
+            endingLineNumber = "183"
             landmarkName = "-call:"
             landmarkType = "5">
          </BreakpointContent>
@@ -694,11 +694,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440959311.835372"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
+            startingLineNumber = "190"
+            endingLineNumber = "190"
             landmarkName = "-call:"
             landmarkType = "5">
          </BreakpointContent>
@@ -710,11 +710,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440959311.835372"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "200"
-            endingLineNumber = "200"
+            startingLineNumber = "197"
+            endingLineNumber = "197"
             landmarkName = "-call:"
             landmarkType = "5">
          </BreakpointContent>
@@ -726,11 +726,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440959311.835372"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "207"
-            endingLineNumber = "207"
+            startingLineNumber = "204"
+            endingLineNumber = "204"
             landmarkName = "-call:"
             landmarkType = "5">
          </BreakpointContent>
@@ -742,11 +742,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "127"
-            endingLineNumber = "127"
+            startingLineNumber = "120"
+            endingLineNumber = "120"
             landmarkName = "-loginWithUser:password:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -758,11 +758,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "105"
-            endingLineNumber = "105"
+            startingLineNumber = "107"
+            endingLineNumber = "107"
             landmarkName = "-setUsername:"
             landmarkType = "5">
          </BreakpointContent>
@@ -774,11 +774,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
+            startingLineNumber = "111"
+            endingLineNumber = "111"
             landmarkName = "-setAuthToken:"
             landmarkType = "5">
          </BreakpointContent>
@@ -790,11 +790,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "483"
-            endingLineNumber = "483"
+            startingLineNumber = "476"
+            endingLineNumber = "476"
             landmarkName = "-getUpdates:"
             landmarkType = "5">
          </BreakpointContent>
@@ -822,11 +822,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "443"
-            endingLineNumber = "443"
+            startingLineNumber = "436"
+            endingLineNumber = "436"
             landmarkName = "-getStory:withKey:iv:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -838,11 +838,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "455"
-            endingLineNumber = "455"
+            startingLineNumber = "448"
+            endingLineNumber = "448"
             landmarkName = "-getStory:withKey:iv:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -854,11 +854,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "520"
-            endingLineNumber = "520"
+            startingLineNumber = "513"
+            endingLineNumber = "513"
             landmarkName = "-openURL:"
             landmarkType = "5">
          </BreakpointContent>
@@ -870,11 +870,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "519"
-            endingLineNumber = "519"
+            startingLineNumber = "512"
+            endingLineNumber = "512"
             landmarkName = "-openURL:"
             landmarkType = "5">
          </BreakpointContent>
@@ -886,11 +886,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440284916.02315"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "569"
-            endingLineNumber = "569"
+            startingLineNumber = "580"
+            endingLineNumber = "580"
             landmarkName = "-useParallax:"
             landmarkType = "5">
          </BreakpointContent>
@@ -918,11 +918,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "524"
-            endingLineNumber = "524"
+            startingLineNumber = "517"
+            endingLineNumber = "517"
             landmarkName = "-notification:withMessage:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1110,59 +1110,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SMCamView.m"
-            timestampString = "440812850.75894"
+            timestampString = "441825386.096429"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "553"
-            endingLineNumber = "553"
-            landmarkName = "-showMedia:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SnapMac/SMCamView.m"
-            timestampString = "440812850.75894"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "552"
-            endingLineNumber = "552"
-            landmarkName = "-showMedia:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SnapMac/SMCamView.m"
-            timestampString = "440812850.75894"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "549"
-            endingLineNumber = "549"
-            landmarkName = "-showMedia:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SnapMac/SMCamView.m"
-            timestampString = "440812850.75894"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "527"
-            endingLineNumber = "527"
+            startingLineNumber = "689"
+            endingLineNumber = "689"
             landmarkName = "-showVideo:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1174,12 +1126,60 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SMCamView.m"
-            timestampString = "440812850.75894"
+            timestampString = "441825386.096429"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "298"
-            endingLineNumber = "298"
-            landmarkName = "-screenResize"
+            startingLineNumber = "688"
+            endingLineNumber = "688"
+            landmarkName = "-showVideo:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441825386.096429"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "685"
+            endingLineNumber = "685"
+            landmarkName = "-showVideo:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441825386.096429"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "663"
+            endingLineNumber = "663"
+            landmarkName = "-showImage:withTools:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "303"
+            endingLineNumber = "303"
+            landmarkName = "-screenResize:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1222,11 +1222,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "334"
-            endingLineNumber = "334"
+            startingLineNumber = "327"
+            endingLineNumber = "327"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1238,12 +1238,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SMCamView.m"
-            timestampString = "440812850.75894"
+            timestampString = "441213957.041984"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "314"
-            endingLineNumber = "314"
-            landmarkName = "-needPhoto"
+            startingLineNumber = "331"
+            endingLineNumber = "331"
+            landmarkName = "-refreshVideo:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1254,11 +1254,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "380"
-            endingLineNumber = "380"
+            startingLineNumber = "373"
+            endingLineNumber = "373"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
             <Locations>
@@ -1316,11 +1316,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440880648.927518"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
+            startingLineNumber = "150"
+            endingLineNumber = "150"
             landmarkName = "JSToNS()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1332,11 +1332,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "340"
-            endingLineNumber = "340"
+            startingLineNumber = "333"
+            endingLineNumber = "333"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1348,11 +1348,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "350"
-            endingLineNumber = "350"
+            startingLineNumber = "343"
+            endingLineNumber = "343"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1364,11 +1364,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "140"
-            endingLineNumber = "140"
+            startingLineNumber = "133"
+            endingLineNumber = "133"
             landmarkName = "-testLogin:password:andCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1380,11 +1380,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "377"
-            endingLineNumber = "377"
+            startingLineNumber = "370"
+            endingLineNumber = "370"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1396,11 +1396,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "285"
-            endingLineNumber = "285"
+            startingLineNumber = "278"
+            endingLineNumber = "278"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1412,11 +1412,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "248"
-            endingLineNumber = "248"
+            startingLineNumber = "241"
+            endingLineNumber = "241"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1428,11 +1428,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "367"
-            endingLineNumber = "367"
+            startingLineNumber = "360"
+            endingLineNumber = "360"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1444,11 +1444,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "245"
-            endingLineNumber = "245"
+            startingLineNumber = "238"
+            endingLineNumber = "238"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1460,11 +1460,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "247"
-            endingLineNumber = "247"
+            startingLineNumber = "240"
+            endingLineNumber = "240"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1476,11 +1476,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "290"
-            endingLineNumber = "290"
+            startingLineNumber = "283"
+            endingLineNumber = "283"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1492,11 +1492,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "299"
-            endingLineNumber = "299"
+            startingLineNumber = "292"
+            endingLineNumber = "292"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1508,11 +1508,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "305"
-            endingLineNumber = "305"
+            startingLineNumber = "298"
+            endingLineNumber = "298"
             landmarkName = "-requestTo:withData:andCallback:asData:method:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1524,11 +1524,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapJS.m"
-            timestampString = "440283354.269502"
+            timestampString = "441510972.188264"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "392"
-            endingLineNumber = "392"
+            startingLineNumber = "385"
+            endingLineNumber = "385"
             landmarkName = "-sendSnapTo:withCallback:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1537,60 +1537,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SnapMac/SnapJS.m"
-            timestampString = "440285020.386929"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "557"
-            endingLineNumber = "557"
-            landmarkName = "-script:"
-            landmarkType = "5">
-            <Locations>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "-[SnapJS script:]"
-                  moduleName = "Snappy"
-                  urlString = "file:///Users/fathyboundjadj/Dropbox/SnapMac/SnapMac/SnapJS.m"
-                  timestampString = "440285020.723551"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "557"
-                  endingLineNumber = "557"
-                  offsetFromSymbolStart = "50">
-               </Location>
-               <Location
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "__17-[SnapJS script:]_block_invoke"
-                  moduleName = "Snappy"
-                  urlString = "file:///Users/fathyboundjadj/Dropbox/SnapMac/SnapMac/SnapJS.m"
-                  timestampString = "440285020.723741"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "557"
-                  endingLineNumber = "557"
-                  offsetFromSymbolStart = "12">
-               </Location>
-            </Locations>
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SnapBack.m"
-            timestampString = "440959311.835372"
+            timestampString = "441824994.278333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "172"
-            endingLineNumber = "172"
+            startingLineNumber = "169"
+            endingLineNumber = "169"
             landmarkName = "-call:"
             landmarkType = "5">
          </BreakpointContent>
@@ -1602,12 +1556,332 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SMWebUI.m"
-            timestampString = "441151763.289959"
+            timestampString = "441586850.30258"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "30"
-            endingLineNumber = "30"
-            landmarkName = "-awakeFromNib"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
+            landmarkName = "-webView:contextMenuItemsForElement:defaultMenuItems:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/Snappy.m"
+            timestampString = "441510680.875992"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "99"
+            endingLineNumber = "99"
+            landmarkName = "-showFriends:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441169126.518807"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "156"
+            endingLineNumber = "156"
+            landmarkName = "-mouseDown:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "321"
+            endingLineNumber = "321"
+            landmarkName = "-screenResize:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMDrawButton.m"
+            timestampString = "441168223.065032"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "20"
+            endingLineNumber = "20"
+            landmarkName = "-mouseDown:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMDrawButton.m"
+            timestampString = "441168223.065032"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "18"
+            endingLineNumber = "18"
+            landmarkName = "-mouseDown:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
+            landmarkName = "-mouseDragged:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441169126.518807"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "152"
+            endingLineNumber = "152"
+            landmarkName = "-mouseDown:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
+            landmarkName = "-mouseDragged:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "176"
+            endingLineNumber = "176"
+            landmarkName = "-mouseDragged:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "177"
+            endingLineNumber = "177"
+            landmarkName = "-mouseDragged:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMColorPickerButton.m"
+            timestampString = "441171292.02176"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
+            landmarkName = "-colorUpdate:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441213957.041984"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "329"
+            endingLineNumber = "329"
+            landmarkName = "-screenResize:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441169173.446417"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
+            landmarkName = "-mouseDown:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMPaintingLayer.m"
+            timestampString = "441738440.422159"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "35"
+            endingLineNumber = "35"
+            landmarkName = "-drawLayer:inContext:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMPaintingLayer.m"
+            timestampString = "441738440.422159"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
+            landmarkName = "-drawLayer:inContext:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/Snappy.m"
+            timestampString = "441176316.408086"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
+            landmarkName = "-applicationDidFinishLaunching:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMCamView.m"
+            timestampString = "441825386.096429"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "489"
+            endingLineNumber = "489"
+            landmarkName = "-setShowColorPickerBtn:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMClearFeedWindow.m"
+            timestampString = "441510972.188264"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "40"
+            endingLineNumber = "40"
+            landmarkName = "-clearFeed:"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SMClearFeedWindow.m"
+            timestampString = "441510433.208467"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "16"
+            endingLineNumber = "16"
+            landmarkName = "-init"
+            landmarkType = "5">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "SnapMac/SnapJS.m"
+            timestampString = "441510963.549423"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "547"
+            endingLineNumber = "547"
+            landmarkName = "-clearUserFeed:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -1618,44 +1892,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "SnapMac/SMWebUI.m"
-            timestampString = "440964723.63605"
+            timestampString = "441580993.431665"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "22"
-            endingLineNumber = "22"
-            landmarkName = "-awakeFromNib"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SnapMac/SMWebUI.m"
-            timestampString = "441151763.289959"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
-            landmarkName = "-script:"
-            landmarkType = "5">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "SnapMac/Snappy.m"
-            timestampString = "441151789.04588"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "103"
-            endingLineNumber = "103"
-            landmarkName = "-showFriends:"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "-validateMenuItem:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

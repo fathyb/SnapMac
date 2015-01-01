@@ -11,7 +11,7 @@
 @implementation SMRefreshBouton
 
 -(void)mouseDown:(NSEvent *)theEvent {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyRefreshVideo"
-                                                        object:nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"SnappyRefreshVideo"
+                                                      object:nil];
 }
 @end

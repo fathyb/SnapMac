@@ -12,13 +12,14 @@
 #import <objc/runtime.h>
 #import "SnapJS.h"
 
-SnapJS* snapJS;
 @implementation SMWebUI
 
 
 -(void)awakeFromNib {
-    self.UIDelegate      = self;
-    self.drawsBackground = NO;
+    self.drawsBackground   = NO;
+    self.UIDelegate        = self;
+    self.frameLoadDelegate = self;
+    self.snapJS            = SnapJS.new;
     
     if(isYosemite()) {
         if([self respondsToSelector:@selector(setOpaque:)] && [self respondsToSelector:@selector(setBackgroundColor:)]) {
@@ -26,45 +27,53 @@ SnapJS* snapJS;
             [self performSelector:@selector(setBackgroundColor:) withObject:NSColor.clearColor];
         }
     }
-    snapJS   = [SnapJS new];
     
-    self.frameLoadDelegate = self;
+    [NSNotificationCenter.defaultCenter addObserver:self
+                                           selector:@selector(changeAppearance:)
+                                               name:@"SnappyChangeAppearance"
+                                             object:nil];
     
     NSString *resourcesPath = NSBundle.mainBundle.resourcePath;
     NSString *htmlPath      = [resourcesPath stringByAppendingString:@"/mainUI.html"];
     [self.mainFrame loadRequest:[NSURLRequest requestWithURL:[NSURL fileURLWithPath:htmlPath]]];
 }
 
--(void)webView:(WebView *)sender didCommitLoadForFrame:(WebFrame *)frame {
-    snapJS.webView   = self;
-    [sender.windowScriptObject setValue:snapJS
-                                 forKey:@"SnapJS"];
+-(void)changeAppearance:(NSNotification*)notif {
+    self.appearance = notif.object;
 }
 
--(NSArray*)webView:(WebView *)sender contextMenuItemsForElement:(NSDictionary *)element defaultMenuItems:(NSArray *)defaultMenuItems {
+-(void)webView:(WebView *)sender didCommitLoadForFrame:(WebFrame *)frame {
+    self.snapJS.webView = self;
+    [sender.windowScriptObject setValue:self.snapJS
+                                 forKey:@"SnapJS"];
+}
+- (BOOL)validateMenuItem:(NSMenuItem *)item {
+    return item.isEnabled;
+}
+-(NSArray*)        webView:(WebView *)sender
+contextMenuItemsForElement:(NSDictionary *)element
+          defaultMenuItems:(NSArray *)defaultMenuItems {
+    
     if(!element[@"WebElementDOMNode"])
         return defaultMenuItems;
-    
     WebScriptObject *el     = element[@"WebElementDOMNode"];
     NSMutableArray *items   = NSMutableArray.new;
     
     WebScriptObject *result = [self.windowScriptObject callWebScriptMethod:@"SnappyRClickHandler"
                                                              withArguments:@[el]];
-    
-    if(![result isKindOfClass:WebUndefined.class]) {
-        JSContextRef       jsContext = self.webFrame.globalContext;
-        JSObjectRef         jsObject = result.JSObject;
-        if(JSValueIsNull(self.webFrame.globalContext, jsObject))
+    if(result.class != WebUndefined.class) {
+        JSContextRef jsContext = self.mainFrame.globalContext;
+        JSObjectRef   jsObject = result.JSObject;
+        if(JSValueIsNull(jsContext, jsObject))
             goto quit;
         
         JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(jsContext, jsObject);
         ssize_t            arraySize = JSPropertyNameArrayGetCount(props);
-        
         for(ssize_t i = 0; i < arraySize; i++) {
             JSStringRef    k = JSPropertyNameArrayGetNameAtIndex(props, i);
             JSValueRef  vval = JSObjectGetProperty(jsContext, jsObject, k, nil);
             NSString  *title = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, k));
-            NSMenuItem *item;
+            NSMenuItem *item = nil;
             
             JSStringRelease(k);
             
@@ -80,8 +89,10 @@ SnapJS* snapJS;
                                                                                1,
                                                                   (JSValueRef*)&object,
                                                                                0);
-                } keyEquivalent:@""];
-            
+                                        } keyEquivalent:@""];
+            if(JSValueGetType(jsContext, vval) == kJSTypeString) {
+                item.enabled = NO;
+            }
             [items addObject:item];
         }
     }
@@ -89,6 +100,7 @@ SnapJS* snapJS;
     
 quit:
 #ifdef SnapBug
+    [items addObject:NSMenuItem.separatorItem];
     [items addObjectsFromArray:defaultMenuItems];
 #endif
     
@@ -98,6 +110,8 @@ quit:
 
 -(void)script:(NSString*)commande {
     
-    [self.windowScriptObject performSelectorOnMainThread:@selector(evaluateWebScript:) withObject:commande waitUntilDone:NO];
+    [self.windowScriptObject performSelectorOnMainThread:@selector(evaluateWebScript:)
+                                              withObject:commande
+                                           waitUntilDone:NO];
 }
 @end

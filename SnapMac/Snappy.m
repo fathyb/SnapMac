@@ -41,14 +41,15 @@ BOOL hideDivider = NO;
     
     self.window.title = @"Snappy - chargement";
     
-    
     self.window.delegate = self;
-    self.settingsView    = [SMSettings.alloc initForWindow:_window];
+    self.settingsView    = [Settings.alloc initForWindow:_window];
+    
     self.about = About.new;
+    NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
+    [center postNotificationName:@"IGotCamPosConstraint"
+                          object:self.camPosConstraint];
     
-    [NSNotificationCenter.defaultCenter postNotificationName:@"IGotCamPosConstraint"
-                                                      object:self.camPosConstraint];
-    
+    self.clearFeedWindow = SMClearFeedWindow.new;
     self.window.settingsWindow = self.settingsView.settingsWindow;
     self.window.webUI = self.webUI;
     self.window.aboutWindow = self.about.aboutWindow;
@@ -57,18 +58,13 @@ BOOL hideDivider = NO;
     if(isYosemite()) {
         NSAppearance *appearance = [NSAppearance appearanceNamed:[_settingsView objectForKey:@"SMDefaultTheme"]];
         self.window.appearance = appearance;
-        self.window.movableByWindowBackground = YES;
+        self.window.movableByWindowBackground = NO;
     }
     [self setEffects];
-    self.photoButton.actionBlock = ^{
-        [self.camView photo:^(NSImage* image) {
-            [self.camView showImage:image withTools:YES];
-            [self showSend];
-        }];
-    };
+    
     self.effectList.superview.layer = CALayer.new;
     self.window.title = @"Snappy (Beta 1)";
-    [NSUserNotificationCenter.defaultUserNotificationCenter setDelegate:self];
+    NSUserNotificationCenter.defaultUserNotificationCenter.delegate = self;
 }
 -(void)showPhotoTools {
     _photoToolsYPos.animator.constant = 0;
@@ -112,18 +108,14 @@ BOOL hideDivider = NO;
 
 
 -(IBAction)showAbout:(id)sender {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowAboutWindow"
-                                                        object:self];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"ShowAboutWindow"
+                                                      object:self];
 }
 
 - (IBAction)changePhotoEffect:(NSPopUpButton*)sender {
     
-    NSString* effet = _effects[[sender selectedItem].title];
-    CIFilter* filter;
-    if(!effet)
-        filter = nil;
-    else
-        filter = [CIFilter filterWithName:effet];
+    NSString* effect = _effects[sender.selectedItem.title];
+    CIFilter* filter = effect ? [CIFilter filterWithName:effect] : nil;
     
     [self.camView setFilter:filter];
 }

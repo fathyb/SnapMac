@@ -9,11 +9,9 @@
 #import <Cocoa/Cocoa.h>
 #import "SMButton.h"
 
-typedef void (^SMPhotoBlock)();
-
 IB_DESIGNABLE
 @interface SMPhotoButton : SMButton
 
-@property (nonatomic)   BOOL down;
-@property (strong)      SMPhotoBlock actionBlock;
+@property (nonatomic) BOOL down;
+@property (nonatomic) BOOL dark;
 @end

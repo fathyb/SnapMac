@@ -9,12 +9,13 @@
 #import <Cocoa/Cocoa.h>
 #import <AVFoundation/AVFoundation.h>
 #import "SMWebUI.h"
-#import "SMSettings.h"
+#import "Settings.h"
 #import "SMCamView.h"
 #import "SMImage.h"
 #import "SMPhotoButton.h"
 #import "About.h"
 #import "SMWindow.h"
+#import "SMClearFeedWindow.h"
 
 @interface Snappy : NSObject <NSApplicationDelegate, NSSplitViewDelegate, NSUserNotificationCenterDelegate, NSWindowDelegate> {
     __weak NSPopUpButton *effectList;
@@ -27,8 +28,9 @@
 @property (nonatomic)       AVCaptureSession* session;
 @property (nonatomic)       NSDictionary* effects;
 @property (nonatomic)       SMWebUI* webUI;
-@property (nonatomic)       SMSettings* settingsView;
+@property (nonatomic)       Settings* settingsView;
 @property (nonatomic)       CALayer* progressLayer;
+@property (nonatomic)       SMClearFeedWindow* clearFeedWindow;
 @property (weak) IBOutlet   SMWebUI* webView;
 @property (weak) IBOutlet   SMCamView* camView;
 @property (weak) IBOutlet   NSPopUpButton* effectList;

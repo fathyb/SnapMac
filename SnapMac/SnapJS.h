@@ -38,11 +38,12 @@ typedef NS_ENUM(NSUInteger, SnappyError) {
 
 @property (nonatomic) NSString* authToken;
 @property (nonatomic) NSString* username;
-@property (nonatomic) SMWebUI* webView;
+@property (nonatomic, weak) SMWebUI* webView;
 @property (nonatomic) NSOperationQueue* opQueue;
 @property (nonatomic) BOOL logged;
 @property (nonatomic) BOOL use3D;
 @property (nonatomic) BOOL useParallax;
 @property (nonatomic) BOOL hideFeedPics;
+@property (nonatomic) BOOL darkTheme;
 
 @end

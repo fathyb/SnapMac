@@ -100,16 +100,6 @@ var Snappy = new (function() {
 			this.mapsURL = "https://www.google.fr/maps/place/"+escape(this.place);
 		}
 		
-		this.changeBlocks = new Array();
-		this.change 	  = function(fn) {
-			if(!fn)
-				for(var i in this.changeBlocks)
-					this.changeBlocks[i](this);
-					
-			else if(typeof fn == "function")
-				this.changeBlocks.push(fn);
-		}
-		
 		this.addStories	 = function(stories) {
 			var story;
 			
@@ -117,13 +107,9 @@ var Snappy = new (function() {
 				story = new Snappy.Story(stories[i]);
 				
 				story.friend = this;
-				story.change(function(story) {
-					story.friend.change();
-				});
 				
 				this.stories.push(story);
 			}
-			this.change();
 		}
 		
 		return this;
@@ -210,7 +196,7 @@ var Snappy = new (function() {
 		}
 		
 		
-		this.attachStories = function(data) {
+		this.setStories = function(data) {
 			var fStories = data.friend_stories,
 				friend, stories;
 			
@@ -256,7 +242,7 @@ var Snappy = new (function() {
 			this.addFriend(friend);
 		}
 		
-		this.attachStories(updates.stories_response);
+		this.setStories(updates.stories_response);
 		
 		Snappy.cache.friends = this;
 		
@@ -278,6 +264,7 @@ var Snappy = new (function() {
 		this.id		   = story.media_id;
 		this.duration  = Math.round(story.time);
 		this.date	   = new Snappy.SnappyDate(story.timestamp);
+		this.timeLeft  = raw.time_left;
 		this.mediaType = new Snappy.MediaType(story.media_type);
 		
 		this.show = function() {

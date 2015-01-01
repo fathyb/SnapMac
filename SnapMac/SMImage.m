@@ -77,7 +77,7 @@
 			thumbnailPoint.x = (newWidth - scaledWidth) * 0.5;
 	}
 	
-	NSImage* newImage = [[NSImage alloc] initWithSize:newSize];
+	NSImage* newImage = [NSImage.alloc initWithSize:newSize];
 	
 	[newImage lockFocus];
 	

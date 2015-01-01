@@ -6,7 +6,16 @@
 	<string>fr</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
-		<dict/>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string></string>
+			<key>CFBundleTypeIconFile</key>
+			<string>SnapMac/Images.xcassets/Snappy.imageset/SnapMac.png</string>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<integer>1</integer>
+		</dict>
 	</array>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
@@ -25,7 +34,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>7193</string>
+	<string>7777</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.social-networking</string>
 	<key>LSMinimumSystemVersion</key>

@@ -7,6 +7,7 @@
 //
 
 #import "SMButton.h"
+#import "Settings.h"
 
 typedef NS_ENUM(NSUInteger, SMFlashState) {
     SMFlashOff = 0,
@@ -15,6 +16,7 @@ typedef NS_ENUM(NSUInteger, SMFlashState) {
 
 @interface SMFlashButton : SMButton
 
+@property (nonatomic) Settings *settings;
 @property (nonatomic) SMFlashState flashState;
 
 @end

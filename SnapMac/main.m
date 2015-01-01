@@ -43,5 +43,15 @@ int main(int argc, const char * argv[]) {
     }
     printf("[com.fathyb.snappy.glparallax][error](0xdeadbeef) on GPU@1. malloc error\n");
     printf("[com.fathyb.snappy.smwebui.jscbridge][notice] skipping glparallax module\n");
-    return NSApplicationMain(argc, argv);
+    
+    int mainr = 0;
+    @try {
+         mainr = NSApplicationMain(argc, argv);
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Snappy crashed...");
+        NSLog(@"Exception  : %@", exception);
+        NSLog(@"Call stack : %@", exception.callStackSymbols);
+    }
+    return mainr;
 }

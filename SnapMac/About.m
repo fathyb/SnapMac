@@ -22,19 +22,30 @@
         _aboutWindow.opaque = NO;
         _aboutWindow.backgroundColor = [NSColor clearColor];
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(showAbout)
-                                                     name:@"ShowAboutWindow"
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(closeAbout:)
-                                                     name:@"CloseAboutWindow"
-                                                   object:nil];
+        NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
+        [center addObserver:self
+                   selector:@selector(showAbout)
+                       name:@"ShowAboutWindow"
+                     object:nil];
+        [center addObserver:self
+                   selector:@selector(closeAbout:)
+                       name:@"CloseAboutWindow"
+                     object:nil];
+        [center addObserver:self
+                   selector:@selector(changeAppearance:)
+                       name:@"SnappyChangeAppearance"
+                     object:nil];
     }
     
     return self;
 }
 
+-(void)changeAppearance:(NSNotification*)notif {
+    NSAppearance *appearance = notif.object;
+    
+              self.aboutWindow.             appearance =
+    ((NSView*)self.aboutWindow.contentView).appearance = appearance;
+}
 - (void)showAbout {
     [NSApp beginSheet:_aboutWindow
        modalForWindow:_window

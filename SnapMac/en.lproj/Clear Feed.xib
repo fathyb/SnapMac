@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14C81f" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="SMClearFeedWindow">
+            <connections>
+                <outlet property="window" destination="KaB-pR-hmP" id="kZB-eX-Qpm"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" restorable="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" animationBehavior="default" id="KaB-pR-hmP">
+            <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="283" y="305" width="368" height="133"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <view key="contentView" id="d4E-Jy-Mwz" customClass="NSVisualEffectView">
+                <rect key="frame" x="0.0" y="0.0" width="368" height="133"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="C5D-JC-u2Z">
+                        <rect key="frame" x="18" y="96" width="332" height="17"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Are you sure you want to clear your feed ?" id="ecM-cN-Pu3">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Xnx-2v-L77">
+                        <rect key="frame" x="14" y="13" width="212" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="200" id="KMS-eF-PLc"/>
+                            <constraint firstAttribute="height" constant="21" id="sPD-XN-ONi"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="Yes, I want to clear my feed" bezelStyle="rounded" imagePosition="right" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="cYa-d9-vwY">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearFeed:" target="-2" id="flZ-7Z-X7r"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2nS-Y8-9b0">
+                        <rect key="frame" x="287" y="13" width="67" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="Rir-Tu-NRs"/>
+                            <constraint firstAttribute="width" constant="55" id="sry-bG-VVX"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="No" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="4a1-iw-hbb">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="hide:" target="-2" id="uOf-1C-7yo"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="Xnx-2v-L77" secondAttribute="bottom" constant="20" id="6nA-ga-lZk"/>
+                    <constraint firstAttribute="bottom" secondItem="2nS-Y8-9b0" secondAttribute="bottom" constant="20" id="86a-G7-d1K"/>
+                    <constraint firstItem="C5D-JC-u2Z" firstAttribute="leading" secondItem="d4E-Jy-Mwz" secondAttribute="leading" constant="20" id="9z7-Sj-LiO"/>
+                    <constraint firstAttribute="trailing" secondItem="2nS-Y8-9b0" secondAttribute="trailing" constant="20" id="CQC-y0-lVi"/>
+                    <constraint firstAttribute="trailing" secondItem="C5D-JC-u2Z" secondAttribute="trailing" constant="20" id="KS0-tY-Q0M"/>
+                    <constraint firstItem="C5D-JC-u2Z" firstAttribute="top" secondItem="d4E-Jy-Mwz" secondAttribute="top" constant="20" id="N0l-Js-gmd"/>
+                    <constraint firstItem="Xnx-2v-L77" firstAttribute="leading" secondItem="d4E-Jy-Mwz" secondAttribute="leading" constant="20" id="SSY-0s-1aU"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="831" y="197.5"/>
+        </window>
+    </objects>
+</document>

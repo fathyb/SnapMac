@@ -10,6 +10,7 @@
 #import <Foundation/Foundation.h>
 #import "SMBezierPath.h"
 
+
 #define NSLoc(a) NSLocalizedString(a, nil)
 typedef void (^SMCallback)(id);
 
@@ -23,7 +24,7 @@ typedef void (^SMCallback)(id);
 
 #import "main.h"
 
-#define SnapBug
+//#define SnapBug
 
 #define LogRect(RECT) NSLog(@"%s: (%0.0f, %0.0f) %0.0f x %0.0f", #RECT, RECT.origin.x, RECT.origin.y, RECT.size.width, RECT.size.height)
 

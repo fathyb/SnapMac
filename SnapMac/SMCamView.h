@@ -10,7 +10,10 @@
 #import <AVFoundation/AVFoundation.h>
 #import "SMPhotoButton.h"
 #import "SMQuitMediaButton.h"
-#import "SMSettings.h"
+#import "Settings.h"
+
+@class SMPaintingLayer;
+@class SMLine;
 
 @interface SMCamView : NSView
 
@@ -22,10 +25,18 @@
 @property (nonatomic) BOOL showCancelBtn;
 @property (nonatomic) BOOL showPhotoBtn;
 @property (nonatomic) BOOL showFilterList;
-@property (nonatomic) BOOL showPhotoTools;
 @property (nonatomic) BOOL showRefreshBtn;
-@property (nonatomic) BOOL showPhotoOptions;
+@property (nonatomic) BOOL showFlashBtn;
+@property (nonatomic) BOOL showDrawBtn;
+@property (nonatomic) BOOL showColorPickerBtn;
+@property (nonatomic) BOOL showUndoDrawBtn;
+@property (nonatomic) BOOL isDrawingEnabled;
+@property (nonatomic) BOOL down;
 @property (nonatomic) NSLayoutConstraint *positionLeft;
+@property (nonatomic) NSBezierPath *path;
+@property (nonatomic) SMLine *currentLine;
+@property (nonatomic) SMPaintingLayer *paintingLayer;
+@property (nonatomic) NSColor *drawingColor;
 
 -(void)setFilter:(CIFilter*)filter;
 -(void)cleanStart;

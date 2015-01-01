@@ -10,8 +10,14 @@
 #import "SMImage.h"
 #import "SMLoadingView.h"
 #import "SMPhotoButton.h"
-#import "SMphotoOptsView.h"
 #import "SMRefreshBouton.h"
+#import "SMDrawButton.h"
+#import "SMLine.h"
+#import "SMPaintingLayer.h"
+#import "SMDrawButton.h"
+#import "SMUndoDrawButton.h"
+#import "SMColorPickerButton.h"
+#import "SMFlashButton.h"
 
 #define kSwipeMinimumLength 0.15
 
@@ -20,8 +26,11 @@
 @synthesize showCancelBtn,
             showPhotoBtn,
             showRefreshBtn,
+            showDrawBtn,
             showFilterList,
-            showPhotoOptions,
+            showFlashBtn,
+            showUndoDrawBtn,
+            showColorPickerBtn,
             previewLayer,
             session,
             twoFingerTouches,
@@ -35,6 +44,7 @@ float scrollDeltaX;
 BOOL downed;
 BOOL isHandlingEvent;
 
+#pragma mark Support touchpad multitouch
 -(BOOL)acceptsTouchEvents {
     return YES;
 }
@@ -62,142 +72,135 @@ BOOL isHandlingEvent;
         scrollDeltaY = 0;
         isHandlingEvent = YES;
     }
-    else if(event.phase == NSEventPhaseChanged) {
-        if(!isHandlingEvent) {
-            if(currentSum != 0)
-                currentSum = 0;
-        }
-        else {
-            scrollDeltaX += event.scrollingDeltaX;
-            scrollDeltaY += event.scrollingDeltaY;
-            
-            float absoluteSumX = fabsf(scrollDeltaX);
-            float absoluteSumY = fabsf(scrollDeltaY);
-            if((absoluteSumX < absoluteSumY && currentSum == 0)) {
-                isHandlingEvent = NO;
+    switch(event.phase) {
+        case NSEventPhaseChanged:
+            if(!isHandlingEvent) {
                 if(currentSum != 0)
                     currentSum = 0;
             }
             else {
-                CGFloat flippedDeltaX = scrollDeltaX * -1;
-                if(flippedDeltaX == 0) {
+                scrollDeltaX += event.scrollingDeltaX;
+                scrollDeltaY += event.scrollingDeltaY;
+            
+                float absoluteSumX = fabsf(scrollDeltaX);
+                float absoluteSumY = fabsf(scrollDeltaY);
+                if((absoluteSumX < absoluteSumY && currentSum == 0)) {
+                    isHandlingEvent = NO;
                     if(currentSum != 0)
                         currentSum = 0;
                 }
                 else {
-                    currentSum = flippedDeltaX/1000;
-                    return;
+                    CGFloat flippedDeltaX = scrollDeltaX * -1;
+                    if(flippedDeltaX == 0) {
+                        if(currentSum != 0)
+                            currentSum = 0;
+                    }
+                    else {
+                        currentSum = flippedDeltaX/1000;
+                        return;
+                    }
                 }
             }
-        }
-    }
-    else if(event.phase == NSEventPhaseEnded) {
-        
-        float absoluteSum = fabsf(currentSum);
-        
-        if (absoluteSum < kSwipeMinimumLength)
-            return;
-        
-        if(!currentSum)
-            return;
-        id delegate = NSApplication.sharedApplication.delegate;
-        SEL selector = NSSelectorFromString(currentSum > 0 ? @"prevFilter" : @"nextFilter");
-        if([delegate respondsToSelector:selector]) {
-            [delegate performSelectorInBackground:selector withObject:nil];
-        }
-        isHandlingEvent = NO;
-        if(currentSum != 0)
-            currentSum = 0;
-    }
-    else if(event.phase == NSEventPhaseMayBegin || event.phase == NSEventPhaseCancelled) {
-        isHandlingEvent = NO;
-        if(currentSum != 0)
-            currentSum = 0;
+            break;
+        case NSEventPhaseMayBegin:
+        case NSEventPhaseCancelled:
+            isHandlingEvent = NO;
+            if(currentSum != 0)
+                currentSum = 0;
+            break;
+        default:
+            break;
+        case NSEventPhaseEnded:
+            if(fabsf(currentSum) < kSwipeMinimumLength || !currentSum)
+                return;
+            
+            id delegate = NSApplication.sharedApplication.delegate;
+            SEL selector = NSSelectorFromString(currentSum > 0 ? @"prevFilter" : @"nextFilter");
+            if([delegate respondsToSelector:selector])
+                [delegate performSelectorInBackground:selector withObject:nil];
+            
+            isHandlingEvent = NO;
+            if(currentSum != 0)
+                currentSum = 0;
+            
+            break;
     }
     [super scrollWheel:event];
 }
 
 -(void)swipeWithEvent:(NSEvent*)event {
-    CGFloat x = [event deltaX];
-    if(!x) return;
-    id delegate = [[NSApplication sharedApplication] delegate];
+    CGFloat x = event.deltaX;
+    if(!x)
+        return;
+    id delegate = NSApplication.sharedApplication.delegate;
     SEL selector = NSSelectorFromString(x < 0 ? @"prevFilter" : @"nextFilter");
-    if([delegate respondsToSelector:selector]) {
+    if([delegate respondsToSelector:selector])
         [delegate performSelectorOnMainThread:selector withObject:nil waitUntilDone:NO];
-    }
 }
--(void)photo:(SMCallback)callback {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        SMSettings *settings = [SMSettings sharedInstance];
-        if([[settings objectForKey:@"SMUseFlash"] boolValue])
-            [self flashScreen:YES];
-        
-        [stillImageOutput captureStillImageAsynchronouslyFromConnection:[stillImageOutput connectionWithMediaType:AVMediaTypeVideo] completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
-            if([[settings objectForKey:@"SMUseFlash"] boolValue])
-                [self flashScreen:NO];
-            
-            if(!error && imageSampleBuffer) {
-                [session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
-                
-                NSData        *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
-                NSImage       *oldImage = [[NSImage alloc] initWithData:jpegData];
-                NSRect          newRect = NSMakeRect(400, 0, 480, 720);
-                CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)[oldImage TIFFRepresentation], nil);
-                CGImageRef    nImageRef = CGImageSourceCreateImageAtIndex(source, 0, nil);
-                CGImageRef     imageRef = CGImageCreateWithImageInRect(nImageRef, newRect);
-                NSImage       *newImage = [[NSImage alloc] initWithCGImage:imageRef size:newRect.size];
-                NSArray        *filters = previewLayer.filters;
-                
-                CFRelease(source);
-                CFRelease(nImageRef);
-                CFRelease(imageRef);
-                
-                [newImage setFilter:(filters.count > 0 ? filters[0] : nil)];
-                [newImage flipImage];
-                
-                callback(newImage);
-            }
-            else {
-                callback(error);
-            }
-        }];
-    });
 
+#pragma mark NSView methods
+-(void)mouseDown:(NSEvent*)theEvent {
+    if(!self.isDrawingEnabled)
+        return [super mouseDown:theEvent];
+    
+    NSPoint loc = theEvent.locationInWindow;
+    loc.x -= self.frame.origin.x;
+    loc.y -= self.frame.origin.y;
+    
+    SMLine *line = SMLine.new;
+    line.color   = CGColorCreateCopy(self.drawingColor.CGColor);
+    line.begin   = loc;
+    line.end     = loc;
+    
+    self.currentLine = line;
 }
--(void)flashScreen:(BOOL)flash {
-    CGDisplayFadeReservationToken fadeToken;
+- (void)mouseDragged:(NSEvent*)theEvent {
+    if(!self.isDrawingEnabled || !self.currentLine)
+        return [super mouseDragged:theEvent];
     
-    NSColor*     flashColor = [NSColor colorWithCalibratedRed:255
-                                                        green:255
-                                                         blue:255
-                                                        alpha:1];
-    NSTimeInterval duration = .25;
-    CGError        error    = CGAcquireDisplayFadeReservation(duration * 2, &fadeToken);
+    SMPaintingLayer *layer = self.paintingLayer;
     
-    if (error != kCGErrorSuccess)
+    if(!layer)
         return;
     
-    if(flash) {
-        CGDisplayFade(fadeToken, duration, kCGDisplayBlendNormal, kCGDisplayBlendSolidColor, flashColor.redComponent, flashColor.greenComponent, flashColor.blueComponent, true);
-        usleep(duration*1000000);
-    }
-    else
-        CGDisplayFade(fadeToken, duration, kCGDisplayBlendSolidColor, kCGDisplayBlendNormal,flashColor.redComponent, flashColor.greenComponent, flashColor.blueComponent, false);
+    NSPoint loc = theEvent.locationInWindow;
+    loc.x -= self.frame.origin.x;
+    loc.y -= self.frame.origin.y;
     
+    self.currentLine.end = loc;
+    [layer.lines addObject:self.currentLine];
+    
+    SMLine *line = SMLine.new;
+    line.color   = CGColorCreateCopy(self.drawingColor.CGColor);
+    line.begin   = loc;
+    line.end     = loc;
+    
+    self.currentLine = line;
+    
+    [layer setNeedsDisplay];
+}
+-(void)drawRect:(NSRect)dirtyRect {
+    [NSColor.redColor set];
+    
+    [self.path stroke];
 }
 
 -(void)awakeFromNib {
     
     NSDictionary* notifications = @{
-        NSWindowDidResizeNotification: @"screenResize",
-        @"SnappyShowCamera": @"showCamera:",
-        @"SnappyShowMedia": @"showMedia:",
-        @"SnappyRefreshVideo": @"refreshVideo",
-        @"SnappyNeedPhoto": @"needPhoto",
-        @"IGotCamPosConstraint": @"setPosConstraint:"
+        NSWindowDidResizeNotification: @"screenResize:",
+                  @"SnappyShowCamera": @"showCamera:",
+                   @"SnappyShowMedia": @"showMedia:",
+                @"SnappyRefreshVideo": @"refreshVideo:",
+                   @"SnappyNeedPhoto": @"needPhoto:",
+              @"IGotCamPosConstraint": @"setPosConstraint:",
+                   @"SnappyTakePhoto": @"takePhoto:",
+               @"SnappyToggleDrawing": @"toggleDrawing:",
+          @"SnappyChangeDrawingColor": @"changeDrawingColor:",
+               @"SnappyUndoDirtyDraw": @"undoDraw:"
     };
     
-    NSNotificationCenter* center = [NSNotificationCenter defaultCenter];
+    NSNotificationCenter* center = NSNotificationCenter.defaultCenter;
     
     for(NSString *k in notifications.allKeys)
         [center addObserver:self
@@ -230,7 +233,7 @@ BOOL isHandlingEvent;
             }
         }
     
-        stillImageOutput = [AVCaptureStillImageOutput new];
+        stillImageOutput = AVCaptureStillImageOutput.new;
         if([session canAddOutput:stillImageOutput])
             [session addOutput:stillImageOutput];
     
@@ -247,6 +250,8 @@ BOOL isHandlingEvent;
         [self hideLoading];
     });
 }
+
+#pragma mark Utils
 NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     
     float width		 = imageSize.width;
@@ -286,14 +291,25 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     return NSMakeRect(x, y, scaledWidth, scaledHeight);
     
 }
--(void)screenResize {
+#pragma mark Notification Center
+-(void)undoDraw:(NSNotification*)notif {
+    if(!self.isDrawingEnabled)
+        return;
+    
+    [self.paintingLayer.lines removeLastObject];
+    [self.paintingLayer setNeedsDisplay];
+}
+-(void)screenResize:(NSNotification*)notif {
     [CATransaction begin];
     [CATransaction setValue:(id)kCFBooleanTrue
                      forKey:kCATransactionDisableActions];
     
     if(_positionLeft.constant != 0)
             _positionLeft.constant = -self.bounds.size.width;
-
+    
+    if(self.paintingLayer)
+        [self.paintingLayer resizeTo:self.layer.frame.size];
+    
     if(self.layer && [self.layer isKindOfClass:[AVPlayerLayer class]]) {
         CALayer *playerLayer = self.layer;
         if(playerLayer.sublayers.count > 1) {
@@ -308,12 +324,37 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
         }
     }
     
+    
     [CATransaction commit];
 }
--(void)needPhoto {
+-(void)refreshVideo:(NSNotification*)notif {
+    if([self.layer isKindOfClass:AVPlayerLayer.class]) {
+        AVPlayerLayer *playerLayer = (AVPlayerLayer*)self.layer;
+        AVPlayer *player = playerLayer.player;
+        
+        [player seekToTime:CMTimeMake(0, 1)];
+        [player play];
+    }
+}
+-(void)toggleDrawing:(NSNotification*)notif {
+    BOOL value = [notif.object boolValue];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyIGotPhoto"
-                                                        object:self.layer.contents];
+    self.isDrawingEnabled = value;
+    if(value)
+        [self showDrawingLayer];
+    else
+        [self hideDrawingLayer];
+}
+-(void)changeDrawingColor:(NSNotification*)notif {
+    self.drawingColor = notif.object;
+}
+-(void)needPhoto:(NSNotification*)notif {
+    NSImage *image = self.layer.contents;
+    if(self.paintingLayer)
+        [self.paintingLayer drawInImage:image];
+    
+    [NSNotificationCenter.defaultCenter postNotificationName:@"SnappyIGotPhoto"
+                                                      object:image];
 }
 -(void)setPosConstraint:(NSNotification*)notif {
     self.positionLeft = notif.object;
@@ -328,10 +369,20 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     else
         [self hide];
 }
+
+-(void)takePhoto:(NSNotification*)notif {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self photo:^(NSImage* image) {
+            [self showImage:image withTools:YES];
+        }];
+    });
+}
+
+
 -(void)showAndUseCamera:(BOOL)showCamera {
     _positionLeft.animator.constant = 0;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ShowingCamera"
+    [NSNotificationCenter.defaultCenter postNotificationName:@"ShowingCamera"
                                                             object:self];
     
     if(showCamera)
@@ -343,97 +394,191 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
 -(void)hide {
     _positionLeft.animator.constant = -self.bounds.size.width;
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ClosingCamera"
+    [NSNotificationCenter.defaultCenter postNotificationName:@"ClosingCamera"
                                                             object:self];
     [self cleanStop];
 }
+#pragma mark Getters
 
 -(NSView*)photoTools {
     return (NSView*)(self.superview.subviews[1]);
 }
 -(id)photoToolsSubview:(Class)class {
-    for(NSView* subview in [self photoTools].subviews) {
+    for(NSView* subview in self.photoTools.subviews) {
         if([subview isKindOfClass:class]) return subview;
     }
     return nil;
 }
-
-
--(SMPhotoOptsView*)photoOptsView {
-    return [self photoToolsSubview:[SMPhotoOptsView class]];
-}
 -(NSPopUpButton*)filterList {
-    return [self photoToolsSubview:[NSPopUpButton class]];
+    return [self photoToolsSubview:NSPopUpButton.class];
 }
 -(SMPhotoButton*)photoBtn {
-    return [self photoToolsSubview:[SMPhotoButton class]];
+    return [self photoToolsSubview:SMPhotoButton.class];
+}
+-(SMRefreshBouton*)refreshBtn {
+    return [self photoToolsSubview:SMRefreshBouton.class];
+}
+-(SMDrawButton*)drawBtn {
+    return [self photoToolsSubview:SMDrawButton.class];
+}
+-(SMColorPickerButton*)colorPickerBtn {
+    return [self photoToolsSubview:SMColorPickerButton.class];
+}
+-(SMColorPickerButton*)undoDrawBtn {
+    return [self photoToolsSubview:SMUndoDrawButton.class];
+}
+-(SMLoadingView*)loadingView {
+    return [self photoToolsSubview:SMLoadingView.class];
+}
+-(NSProgressIndicator*)loadingView_spin {
+    return self.loadingView.subviews[1];
 }
 -(SMQuitMediaButton*)cancelBtn {
-    return [self photoTools].subviews[2];
+    return self.photoTools.subviews[2];
+}
+-(SMFlashButton*)flashBtn {
+    return [self photoToolsSubview:SMFlashButton.class];
 }
 
--(SMButton*)refreshBtn {
-    return [self photoToolsSubview:[SMRefreshBouton class]];
-}
-
+#pragma mark Setters
 
 -(void)setShowFilterList:(BOOL)val {
     showFilterList = val;
-    [self filterList].animator.alphaValue = val;
+    self.filterList.animator.alphaValue = val;
 }
 -(void)setShowPhotoBtn:(BOOL)val {
     showPhotoBtn = val;
     if(val)
-       [[self photoBtn] show];
+        [self.photoBtn show];
     else
-        [[self photoBtn] hide];
+        [self.photoBtn hide];
 }
 -(void)setShowCancelBtn:(BOOL)val {
     showCancelBtn = val;
     if(val)
-        [[self cancelBtn] show];
+        [self.cancelBtn show];
     else
-        [[self cancelBtn] hide];
+        [self.cancelBtn hide];
 }
--(void)setShowPhotoOptions:(BOOL)val {
-    showPhotoOptions = val;
+-(void)setShowFlashBtn:(BOOL)val {
+    showFlashBtn = val;
     if(val)
-        [[self photoOptsView] show];
+        [self.flashBtn show];
     else
-        [[self photoOptsView] hide];
+        [self.flashBtn hide];
 }
--(void)setShowPhotoTools:(BOOL)val {
-    showPhotoOptions = val;
-    if(val)
-        [[self photoOptsView] show];
-    else
-        [[self photoOptsView] hide];
-}
+
 -(void)setShowRefreshBtn:(BOOL)val {
     showRefreshBtn = val;
     if(val)
-        [[self refreshBtn] show];
+        [self.refreshBtn show];
     else
-        [[self refreshBtn] hide];
+        [self.refreshBtn hide];
+}
+-(void)setShowDrawBtn:(BOOL)val {
+    showDrawBtn = val;
+    if(val)
+        [self.drawBtn show];
+    else
+        [self.drawBtn hide];
+}
+-(void)setShowColorPickerBtn:(BOOL)val {
+    showColorPickerBtn = val;
+    if(val)
+        [self.colorPickerBtn show];
+    else
+        [self.colorPickerBtn hide];
+}
+-(void)setShowUndoDrawBtn:(BOOL)val {
+    showUndoDrawBtn = val;
+    if(val)
+        [self.undoDrawBtn show];
+    else
+        [self.undoDrawBtn hide];
+}
+#pragma mark UI API
+
+-(void)photo:(SMCallback)callback {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        Settings *settings = Settings.sharedInstance;
+        BOOL      useFlash = [[settings objectForKey:@"SMUseFlash"] boolValue];
+        if(useFlash)
+            [self flashScreen:YES];
+        
+        [stillImageOutput captureStillImageAsynchronouslyFromConnection:[stillImageOutput connectionWithMediaType:AVMediaTypeVideo] completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+            if(useFlash)
+                [self flashScreen:NO];
+            
+            if(!error && imageSampleBuffer) {
+                [session performSelectorOnMainThread:@selector(stopRunning)
+                                          withObject:nil
+                                       waitUntilDone:NO];
+                
+                NSData        *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
+                NSImage       *oldImage = [NSImage.alloc initWithData:jpegData];
+                NSSize        imageSize = NSMakeSize(480, 720);
+                
+                
+                NSRect          newRect = NSMakeRect((oldImage.size.width-imageSize.width)/2, (oldImage.size.height-imageSize.height)/2, imageSize.width, imageSize.height);
+                CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)oldImage.TIFFRepresentation, nil);
+                CGImageRef    nImageRef = CGImageSourceCreateImageAtIndex(source, 0, nil);
+                CGImageRef     imageRef = CGImageCreateWithImageInRect(nImageRef, newRect);
+                NSImage       *newImage = [NSImage.alloc initWithCGImage:imageRef
+                                                                    size:newRect.size];
+                NSArray        *filters = previewLayer.filters;
+                
+                CFRelease(source);
+                CFRelease(nImageRef);
+                CFRelease(imageRef);
+                
+                [newImage setFilter:(filters.count > 0 ? filters[0] : nil)];
+                [newImage flipImage];
+                
+                callback(newImage);
+            }
+            else {
+                callback(error);
+            }
+        }];
+    });
+    
+}
+-(void)flashScreen:(BOOL)flash {
+    CGDisplayFadeReservationToken fadeToken;
+    
+    CGError           error = CGAcquireDisplayFadeReservation(.5, &fadeToken);
+    NSColor*     flashColor = [NSColor colorWithCalibratedRed:255
+                                                        green:255
+                                                         blue:255
+                                                        alpha:1];
+    
+    if (error != kCGErrorSuccess)
+        return;
+    
+    CGDisplayFade(fadeToken,
+                  .25,
+                  flash ? kCGDisplayBlendNormal : kCGDisplayBlendSolidColor,
+                  flash ? kCGDisplayBlendSolidColor : kCGDisplayBlendNormal,
+                  flashColor.redComponent,
+                  flashColor.greenComponent,
+                  flashColor.blueComponent,
+                  flash);
+    
+    if(flash)
+        usleep(250000);
+    
 }
 
-
--(NSView*)loadingView {
-    return [self photoToolsSubview:[SMLoadingView class]];
-}
--(NSProgressIndicator*)loadingView_spin {
-    return [self loadingView].subviews[1];
-}
 -(void)showLoading {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[self loadingView] setHidden:NO];
-        [[self loadingView_spin] startAnimation:nil];
+        self.loadingView.hidden = NO;
+        [self.loadingView_spin startAnimation:nil];
     });
 }
 -(void)hideLoading {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [[self loadingView] setHidden:YES];
-        [[self loadingView_spin] stopAnimation:nil];
+        self.loadingView.hidden = YES;
+        [self.loadingView_spin stopAnimation:nil];
     });
 }
 
@@ -442,29 +587,35 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
         [self showLoading];
         
         if(session.isRunning)
-            self.layer.filters = (filter ? @[filter] : nil);
+            self.layer.filters = filter ? @[filter] : nil;
         
         [self hideLoading];
     });
 }
 
-
 -(void)cleanStart {
-    currentImage        = nil;
     if(self.layer.contents)
         self.layer.contents = nil;
-    self.layer          = previewLayer;
-    self.showCancelBtn    =
-    self.showRefreshBtn   = NO;
-    self.showPhotoBtn     =
-    self.showFilterList   =
-    self.showPhotoOptions = YES;
+    currentImage            = nil;
+    self.layer              = previewLayer;
+    
+    self.showCancelBtn      =
+    self.showColorPickerBtn =
+    self.showDrawBtn        =
+    self.showUndoDrawBtn    =
+    self.showRefreshBtn     = NO;
+    
+    self.showPhotoBtn       =
+    self.showFilterList     =
+    self.showFlashBtn   = YES;
     
     if(!session.isRunning) {
         [self showLoading];
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-            [session performSelectorOnMainThread:@selector(startRunning) withObject:nil waitUntilDone:YES];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{//return;
+            [session performSelectorOnMainThread:@selector(startRunning)
+                                      withObject:nil
+                                   waitUntilDone:YES];
             sleep(2);
             [self hideLoading];
         });
@@ -478,9 +629,27 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
             [session stopRunning];
     [self resetSubviews];
 }
+
+-(void)showDrawingLayer {
+    SMPaintingLayer *layer = SMPaintingLayer.new;
+    layer.frame = self.layer.bounds;
+    [self.layer addSublayer:layer];
+    
+    self.showColorPickerBtn =
+    self.showUndoDrawBtn    =
+    self.isDrawingEnabled   = YES;
+    self.paintingLayer      = layer;
+}
+-(void)hideDrawingLayer {
+    self.layer.sublayers    = @[];
+    self.paintingLayer      = nil;
+    self.showColorPickerBtn =
+    self.showUndoDrawBtn    =
+    self.isDrawingEnabled   = NO;
+}
+
 -(void)resetSubviews {
-    NSView* photoTools = [self photoTools];
-    photoTools.layer = CALayer.new;
+    self.photoTools.layer = CALayer.new;
 }
 -(void)showImageFile:(NSString*)path {
     NSImage *sourceImage = [NSImage.alloc initWithContentsOfFile:path];
@@ -490,26 +659,20 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     [self showImage:image withTools:NO];
 }
 -(void)showImage:(NSImage*)image withTools:(BOOL)useOpts {
+    [self cleanStop];
     
-    self.showPhotoTools   = useOpts;
-    self.showCancelBtn    = !(
-    self.showRefreshBtn   =
-    self.showPhotoBtn     =
-    self.showFilterList   =
-    self.showPhotoOptions = NO);
+    self.showDrawBtn        = useOpts;
+    self.showCancelBtn      = !(
+    self.showRefreshBtn     =
+    self.showUndoDrawBtn    =
+    self.showColorPickerBtn =
+    self.showPhotoBtn       =
+    self.showFilterList     =
+    self.showFlashBtn       = NO);
     
     self.layer.contents = [image imageResizedToSize:self.bounds.size];
 }
 
--(void)refreshVideo {
-    if([self.layer isKindOfClass:AVPlayerLayer.class]) {
-        AVPlayerLayer *playerLayer = (AVPlayerLayer*)self.layer;
-        AVPlayer *player = playerLayer.player;
-        
-        [player seekToTime:CMTimeMake(0, 1)];
-        [player play];
-    }
-}
 -(void)showVideo:(NSDictionary*)urls {
     
     self.showRefreshBtn = YES;
@@ -562,7 +725,7 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     self.showRefreshBtn =
     self.showPhotoBtn   =
     self.showFilterList =
-    self.showPhotoOptions = NO;
+    self.showFlashBtn = NO;
     
     if([path hasSuffix:@"jpg"] || [path hasSuffix:@"jpeg"] || [path hasSuffix:@"png"])
         [self showImageFile:path];

@@ -10,9 +10,12 @@
 #import <WebKit/WebKit.h>
 #import <Webkit/WebFrameLoadDelegate.h>
 
+@class SnapJS;
 @interface SMWebUI : WebView
 
 
 -(void)script:(NSString*)commande;
+
+@property (nonatomic) SnapJS *snapJS;
 
 @end

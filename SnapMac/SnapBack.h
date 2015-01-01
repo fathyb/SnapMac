@@ -18,6 +18,3 @@
 @end
 
 extern JSContextRef SMJSContext;
-
-typedef WebScriptObject JSCallback;
-

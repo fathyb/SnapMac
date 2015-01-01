@@ -76,6 +76,9 @@ JSValueRef NStoJS(id ns) {
         },
         @"Boolean": ^(NSNumber *o) {
             return JSValueMakeBoolean(SMJSContext, o.boolValue);
+        },
+        @"WebScriptObject": ^(WebScriptObject *o) {
+            return o.JSValue;
         }
     };
         
@@ -125,8 +128,7 @@ id JSToNS(JSValueRef object) {
             break;
     
         case kJSTypeString:
-            nil;
-            
+            ;
             JSStringRef jsStr = JSValueToStringCopy(SMJSContext, object, nil);
             result = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, jsStr));
             JSStringRelease(jsStr);
@@ -141,16 +143,12 @@ id JSToNS(JSValueRef object) {
             result = @(JSValueToNumber(SMJSContext, object, nil));
             break;
             
-        case kJSTypeNull:
-            result = @"nil";
-            break;
-            
-        case kJSTypeUndefined:
-            result = @"nil";
-            break;
-            
         default:
             NSLog(@"__id_to_jsValue(runtime) : unknown kJSType : %d", type);
+        case kJSTypeNull:
+        case kJSTypeUndefined:
+            ;
+            result = nil;
             break;
     }
     

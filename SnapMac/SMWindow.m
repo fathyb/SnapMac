@@ -14,24 +14,15 @@ NSView* c(NSWindow* window) {
 @implementation SMWindow
 
 -(void)setAppearance:(NSAppearance *)appearance {
+    [NSNotificationCenter.defaultCenter postNotificationName:@"SnappyChangeAppearance"
+                                                      object:appearance];
     super.appearance = appearance;
     
     if(self.contentView)
-        c(self).appearance = appearance;
-    
-    if(self.settingsWindow) {
-        c(self.settingsWindow).appearance = appearance;
-          self.settingsWindow .appearance = appearance;
-    }
+        ((NSView*)self.contentView).appearance = appearance;
     
     if(self.webUI)
         self.webUI.appearance = appearance;
-    
-    if(self.aboutWindow) {
-        c(self.aboutWindow).appearance = appearance;
-          self.aboutWindow .appearance = appearance;
-    }
-    
 }
 
 @end

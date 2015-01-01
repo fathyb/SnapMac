@@ -7,23 +7,22 @@
 //
 
 #import "SMButton.h"
+#import "SMPhotoButton.h"
+
 
 @implementation SMButton
+
+@synthesize backgroundColor;
 
 -(void)awakeFromNib {
     [super awakeFromNib];
     
     self.alphaValue = .5;
-    
-    ((NSButtonCell*)self.cell).backgroundColor = [NSColor colorWithCalibratedRed:255
-                                                                           green:255
-                                                                            blue:255
-                                                                           alpha:0.5];
-    
-    NSTrackingArea* trackingArea = [[NSTrackingArea alloc] initWithRect:self.bounds
-                                                                options:NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways
-                                                                  owner:self
-                                                               userInfo:nil];
+
+    NSTrackingArea* trackingArea = [NSTrackingArea.alloc initWithRect:self.bounds
+                                                              options:NSTrackingMouseEnteredAndExited|NSTrackingActiveAlways
+                                                                owner:self
+                                                             userInfo:nil];
     [self addTrackingArea:trackingArea];
 }
 -(void)show {
@@ -45,6 +44,6 @@
     if(![self visible])
         return;
     
-    [self show];
+    self.animator.alphaValue = .5;
 }
 @end
