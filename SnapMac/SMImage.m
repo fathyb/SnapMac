@@ -15,8 +15,7 @@
     if(!filter)
 		return;
 	
-    NSRect bounds = {NSZeroPoint,
-					 self.size};
+    NSRect bounds = {NSZeroPoint, self.size};
 	
     [self lockFocus];
     [filter setValue:[CIImage imageWithData:self.TIFFRepresentation]

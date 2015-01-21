@@ -133,8 +133,6 @@ p {
 }
 
 h1 {
-    font-family: Pacifico;
-    font-size: 50px;
     margin: 20px 0;
 
 }
@@ -170,6 +168,12 @@ section header {
     box-shadow: 0 0 10px gray;
     z-index: 99999;
     position: relative;
+	border-bottom: 1px solid black;
+}
+section *>header {
+	line-height: 10px;
+	margin-top: 0;
+	border-top: 1px solid black;
 }
 
 .loginPage header {
@@ -263,13 +267,13 @@ section .zoom {
     overflow: hidden !important;
 }
 
-section .zoom .friend {
+section .zoom>*:not(.toolbox) {
     opacity: 0;
 }
 
 section .content {
     height: -webkit-calc(100% - 75px);
-    width: -webkit-calc(100% - 10px);
+    width: -webkit-calc(100% - 100px);
     padding: 25px 25px 0 25px;
     margin: 0;
     margin-left: -20px;
@@ -277,6 +281,11 @@ section .content {
     -webkit-transition: all 0.5s;
     -webkit-perspective : 1500px;
     -webkit-perspective-origin: 50% 50%;
+}
+
+.friendsPage .content {
+	padding-left: 100px;
+	text-align: left;
 }
 
 section.sendPage {
@@ -321,7 +330,6 @@ div.friend {
     border: 2px solid rgba(0, 0, 0, 0.5);
     vertical-align: middle;
 }
-
 div.snap {
     width: 400px;
     height: 200px;
@@ -417,6 +425,7 @@ div.friend .displayName input {
     -webkit-transform: translate(150px);
     display: inline-block;
     vertical-align: top;
+	border-radius: 0;
 }
 
 div.friend .displayName p {
@@ -455,6 +464,12 @@ div.snap.hide[data-media-type="0"], div.snap.hide[data-media-type="4"] {
 div.snap.hide[data-media-type="1"], div.snap.hide[data-media-type="2"],
 div.snap.hide[data-media-type="5"], div.snap.hide[data-media-type="6"] {
     border-color: purple;
+}
+
+
+h1.title {
+	margin: 20px 50px;
+	text-align: left;
 }
 
 .sendSnapBtn, .storiesBtn, .acceptFriend {
@@ -502,7 +517,7 @@ section input[type=search]::-webkit-input-placeholder {
     display: block;
     background-color: rgba(255, 255, 255, 0.3);
     width: 100%;
-    height: -webkit-calc(100% - 53px - 150px);
+    height: -webkit-calc(100% - 53px - 95px);
     overflow: auto;
 }
 
@@ -657,6 +672,7 @@ div.toolbox {
     left: 0;
     opacity: 0;
     -webkit-transition: 0.5s;
+	text-align: center;
 }
 
 .zoom .toolbox {
@@ -829,7 +845,7 @@ body>.toggleCam {
 }
 
 .conversation:not(:last-child) {
-    border-bottom: 1px solid gray;
+    border-bottom: 1px solid black;
 }
 
 .conversation:hover {

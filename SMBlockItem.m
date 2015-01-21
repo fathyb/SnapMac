@@ -20,7 +20,9 @@
 }
 
 - (id)initWithTitle:(NSString *)aString block:(void (^)(NSMenuItem *item))aBlock keyEquivalent:(NSString *)charCode {
-    if (self = [super initWithTitle:aString action:@selector(_actionTriggered:) keyEquivalent:charCode]) {
+    if (self = [super initWithTitle:aString
+                             action:@selector(_actionTriggered:)
+                      keyEquivalent:charCode]) {
         [self setTarget:self];
         [self setBlock:aBlock];
     }
@@ -28,8 +30,8 @@
 }
 
 - (void)_actionTriggered:(NSMenuItem *)theItem {
-    if (theItem == self && [self block] != nil)
-        [self block](theItem);
+    if (theItem == self && self.block != nil)
+        self.block(theItem);
 }
 
 @end

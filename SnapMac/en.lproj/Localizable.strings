@@ -1,0 +1,75 @@
+/*
+ Localizable.strings
+ Snappy
+ 
+ Created by Fathy Boundjadj  on 01/01/2015.
+ Copyright (c) 2015 Fathy B. All rights reserved.
+ */
+
+/* Headers & Titles */
+"Friends" = "Friends";
+"%@'s story" = "%@'s story";
+"My feed" = "My feed";
+"Conversation with %@" = "Conversation with %@";
+"Snappy - loading" = "Snappy - loading";
+
+/* Time */
+"%@ ago"  = "%@ ago";
+"days" = "days";
+"hours" = "hours";
+"minutes" = "minutes";
+"seconds" = "seconds";
+
+/* Themes */
+"Light" = "Light";
+"Dark"  = "Dark";
+
+/* Photo Effects */
+"No effect" = "No effect";
+"Chrome" = "Chrome";
+"Fade"   = "Fondu";
+"Instant" = "Instant";
+"Mono" = "Mono";
+"Noir" = "Noir";
+"Process" = "Process";
+"Tonal" = "Tonal";
+"Transfer" = "Transfer";
+
+/* Right click context menu - Friends */
+"Rename" = "Rename";
+"Delete" = "Delete";
+"Block %@" = "Block %@";
+
+/* Right click context menu - Snaps */
+"Show in Finder" = "Show in Finder";
+
+/* FriendsPage */
+"Searching \"%@\"" = "Searching \"%@\"";
+"Events" = "Events";
+"Me" = "Me";
+
+/* Send Page */
+"Cancel" = "Cancel";
+"Share" = "Share";
+"Save" = "Save";
+"Send" = "Send";
+"Search..." = "Search...";
+"My Story" = "My Story";
+
+/* Login Page */
+"Username" = "Username";
+"Connection" = "Connection";
+"Android Synchronization" = "Android Synchronization";
+"iOS Synchronization" = "iOS Synchronization";
+"Please connect a rooted Android device with usb debugging enabled" = "Please connect a rooted Android device with usb debugging enabled";
+
+
+/* Errors */
+"You have been disconnected." = "You have been disconnected.";
+"Unknown error." = "Unknown error.";
+"An unknown connection error occurred. (e%ld)" = "An unknown connection error occurred. (e%ld)";
+"Can't establish connection to Snapchat." = "Can't establish connection to Snapchat.";
+
+/* Others */
+"Loading" = "Loading";
+"Stories" = "Stories";

@@ -15,7 +15,6 @@
     if((self = super.init)) {
         [self clear];
         self.delegate = self;
-        
     }
     
     return self;
@@ -26,15 +25,17 @@
     [img lockFocus];
     
     [self drawLayer:self
-          inContext:isYosemite() ? NSGraphicsContext.currentContext.CGContext : NSGraphicsContext.currentContext.graphicsPort];
+          inContext:isYosemite() ?
+                    NSGraphicsContext.currentContext.CGContext :
+                    NSGraphicsContext.currentContext.graphicsPort];
     
     [img unlockFocus];
 }
--(void)drawLayer:(CALayer*)layer inContext:(CGContextRef)ctx {
+-(void)drawLayer:(CALayer*)layer
+       inContext:(CGContextRef)ctx {
+    
     CGContextSetLineWidth(ctx, 5);
     CGContextSetLineCap(ctx, kCGLineCapRound);
-    
-    [NSColor.redColor set];
     
     CGPoint begin, end;
     

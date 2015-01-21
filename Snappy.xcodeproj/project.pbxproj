@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		01041E31199FF5C500816CB4 /* SMButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 01041E30199FF5C500816CB4 /* SMButton.m */; };
 		01083C171A2906BF00578661 /* SnappyOpeationQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 01083C161A2906BF00578661 /* SnappyOpeationQueue.m */; };
+		010DA7F21A6AF0BD00B384E5 /* SMTimerLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 010DA7F11A6AF0BD00B384E5 /* SMTimerLayer.m */; };
 		01188AFD1A12B17E009348C3 /* SMBlockItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 01188AFC1A12B17E009348C3 /* SMBlockItem.m */; };
 		011E4EFB1A4B77CB00C5E628 /* SMDrawButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 011E4EFA1A4B77CB00C5E628 /* SMDrawButton.m */; };
 		011E4F031A4B9F4000C5E628 /* SMLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 011E4F021A4B9F4000C5E628 /* SMLine.m */; };
@@ -38,6 +39,7 @@
 		015D04A819F546F800B4F461 /* AFURLSessionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 015D049F19F546F800B4F461 /* AFURLSessionManager.m */; };
 		015D04AB19F54EFF00B4F461 /* SMCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 015D04AA19F54EFF00B4F461 /* SMCrypto.m */; };
 		015D04AE19F5555E00B4F461 /* SMFileCollector.m in Sources */ = {isa = PBXBuildFile; fileRef = 015D04AD19F5555E00B4F461 /* SMFileCollector.m */; };
+		016CD8F51A61B29D00D50A05 /* SMiOSSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 016CD8F41A61B29D00D50A05 /* SMiOSSync.m */; };
 		01733CC91A32B3A400236C71 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 499F56C8195B4569007D882B /* libz.dylib */; };
 		0179053C1A50C29C0071D255 /* SMClearFeedWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = 0179053B1A50C29C0071D255 /* SMClearFeedWindow.m */; };
 		018EF1EA1A546BE4005B03A5 /* Clear Feed.xib in Resources */ = {isa = PBXBuildFile; fileRef = 018EF1EC1A546BE4005B03A5 /* Clear Feed.xib */; };
@@ -45,6 +47,9 @@
 		018EF1FD1A54725E005B03A5 /* Settings.xib in Resources */ = {isa = PBXBuildFile; fileRef = 018EF1FF1A54725E005B03A5 /* Settings.xib */; };
 		01A9F216199C521F003776E3 /* SMPhotoButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 01A9F215199C521F003776E3 /* SMPhotoButton.m */; };
 		01AC6EC01A32967800170718 /* SMRefreshBouton.m in Sources */ = {isa = PBXBuildFile; fileRef = 01AC6EBF1A32967800170718 /* SMRefreshBouton.m */; };
+		01ACADC01A55F43600297E9B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 01ACADC21A55F43600297E9B /* Localizable.strings */; };
+		01ACADC61A56321500297E9B /* SnappyFunction.m in Sources */ = {isa = PBXBuildFile; fileRef = 01ACADC51A56321500297E9B /* SnappyFunction.m */; };
+		01ACADC91A563F4300297E9B /* SnappyDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 01ACADC81A563F4300297E9B /* SnappyDictionary.m */; };
 		01B6A22A19F1B07700E2B22B /* About.m in Sources */ = {isa = PBXBuildFile; fileRef = 01B6A22919F1B07700E2B22B /* About.m */; };
 		01DA34F71A55B19F0007D70D /* SnapMac.png in Resources */ = {isa = PBXBuildFile; fileRef = 01DA34F61A55B19F0007D70D /* SnapMac.png */; };
 		01E085A51A4E2345002F9DF9 /* SMUndoDrawButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 01E085A41A4E2345002F9DF9 /* SMUndoDrawButton.m */; };
@@ -94,6 +99,8 @@
 		01041E30199FF5C500816CB4 /* SMButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMButton.m; sourceTree = "<group>"; };
 		01083C151A2906BF00578661 /* SnappyOpeationQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnappyOpeationQueue.h; sourceTree = "<group>"; };
 		01083C161A2906BF00578661 /* SnappyOpeationQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnappyOpeationQueue.m; sourceTree = "<group>"; };
+		010DA7F01A6AF0BD00B384E5 /* SMTimerLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMTimerLayer.h; sourceTree = "<group>"; };
+		010DA7F11A6AF0BD00B384E5 /* SMTimerLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMTimerLayer.m; sourceTree = "<group>"; };
 		01188AFB1A12B17E009348C3 /* SMBlockItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SMBlockItem.h; path = ../SMBlockItem.h; sourceTree = "<group>"; };
 		01188AFC1A12B17E009348C3 /* SMBlockItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = SMBlockItem.m; path = ../SMBlockItem.m; sourceTree = "<group>"; };
 		011E4EF91A4B77CB00C5E628 /* SMDrawButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMDrawButton.h; sourceTree = "<group>"; };
@@ -151,6 +158,8 @@
 		015D04AA19F54EFF00B4F461 /* SMCrypto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMCrypto.m; sourceTree = "<group>"; };
 		015D04AC19F5555E00B4F461 /* SMFileCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMFileCollector.h; sourceTree = "<group>"; };
 		015D04AD19F5555E00B4F461 /* SMFileCollector.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMFileCollector.m; sourceTree = "<group>"; };
+		016CD8F31A61B29D00D50A05 /* SMiOSSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMiOSSync.h; sourceTree = "<group>"; };
+		016CD8F41A61B29D00D50A05 /* SMiOSSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMiOSSync.m; sourceTree = "<group>"; };
 		0179053A1A50C29C0071D255 /* SMClearFeedWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMClearFeedWindow.h; sourceTree = "<group>"; };
 		0179053B1A50C29C0071D255 /* SMClearFeedWindow.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMClearFeedWindow.m; sourceTree = "<group>"; };
 		018EF1EB1A546BE4005B03A5 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "en.lproj/Clear Feed.xib"; sourceTree = "<group>"; };
@@ -168,6 +177,12 @@
 		01A9F215199C521F003776E3 /* SMPhotoButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMPhotoButton.m; sourceTree = "<group>"; };
 		01AC6EBE1A32967800170718 /* SMRefreshBouton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SMRefreshBouton.h; sourceTree = "<group>"; };
 		01AC6EBF1A32967800170718 /* SMRefreshBouton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SMRefreshBouton.m; sourceTree = "<group>"; };
+		01ACADC11A55F43600297E9B /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		01ACADC31A55F43800297E9B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		01ACADC41A56321500297E9B /* SnappyFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnappyFunction.h; sourceTree = "<group>"; };
+		01ACADC51A56321500297E9B /* SnappyFunction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnappyFunction.m; sourceTree = "<group>"; };
+		01ACADC71A563F4300297E9B /* SnappyDictionary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SnappyDictionary.h; sourceTree = "<group>"; };
+		01ACADC81A563F4300297E9B /* SnappyDictionary.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SnappyDictionary.m; sourceTree = "<group>"; };
 		01B6A22819F1B07700E2B22B /* About.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = About.h; sourceTree = "<group>"; };
 		01B6A22919F1B07700E2B22B /* About.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = About.m; sourceTree = "<group>"; };
 		01DA34F61A55B19F0007D70D /* SnapMac.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = SnapMac.png; path = SnapMac/Images.xcassets/Snappy.imageset/SnapMac.png; sourceTree = "<group>"; };
@@ -337,6 +352,8 @@
 		011E4F041A4BA05D00C5E628 /* Graphics */ = {
 			isa = PBXGroup;
 			children = (
+				010DA7F01A6AF0BD00B384E5 /* SMTimerLayer.h */,
+				010DA7F11A6AF0BD00B384E5 /* SMTimerLayer.m */,
 				011E4F051A4BA08300C5E628 /* SMPaintingLayer.h */,
 				011E4F061A4BA08300C5E628 /* SMPaintingLayer.m */,
 				011E4F011A4B9F3F00C5E628 /* SMLine.h */,
@@ -451,6 +468,7 @@
 				491D2A6E18E901330026A755 /* Snappy.m */,
 				015771901A0D39B50032CDD5 /* SMWindow.h */,
 				015771911A0D39B50032CDD5 /* SMWindow.m */,
+				01ACADC21A55F43600297E9B /* Localizable.strings */,
 				011F91361A29363500F7BBE5 /* Minizip */,
 				49BB97531938BD6E000EB7B5 /* Coeur */,
 				49BB97541938BD82000EB7B5 /* Bridge Interface */,
@@ -535,6 +553,8 @@
 				49B2437918F33EB100F33A43 /* MobileDevice.h */,
 				4935CBEB18F315E400BF5586 /* SMAndroidSync.h */,
 				4935CBEC18F315E400BF5586 /* SMAndroidSync.m */,
+				016CD8F31A61B29D00D50A05 /* SMiOSSync.h */,
+				016CD8F41A61B29D00D50A05 /* SMiOSSync.m */,
 				491D2A8F18E90F3E0026A755 /* SMConnection.h */,
 				491D2A9018E90F3E0026A755 /* SMConnection.m */,
 				49E8A8E01950D84200005668 /* NSData+Base64.h */,
@@ -559,6 +579,10 @@
 				015D04AA19F54EFF00B4F461 /* SMCrypto.m */,
 				01F0B61F19985F5F000EF0A9 /* SnapBack.h */,
 				015BDB451A2A725400600A00 /* SnapBack.m */,
+				01ACADC41A56321500297E9B /* SnappyFunction.h */,
+				01ACADC51A56321500297E9B /* SnappyFunction.m */,
+				01ACADC71A563F4300297E9B /* SnappyDictionary.h */,
+				01ACADC81A563F4300297E9B /* SnappyDictionary.m */,
 			);
 			name = "Bridge Interface";
 			sourceTree = "<group>";
@@ -661,6 +685,7 @@
 				491D2A6C18E901330026A755 /* Credits.rtf in Resources */,
 				491D2A7218E901330026A755 /* Snappy.xib in Resources */,
 				018EF1EA1A546BE4005B03A5 /* Clear Feed.xib in Resources */,
+				01ACADC01A55F43600297E9B /* Localizable.strings in Resources */,
 				011F31DB19D9DEF1009D37DA /* SnappyJS in Resources */,
 				01DA34F71A55B19F0007D70D /* SnapMac.png in Resources */,
 				491A367C18EA5CE700285295 /* mainUI.css in Resources */,
@@ -708,6 +733,8 @@
 				011E4F0A1A4BAE7200C5E628 /* SMColorPickerButton.m in Sources */,
 				015D04A019F546F800B4F461 /* AFHTTPRequestOperation.m in Sources */,
 				49B517AB18FC54D90050E3AD /* SnapMac Utils.c in Sources */,
+				010DA7F21A6AF0BD00B384E5 /* SMTimerLayer.m in Sources */,
+				01ACADC91A563F4300297E9B /* SnappyDictionary.m in Sources */,
 				015D04A119F546F800B4F461 /* AFHTTPRequestOperationManager.m in Sources */,
 				4915DFE619045DAE00969F60 /* SMImage.m in Sources */,
 				015D04A819F546F800B4F461 /* AFURLSessionManager.m in Sources */,
@@ -717,6 +744,7 @@
 				491D2A9118E90F3E0026A755 /* SMConnection.m in Sources */,
 				4935CBED18F315E400BF5586 /* SMAndroidSync.m in Sources */,
 				014B8913199D939E00A4DE96 /* SMLoadingView.m in Sources */,
+				016CD8F51A61B29D00D50A05 /* SMiOSSync.m in Sources */,
 				491A367818EA587900285295 /* SMWebUI.m in Sources */,
 				011E4F031A4B9F4000C5E628 /* SMLine.m in Sources */,
 				015D04A219F546F800B4F461 /* AFHTTPSessionManager.m in Sources */,
@@ -745,6 +773,7 @@
 				01041E31199FF5C500816CB4 /* SMButton.m in Sources */,
 				49E8A8E11950D84200005668 /* NSData+Base64.m in Sources */,
 				49CDBDE318F1CEB40097C4B1 /* SSKeychain.m in Sources */,
+				01ACADC61A56321500297E9B /* SnappyFunction.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -792,6 +821,15 @@
 				018EF2021A547266005B03A5 /* en */,
 			);
 			name = Settings.xib;
+			sourceTree = "<group>";
+		};
+		01ACADC21A55F43600297E9B /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				01ACADC11A55F43600297E9B /* fr */,
+				01ACADC31A55F43800297E9B /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 		491D2A6418E901330026A755 /* InfoPlist.strings */ = {
@@ -906,6 +944,7 @@
 		491D2A8A18E901330026A755 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -937,6 +976,7 @@
 		491D2A8B18E901330026A755 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "";
 				COMBINE_HIDPI_IMAGES = YES;
 				FRAMEWORK_SEARCH_PATHS = (

@@ -43,7 +43,7 @@
 }
 -(void)setFlashState:(SMFlashState)flashState {
     _flashState = flashState;
-    self.image  = [NSImage imageNamed:@(self.flashState ? "FlashIconAlternate" : "FlashIcon")];
+    self.animator.image  = [NSImage imageNamed:@(self.flashState ? "FlashIconAlternate" : "FlashIcon")];
     self.image.size = NSMakeSize(25, 25);
     [self.settings setObject:@(self.flashState) forKey:@"SMUseFlash"];
 }

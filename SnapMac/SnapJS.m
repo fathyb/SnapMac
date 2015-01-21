@@ -43,22 +43,13 @@ NSDictionary *jsError(id error) {
 	
 	return @{ @"error": @{
 					  @"code": @(code),
-					  @"message": message ? message : @"Erreur inconnue"
+					  @"message": message ? message : NSLoc(@"Unknown error")
 					  }
 			  };
 }
 id AFError(NSError *error, BOOL forJS) {
 	NSInteger code = SnappyErrorUnknowError;
-	NSString *message = [NSString stringWithFormat:@"Erreur de connection inconnue! (e%ld)", (long)error.code];
-	
-	switch (error.code) {
-		case -1011:
-			code = SnappyErrorNotAuthorized;
-			message = @"Non authorisé";
-			break;
-		default:
-			break;
-	}
+	NSString *message = [NSString stringWithFormat:NSLoc(@"An unknown connection error occurred. (e%ld)"), (long)error.code];
 	
 	return forJS ? jsError(nserror(code, message)) : nserror(code, message);
 }
@@ -95,7 +86,7 @@ BOOL isError(id obj) {
 					   selector:NSSelectorFromString(dict[notifName])
 						   name:notifName
 						 object:nil];
-		
+		_androSync = SMAndroidSync.new;
 		_opQueue = NSOperationQueue.new;
 	}
 	SnapJSSharedInstance = self;
@@ -154,7 +145,7 @@ BOOL isError(id obj) {
 				}
 			}
 			else {
-				callback(nserror(SnappyErrorFailedToConnect, @"Impossible de se connecter à Snapchat!"));
+				callback(nserror(SnappyErrorFailedToConnect, NSLoc(@"Can't establish connection to Snapchat.")));
 			}
 	}];
 }
@@ -182,7 +173,8 @@ BOOL isError(id obj) {
 		@"loginWithUser:password:andCallback:": @"login",
 		@"openURL:": @"openURL",
 		@"testCallback:": @"testCallback",
-		@"notification:withMessage:andCallback:": @"notification"
+		@"notification:withMessage:andCallback:": @"notification",
+		@"localizedString:": @"locale"
 	};
 	for(NSString *selName in selectors) {
 		if(NSSelectorFromString(selName) == sel) return selectors[selName];
@@ -306,12 +298,19 @@ BOOL isError(id obj) {
 
 #pragma mark API
 
+-(void)clearSearchField {
+	[NSNotificationCenter.defaultCenter postNotificationName:@"SnappyClearSearchField"
+													  object:nil];
+}
+-(NSString*)localizedString:(NSString*)key {
+	return NSLocalizedString(key, nil);
+}
 -(void)showCamera {
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyShowCamera"
+	[NSNotificationCenter.defaultCenter postNotificationName:@"SnappyShowCamera"
 														object:@YES];
 }
 -(void)hideCamera {
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"SnappyShowCamera"
+	[NSNotificationCenter.defaultCenter postNotificationName:@"SnappyShowCamera"
 														object:@NO];
 }
 -(void)showMedia:(NSString*)media {
@@ -349,11 +348,10 @@ BOOL isError(id obj) {
 				usingBlock:^(NSNotification *note) {
 					
 					NSImage *media	  = note.object;
-					if(!media) {
+					if(!media)
 						return [callback call:@{
-												@"error": @"Aucune image"
+												@"error": NSLoc(@"No image to send")
 											  }, nil];
-					}
 		
 					NSString *guuid	  = [NSString stringWithFormat:@"%@~%@", self.username.uppercaseString, UUID()];
 					NSData	 *imgData = [media dataForFileType:NSJPEGFileType];
@@ -376,7 +374,7 @@ BOOL isError(id obj) {
 									NSMutableDictionary *data = @{
 																  @"media_id" : guuid,
 																  @"recipient": recpString,
-																  @"time"	 : @5
+																  @"time"	  : @5
 																 }.mutableCopy;
 									if(multiPost)
 										[data setValuesForKeysWithDictionary:@{
@@ -384,11 +382,11 @@ BOOL isError(id obj) {
 																			   @"caption_text_display": @""
 																			 }];
 										
-									[self requestTo:multiPost ? @"/bq/send" : @"/bq/double_post"
-										  withData:data
-									   andCallback:^(NSError *result) {
-										   [callback call:isError(result) ? jsError(result) : @YES, nil];
-									}];
+									[self requestTo:@(multiPost ? "/bq/double_post" : "/bq/send")
+										   withData:data
+										andCallback:^(NSError *result) {
+											[callback call:result, nil];
+										}];
 								}
 						   }];
 					}
@@ -505,24 +503,24 @@ BOOL isError(id obj) {
 
 -(void)showInFinder:(NSString*)url {
 	dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-		[[NSWorkspace sharedWorkspace] selectFile:url
-						 inFileViewerRootedAtPath:url.stringByDeletingLastPathComponent];
+		[NSWorkspace.sharedWorkspace selectFile:url
+					   inFileViewerRootedAtPath:url.stringByDeletingLastPathComponent];
 	});
 }
 -(void)openURL:(NSString*)urlString {
 	NSURL* url = [NSURL URLWithString:urlString];
-	[[NSWorkspace sharedWorkspace] openURL:url];
+	[NSWorkspace.sharedWorkspace openURL:url];
 }
 
 -(void)notification:(NSString*)title withMessage:(NSString*)message andCallback:(WebScriptObject*)callback {
-	SnappyNotification *notif = [SnappyNotification new];
+	SnappyNotification *notif = SnappyNotification.new;
 	notif.title = @"Snappy";
 	notif.subtitle = title;
 	notif.informativeText = message;
 	notif.hasActionButton = YES;
 	notif.actionButtonTitle = @"Test";
 	
-	[[NSUserNotificationCenter defaultUserNotificationCenter] scheduleNotification:notif];
+	[NSUserNotificationCenter.defaultUserNotificationCenter scheduleNotification:notif];
 }
 -(BOOL)use3D {
 	return _use3D;
@@ -531,7 +529,7 @@ BOOL isError(id obj) {
 	return _useParallax;
 }
 -(void)switchToPhotoMode {
-	SMCamView *camView = [[[NSApplication sharedApplication] delegate] performSelector:@selector(camView)];
+	SMCamView *camView = [NSApplication.sharedApplication.delegate performSelector:@selector(camView)];
 	[camView cleanStart];
 }
 -(void)clearFeed {
@@ -570,7 +568,7 @@ BOOL isError(id obj) {
 	
 }
 -(void)use3D:(NSNotification*)notif {
-	_use3D = [[notif object] boolValue];
+	_use3D = [notif.object boolValue];
 	NSString *cmd = [NSString stringWithFormat:@"SnappyUI.use3D(%@);", @(_use3D ? "true" : "false")];
 	[self script:cmd];
 }
@@ -586,6 +584,12 @@ BOOL isError(id obj) {
 }
 
 #pragma mark API Objective-C
+
+-(void)script:(NSString *)command withCallback:(SMCallback)callback {
+	dispatch_async(dispatch_get_main_queue(), ^{
+		callback([_webView.windowScriptObject evaluateWebScript:command]);
+	});
+}
 -(void)script:(NSString*)command {
 	dispatch_async(dispatch_get_main_queue(), ^{
 		[_webView script:command];
@@ -595,5 +599,12 @@ BOOL isError(id obj) {
 	[self script:@"SnappyUI.hideSend();"];
 }
 
-
+-(void)controlTextDidChange:(NSNotification *)notif {
+	NSSearchField *sfield = notif.object;
+	
+	[self.webView.windowScriptObject callWebScriptMethod:@"SnappySearchHandler"
+										   withArguments:@[sfield.stringValue]];
+	
+	return;
+}
 @end

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14C81f" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="6254" systemVersion="14C94b" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="6254"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
@@ -18,6 +18,7 @@
                 <outlet property="camView" destination="h1g-yp-uEh" id="5qn-WC-eIq"/>
                 <outlet property="effectList" destination="eSi-cs-lQi" id="MKq-bp-yeI"/>
                 <outlet property="photoButton" destination="US1-JY-dFX" id="xYe-ib-kDH"/>
+                <outlet property="searchField" destination="E4U-aq-i7J" id="Wbv-oa-r3y"/>
                 <outlet property="webView" destination="P10-EU-aeZ" id="ghC-ly-9mX"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -850,9 +851,6 @@
                     </customView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="P10-EU-aeZ" customClass="SMWebUI">
                         <rect key="frame" x="342" y="0.0" width="514" height="513"/>
-                        <connections>
-                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="self.webUI" id="7Wt-tE-mHH"/>
-                        </connections>
                     </customView>
                 </subviews>
                 <constraints>
@@ -932,14 +930,28 @@
                             </connections>
                         </button>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="11C92653-98AF-4DA1-BC6A-29225EC0B6A2" label="" paletteLabel="" id="H0C-8p-Biq">
+                        <nil key="toolTip"/>
+                        <size key="minSize" width="96" height="22"/>
+                        <size key="maxSize" width="96" height="22"/>
+                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="E4U-aq-i7J">
+                            <rect key="frame" x="0.0" y="0.0" width="96" height="22"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" borderStyle="bezel" placeholderString="Search..." usesSingleLineMode="YES" bezelStyle="round" id="byt-34-aym">
+                                <font key="font" metaFont="system"/>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </searchFieldCell>
+                        </searchField>
+                    </toolbarItem>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
-                    <toolbarItem reference="ffh-cg-wro"/>
                     <toolbarItem reference="IKE-pR-h2v"/>
                     <toolbarItem reference="8HH-x1-JWn"/>
                     <toolbarItem reference="6aq-lw-6Np"/>
                     <toolbarItem reference="4pq-Un-sHY"/>
                     <toolbarItem reference="ffh-cg-wro"/>
+                    <toolbarItem reference="H0C-8p-Biq"/>
                 </defaultToolbarItems>
             </toolbar>
             <point key="canvasLocation" x="-1583" y="-320.5"/>

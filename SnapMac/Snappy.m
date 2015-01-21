@@ -28,18 +28,17 @@ BOOL hideDivider = NO;
 -(void)applicationDidFinishLaunching:(NSNotification *)aNotification {
     
     _effects = @{
-        @"Chrome": @"CIPhotoEffectChrome",
-        @"Fondu": @"CIPhotoEffectFade",
-        @"Instantané": @"CIPhotoEffectInstant",
-        @"Mono": @"CIPhotoEffectMono",
-        @"Noir": @"CIPhotoEffectNoir",
-        @"Processus": @"CIPhotoEffectProcess",
-        @"Tonal": @"CIPhotoEffectTonal",
-        @"Transfert": @"CIPhotoEffectTransfer"
+        NSLoc(@"Chrome"): @"CIPhotoEffectChrome",
+        NSLoc(@"Fade"): @"CIPhotoEffectFade",
+        NSLoc(@"Instant"): @"CIPhotoEffectInstant",
+        NSLoc(@"Mono"): @"CIPhotoEffectMono",
+        NSLoc(@"Noir"): @"CIPhotoEffectNoir",
+        NSLoc(@"Process"): @"CIPhotoEffectProcess",
+        NSLoc(@"Tonal"): @"CIPhotoEffectTonal",
+        NSLoc(@"Transfer"): @"CIPhotoEffectTransfer"
     };
-    _photoToolsYPos.constant = -110;
     
-    self.window.title = @"Snappy - chargement";
+    self.window.title = NSLoc(@"Snappy - loading");
     
     self.window.delegate = self;
     self.settingsView    = [Settings.alloc initForWindow:_window];
@@ -48,12 +47,20 @@ BOOL hideDivider = NO;
     NSNotificationCenter *center = NSNotificationCenter.defaultCenter;
     [center postNotificationName:@"IGotCamPosConstraint"
                           object:self.camPosConstraint];
+    [center addObserverForName:@"SnappyClearSearchField"
+                        object:nil
+                         queue:NSOperationQueue.mainQueue
+                    usingBlock:^(NSNotification* notif) {
+        self.searchField.stringValue = @"";
+    }];
     
     self.clearFeedWindow = SMClearFeedWindow.new;
     self.window.settingsWindow = self.settingsView.settingsWindow;
-    self.window.webUI = self.webUI;
+    self.window.webUI = self.webView;
     self.window.aboutWindow = self.about.aboutWindow;
     self.about.window = self.window;
+    
+    self.searchField.delegate = self.webView.snapJS;
     
     if(isYosemite()) {
         NSAppearance *appearance = [NSAppearance appearanceNamed:[_settingsView objectForKey:@"SMDefaultTheme"]];
@@ -66,19 +73,7 @@ BOOL hideDivider = NO;
     self.window.title = @"Snappy (Beta 1)";
     NSUserNotificationCenter.defaultUserNotificationCenter.delegate = self;
 }
--(void)showPhotoTools {
-    _photoToolsYPos.animator.constant = 0;
-}
--(void)hidePhotoTools {
-    _photoToolsYPos.animator.constant = -110;
-}
-- (IBAction)photoToolsBtn:(id)sender {
-    if(((NSButton*)sender).state)
-        [self hidePhotoTools];
-    else
-        [self showPhotoTools];
-    
-}
+
 - (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{
     return YES;
 }
@@ -139,7 +134,7 @@ BOOL hideDivider = NO;
     
 }
 -(void)setEffects {
-    [effectList addItemWithTitle:@"Aucun effet"];
+    [effectList addItemWithTitle:NSLoc(@"No effect")];
     for(NSString* effect in _effects)
         if([CIFilter filterWithName:_effects[effect]] != nil)
             [effectList addItemWithTitle:effect];

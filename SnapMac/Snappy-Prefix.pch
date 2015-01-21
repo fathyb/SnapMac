@@ -24,7 +24,7 @@ typedef void (^SMCallback)(id);
 
 #import "main.h"
 
-//#define SnapBug
+#define SnapBug
 
 #define LogRect(RECT) NSLog(@"%s: (%0.0f, %0.0f) %0.0f x %0.0f", #RECT, RECT.origin.x, RECT.origin.y, RECT.size.width, RECT.size.height)
 

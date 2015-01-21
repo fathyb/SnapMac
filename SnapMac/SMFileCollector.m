@@ -64,15 +64,13 @@ NSOperationQueue *thumbQueue;
             
             const size_t filename_length = strlen(filename);
             if(filename[filename_length-1] == dir_delimter) {
-                printf("dir:%s\n", filename);
                 mkdir(filename, S_IWOTH);
             }
             else {
-                printf("file:%s\n", filename);
                 NSString *nsFilename = [NSString stringWithCString:filename
                                                           encoding:NSUTF8StringEncoding];
-                BOOL isMedia = [nsFilename hasPrefix:@"media"];
-                BOOL isOverlay = [nsFilename hasPrefix:@"overlay"];
+                BOOL isMedia   = [nsFilename hasPrefix:@"media"],
+                     isOverlay = [nsFilename hasPrefix:@"overlay"];
                 if(isMedia || isOverlay) {
                     if (unzOpenCurrentFile(zipfile) != UNZ_OK) {
                         printf("could not open file\n");
@@ -122,49 +120,49 @@ NSOperationQueue *thumbQueue;
 +(void)generateImageForFile:(NSString*)file andCallback:(SMCallback)callback {
     if(!thumbQueue) {
         thumbQueue = [NSOperationQueue new];
-        thumbQueue.maxConcurrentOperationCount = 1;
+        thumbQueue.maxConcurrentOperationCount = 5;
     }
     [thumbQueue addOperationWithBlock:^{
-        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:[NSURL fileURLWithPath:file]
-                                                    options:nil];
+        AVURLAsset *asset = [AVURLAsset.alloc initWithURL:[NSURL fileURLWithPath:file]
+                                                  options:nil];
 
-        AVAssetImageGenerator *generator = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+        AVAssetImageGenerator *generator = [AVAssetImageGenerator.alloc initWithAsset:asset];
         generator.appliesPreferredTrackTransform = YES;
         generator.maximumSize                    = NSMakeSize(500, 500);
     
     
-        CMTime time = [asset duration];
+        CMTime time = asset.duration;
         time.value  = 1000;
         
         NSError *error = nil;
         CGImageRef imageRef = [generator copyCGImageAtTime:time
                                                 actualTime:nil
                                                      error:&error];
-        
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            
             NSImage *thumb = nil;
-            if(error || !imageRef)
+            if(error || !imageRef) {
                 callback(error);
+                NSLog(@"Error while generating thumb for file %@\nError : %@", file, error);
+            }
             else {
-                thumb = [[NSImage alloc] initWithCGImage:imageRef size:NSZeroSize];
+                thumb = [NSImage.alloc initWithCGImage:imageRef size:NSZeroSize];
                 CGImageRelease(imageRef);
             }
         
-            if(!thumb)
+            if(!thumb) {
+                NSLog(@"Error while generating thumb for file %@ \n Error : empty output", file);
                 callback(nil);
+            }
             else
                 callback(thumb);
-        }];
     }];
     
 }
 +(NSString*)mimeTypeForFileAtPath:(NSString *) path {
-    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+    if (![NSFileManager.defaultManager fileExistsAtPath:path]) {
         return nil;
     }
     
-    CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)[path pathExtension], NULL);
+    CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)path.pathExtension, nil);
     CFStringRef mimeType = UTTypeCopyPreferredTagWithClass (UTI, kUTTagClassMIMEType);
     CFRelease(UTI);
     if (!mimeType) {
@@ -182,7 +180,7 @@ NSOperationQueue *thumbQueue;
              *filePath = nil,
              *overlay  = nil;
     
-    NSFileManager *fManager = [NSFileManager defaultManager];
+    NSFileManager *fManager = NSFileManager.defaultManager;
     NSArray       *dirFiles = [fManager contentsOfDirectoryAtPath:dirPath
                                                             error:nil],
                   *files    = nil;
@@ -244,7 +242,8 @@ NSOperationQueue *thumbQueue;
     thumb    = thumb ? [NSString stringWithFormat:@"%@/%@", dirPath, thumb] : filePath;
     overlay = overlay ? [NSString stringWithFormat:@"%@/%@", dirPath, overlay] : @"";
     
-    if(!thumb && ([filePath hasSuffix:@"mp4"] || [filePath hasSuffix:@"3gpp"])) {
+    if(thumb == filePath && ([filePath hasSuffix:@"mp4"] || [filePath hasSuffix:@"3gpp"])) {
+        
         [SMFileCollector generateImageForFile:filePath
                                   andCallback:^(NSImage* image) {
             if(!image)
@@ -383,7 +382,6 @@ NSOperationQueue *thumbQueue;
                               if(filesTreated == files.count) {
                                   [SMFileCollector urlsForMedia:identifier
                                                     andCallback:^(NSDictionary* urls) {
-                                                        NSLog(@"Urls = %@", urls);
                                                         callback(urls);
                                   }];
                                   [fileManager removeItemAtPath:newPath

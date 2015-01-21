@@ -11,7 +11,6 @@
 @interface SMPaintingLayer : CALayer
 
 @property (nonatomic) NSMutableArray *lines;
-@property (nonatomic) NSColor *color;
 
 -(void)drawInImage:(NSImage*)img;
 -(void)resizeTo:(NSSize)size;

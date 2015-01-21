@@ -1,0 +1,77 @@
+/* 
+  Localizable.strings
+  Snappy
+
+  Created by Fathy Boundjadj  on 01/01/2015.
+  Copyright (c) 2015 Fathy B. All rights reserved.
+*/
+
+/* Headers & Titles */
+"Friends" = "Amis";
+"My feed" = "Mon fil";
+"%@'s story" = "Histoire de %@";
+"Conversation with %@" = "Conversation avec %@";
+"Snappy - loading" = "Snappy - chargement";
+
+/* Time */
+"%@ ago"  = "Il y a %@";
+"days"    = "jours";
+"hours"   = "heures";
+"minutes" = "minutes";
+"seconds" = "secondes";
+"hours"   = "heures";
+
+/* Themes */
+"Light" = "Clair";
+"Dark"  = "Sombre";
+
+/* Photo Effects */
+"No effect" = "Aucun effet";
+"Chrome" = "Chrome";
+"Fade"   = "Fondu";
+"Instant" = "Instantané";
+"Mono" = "Mono";
+"Noir" = "Noir";
+"Process" = "Processus";
+"Tonal" = "Tonal";
+"Transfer" = "Transfer";
+
+/* Right click context menu - Friends */
+
+"Rename"   = "Renommer";
+"Delete"   = "Supprimer";
+"Block %@" = "Bloquer %@";
+
+/* Right click context menu - Snaps */
+"Show in Finder" = "Voir dans le Finder";
+
+/* FriendsPage */
+"Searching \"%@\"" = "Recherche \"%@\"";
+"Events" = "Évenements";
+"Me" = "Moi";
+
+/* Send Page */
+"Cancel" = "Annuler";
+"Share"  = "Partager";
+"Save"   = "Enregistrer";
+"Send"   = "Envoyer";
+"Search..." = "Rechercher...";
+"My Story" = "Mon Histoire";
+
+/* Login Page */
+"Username" = "Nom d'utilisateur";
+"Password" = "Mot de passe";
+"Connection" = "Connection";
+"Android Synchronization" = "Synchronisation Android";
+"iOS Synchronization" = "Synchronisation iOS";
+"Please connect a rooted Android device with usb debugging enabled" = "Veuillez connecter un appareil Android rooté avec le débogage activé";
+
+/* Errors */
+"You have been disconnected" = "Vous avez été déconnecté";
+"Unknown error" = "Erreur inconnue";
+"An unknown connection error occurred. (e%ld)" = "Une erreur de connection est survenue. (e%ld)";
+"Can't establish connection to Snapchat." = "Impossible d'établir la connection à Snapchat.";
+
+/* Others */
+"Loading" = "Chargement";
+"Stories" = "Histoires";

@@ -18,6 +18,7 @@
 #import "SMUndoDrawButton.h"
 #import "SMColorPickerButton.h"
 #import "SMFlashButton.h"
+#import "SMTimerLayer.h"
 
 #define kSwipeMinimumLength 0.15
 
@@ -237,7 +238,7 @@ BOOL isHandlingEvent;
         if([session canAddOutput:stillImageOutput])
             [session addOutput:stillImageOutput];
     
-        previewLayer               = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self->session];
+        previewLayer               = [AVCaptureVideoPreviewLayer.alloc initWithSession:self->session];
         previewLayer.frame         = self.bounds;
         previewLayer.opacity       = 1.f;
         previewLayer.videoGravity  = AVLayerVideoGravityResizeAspectFill;
@@ -307,10 +308,13 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     if(_positionLeft.constant != 0)
             _positionLeft.constant = -self.bounds.size.width;
     
+    if(!self.layer)
+        goto quit;
+    
     if(self.paintingLayer)
         [self.paintingLayer resizeTo:self.layer.frame.size];
     
-    if(self.layer && [self.layer isKindOfClass:[AVPlayerLayer class]]) {
+    if([self.layer isKindOfClass:[AVPlayerLayer class]]) {
         CALayer *playerLayer = self.layer;
         if(playerLayer.sublayers.count > 1) {
             CALayer *overlayLayer = playerLayer.sublayers[1];
@@ -323,7 +327,16 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
             overlayLayer.frame = rect;
         }
     }
+    for(CALayer *layer in self.layer.sublayers) {
+        if([layer isKindOfClass:SMTimerLayer.class]) {
+            NSSize layerSize = self.layer.bounds.size;
+           layer.frame = NSMakeRect(layerSize.width - (20 + 50), layerSize.height - (20 + 50), 50, 50);
+            [layer setNeedsDisplay];
+        }
+    }
     
+    goto quit;
+quit:
     
     [CATransaction commit];
 }
@@ -371,11 +384,11 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
 }
 
 -(void)takePhoto:(NSNotification*)notif {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self photo:^(NSImage* image) {
+    [self photo:^(NSImage* image) {
+        dispatch_async(dispatch_get_main_queue(), ^{
             [self showImage:image withTools:YES];
-        }];
-    });
+        });
+    }];
 }
 
 
@@ -505,7 +518,8 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
         if(useFlash)
             [self flashScreen:YES];
         
-        [stillImageOutput captureStillImageAsynchronouslyFromConnection:[stillImageOutput connectionWithMediaType:AVMediaTypeVideo] completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
+        [stillImageOutput captureStillImageAsynchronouslyFromConnection:[stillImageOutput connectionWithMediaType:AVMediaTypeVideo]
+                                                      completionHandler:^(CMSampleBufferRef imageSampleBuffer, NSError *error) {
             if(useFlash)
                 [self flashScreen:NO];
             
@@ -516,20 +530,26 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
                 
                 NSData        *jpegData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageSampleBuffer];
                 NSImage       *oldImage = [NSImage.alloc initWithData:jpegData];
-                NSSize        imageSize = NSMakeSize(480, 720);
                 
+                CGFloat     imageHeight = oldImage.size.height;
+                NSSize        imageSize = NSMakeSize(imageHeight/1.5, imageHeight);
+                NSRect          newRect = NSMakeRect((oldImage.size.width-imageSize.width)/2, (oldImage.size.height-imageSize.height)/2,
+                                                    imageSize.width, imageSize.height);
                 
-                NSRect          newRect = NSMakeRect((oldImage.size.width-imageSize.width)/2, (oldImage.size.height-imageSize.height)/2, imageSize.width, imageSize.height);
                 CGImageSourceRef source = CGImageSourceCreateWithData((__bridge CFDataRef)oldImage.TIFFRepresentation, nil);
-                CGImageRef    nImageRef = CGImageSourceCreateImageAtIndex(source, 0, nil);
-                CGImageRef     imageRef = CGImageCreateWithImageInRect(nImageRef, newRect);
+                CGImageRef    nImageRef = CGImageSourceCreateImageAtIndex(source, 0, nil),
+                               imageRef = CGImageCreateWithImageInRect(nImageRef, newRect);
+                
                 NSImage       *newImage = [NSImage.alloc initWithCGImage:imageRef
                                                                     size:newRect.size];
                 NSArray        *filters = previewLayer.filters;
                 
-                CFRelease(source);
-                CFRelease(nImageRef);
-                CFRelease(imageRef);
+                if(source)
+                    CFRelease(source);
+                if(nImageRef)
+                    CFRelease(nImageRef);
+                if(imageRef)
+                    CFRelease(imageRef);
                 
                 [newImage setFilter:(filters.count > 0 ? filters[0] : nil)];
                 [newImage flipImage];
@@ -596,8 +616,9 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
 -(void)cleanStart {
     if(self.layer.contents)
         self.layer.contents = nil;
-    currentImage            = nil;
-    self.layer              = previewLayer;
+    
+    currentImage = nil;
+    self.layer   = previewLayer;
     
     self.showCancelBtn      =
     self.showColorPickerBtn =
@@ -605,8 +626,8 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     self.showUndoDrawBtn    =
     self.showRefreshBtn     = NO;
     
-    self.showPhotoBtn       =
-    self.showFilterList     =
+    self.showPhotoBtn   =
+    self.showFilterList =
     self.showFlashBtn   = YES;
     
     if(!session.isRunning) {
@@ -662,21 +683,18 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     [self cleanStop];
     
     self.showDrawBtn        = useOpts;
-    self.showCancelBtn      = !(
+    self.showCancelBtn      = YES;
     self.showRefreshBtn     =
     self.showUndoDrawBtn    =
     self.showColorPickerBtn =
     self.showPhotoBtn       =
     self.showFilterList     =
-    self.showFlashBtn       = NO);
+    self.showFlashBtn       = NO;
     
     self.layer.contents = [image imageResizedToSize:self.bounds.size];
 }
 
 -(void)showVideo:(NSDictionary*)urls {
-    
-    self.showRefreshBtn = YES;
-    
     NSString *path = urls[@"filePath"];
     
     AVPlayer *player = [AVPlayer playerWithURL:[NSURL fileURLWithPath:path]];
@@ -713,6 +731,7 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     if(!urls)
         return;
     
+    self.showRefreshBtn = YES;
     NSString* path = urls[@"filePath"];
     
     if(_positionLeft.animator.constant != 0)
@@ -725,12 +744,19 @@ NSRect getPerfectRect(NSSize imageSize, NSSize layerSize) {
     self.showRefreshBtn =
     self.showPhotoBtn   =
     self.showFilterList =
-    self.showFlashBtn = NO;
+    self.showFlashBtn   = NO;
     
     if([path hasSuffix:@"jpg"] || [path hasSuffix:@"jpeg"] || [path hasSuffix:@"png"])
         [self showImageFile:path];
     else if([path hasSuffix:@"mp4"] || [path hasSuffix:@"3gpp"])
         [self showVideo:urls];
+    
+    NSSize size = self.layer.bounds.size;
+    self.timerLayer = SMTimerLayer.new;
+    self.timerLayer.frame = NSMakeRect(size.width - (20 + 50), size.height - (20 + 50), 50, 50);
+    
+    [self.layer addSublayer:self.timerLayer];
+    [self.timerLayer launchWithTimeout:10];
     
     [self resetSubviews];
 }

@@ -10,12 +10,9 @@
 
 @interface SMAndroidSync : NSObject <NSXMLParserDelegate>
 
--(SMAndroidSync*)initWithCallback:(SMCallback)callback;
-
 @property (nonatomic, strong) NSString* user;
 @property (nonatomic, strong) NSString* authToken;
 @property (nonatomic, strong) NSString* current;
 @property (nonatomic, strong) SMCallback callback;
-@property (nonatomic, strong) NSMutableString *currentStringValue;
 
 @end

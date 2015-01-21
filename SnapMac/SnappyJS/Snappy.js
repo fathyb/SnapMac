@@ -50,8 +50,6 @@ var Snappy = new (function() {
 		if(result.error)
 			return callback(result);
 			
-		console.log(result);
-		
 		Snappy.cache.username = result.updates_response.username;
 		
 		var friends		  = new Snappy.FriendList(result),
@@ -90,14 +88,26 @@ var Snappy = new (function() {
 	this.Friend = function(raw) {
 		this.best 		 = false;
 		this.name 		 = raw.name;
+		this.isMe		 = this.name == Snappy.cache.username;
 		this.displayName = raw.display || this.name;
 		this.stories	 = new Array();
 		this.isEvent	 = !!raw.is_shared_story;
+		
+		this.rename = function(name, callback) {
+			SnapJS.renameFriend(this.name, "display", name, function(r) {
+				if(callback)
+					callback(r);
+			});
+		}
 		
 		if(this.isEvent) {
 			this.expiration = new Snappy.SnappyDate(raw.expiration);
 			this.place = raw.venue;
 			this.mapsURL = "https://www.google.fr/maps/place/"+escape(this.place);
+		}
+		this.showInMaps = function() {
+			if(this.mapsURL)
+				SnapJS.openURL(this.mapsURL);
 		}
 		
 		this.addStories	 = function(stories) {
@@ -109,6 +119,13 @@ var Snappy = new (function() {
 				story.friend = this;
 				
 				this.stories.push(story);
+			}
+		}
+		this.setMyStories = function(stories) {
+			var story;
+			
+			for(var i in stories) {
+				
 			}
 		}
 		
@@ -210,9 +227,15 @@ var Snappy = new (function() {
 				if(friend)
 					friend.addStories(stories.stories);
 			}
+			
+			if(data.my_stories.length) {
+				var me = this.friendByName(Snappy.cache.username);
+				me.addStories(data.my_stories);
+			}
 		}
 		
 		this.searchFriend = function(str) {
+			str =  str.toLowerCase();
 			var friends = [];
 			for(var i in this.friends) {
 				var friend = this.friends[i];
@@ -258,6 +281,23 @@ var Snappy = new (function() {
 			iv 		= story.media_iv,
 			key		= story.media_key,
 			id		= story.media_id;
+		
+		if(raw.story_extras) {
+			this.screenshotCount = raw.story_extras.screenshot_count;
+			this.viewCount		 = raw.story_extras.view_count;
+		}
+		if(raw.story_notes) {
+			this.views = new Object();
+			var note, i;
+			
+			for(i in raw.story_notes) {
+				note = raw.story_notes[i];
+				this.views[note.viewer] = {
+					date		 : new Snappy.SnappyDate(note.timestamp),
+					screenshoted : false
+				}
+			}
+		}
 		
 		this.viewed    = raw.viewed;
 		this.state	   = "decrypt";
@@ -317,12 +357,15 @@ var Snappy = new (function() {
 		
 		this.duration = 0;
 		
-		var user;
+		var user,
+			iremovedclone = false;
 		for(var i in conversation.participants) {
 			user = conversation.participants[i];
 			
-			if(user == Snappy.cache.username)
+			if(user == Snappy.cache.username && !iremovedclone) {
+				iremovedclone = true;
 				continue;
+			}
 				
 			var friend = Snappy.cache.friends.friendByName(user);
 			if(friend)
@@ -391,7 +434,7 @@ var Snappy = new (function() {
 				}
 				_this.urls = result;
 				_this.url = result.thumb;
-				_this.snap.change();
+				_this.change();
 			});
 		}
 		
@@ -413,23 +456,23 @@ var Snappy = new (function() {
 			var interval = Math.floor(seconds / 31536000);
 			
 			if(interval > 1)
-		        return interval + " années";
+		        return interval + " "+loc("years");
 		        
 		    interval = Math.floor(seconds / 2592000);
 		    if(interval > 1)
-		        return interval + " mois";
+		        return interval + " "+loc("months");
 		        
 		    interval = Math.floor(seconds / 86400);
 		    if(interval > 1)
-		        return interval + " jours";
+		        return interval +  " "+loc("days");
 		        
 		    interval = Math.floor(seconds / 3600);
 		    if(interval > 1)
-		        return interval + " heures";
+		        return interval + " "+loc("hours");
 		        
 		    interval = Math.floor(seconds / 60);
 		    if(interval > 1)
-		        return interval + " minutes";
+		        return interval + " "+loc("minutes");
 		        
 		    return Math.floor(seconds) + " secondes";
 		}
@@ -458,14 +501,26 @@ var Snappy = new (function() {
 	this.tmp = {
 		SnapBack: {}
 	}
-	
+
 	this.rightClick = new Function();
+	this.search = new Function();
 	
 	return this; 
 })();
 
+function SnappySearchHandler(str) {
+	return Snappy.search(str);
+}
 function SnappyRClickHandler(element) {
-	if(element.style)
-		return Snappy.rightClick(element);
+	return Snappy.rightClick(element);
 }
 
+function loc(str) {
+	var lStr = SnapJS.locale(str);
+	
+	if(arguments.length > 1)
+		for(var i = 1; lStr.search("%@") != -1; i++)
+			lStr = lStr.replace("%@", arguments[i] || "");
+		
+	return lStr;
+}

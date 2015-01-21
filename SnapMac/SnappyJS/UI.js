@@ -28,98 +28,14 @@ function e(tag, cls, text, css) {
 function toggleClass(el, cls, bool) {
 	$(el)[(arguments.length == 3 ? bool : !$(el).hasClass(cls)) ? "addClass" : "removeClass"](cls);
 }
-SnappyUI = new (function() {
-	
-	this.use3D = function(value) {
-		toggleClass(this.body, "enable3d", value);
-	}
-	this.setTheme = function(theme) {
-		if(theme == "light")
-			this.body.removeClass("dark").addClass("light");
-		else
-			this.body.removeClass("light").addClass("dark");
-	}
-	this.useParallax = function(value) {
-		toggleClass(this.body, "enableParallax", value);
-		this.updateFrame();
-	}
-	this.uhfp = function() {
-		this.hideFeedPics(SnapJS.hideFeedPics());
-	}
-	this.hideFeedPics = function(value) {
-		toggleClass(this.body, "hideFeedPics", value);
-	}
-	
-	this.hideSend = function() {
-		if(!this.SendPage.isVisible())
-			return;
-			
-		this.SendPage.hide();
-		this.FeedPage.show();
-	}
-	this.logout = function() {
-		this.LoginPage.show();
-		this.FeedPage.erase();
-		this.FriendsPage.erase();
-		this.logged = false;
-		this.updateKeychain();
-		this.updates = new Object();
-		
-		SnapJS.logout();
-	}
-	
-	$(document).ready(function() {
-		SnappyUI.init();
-	});
+
+function UI() {
 	
 	return this;
-})();
+}
 
-SnappyUI.init = function() {
+UI.prototype = new (function() {
 	
-	this.logged = false;
-	this.body = $("body");
-	this.updates = new Object();
-	
-	this.ErrorView = new(function() {
-		this.element = e("div", "errorView").appendTo("body");
-		this.errorIcon = e("span", "icon", "r").appendTo(this.element);
-		this.errorText = e("p", "text").appendTo(this.element);
-		this.closeBtn = e("span", "icon", "M").appendTo(this.element);
-		
-		this.closeBtn.click(function() {
-			SnappyUI.ErrorView.hide();
-		});
-		this.unblur = false;
-		this.show = function() {
-			this.element.addClass("show");
-		}
-		this.hide = function() {
-			this.element.removeClass("show");
-			
-			if(this.timeout) {
-				clearTimeout(this.timeout);
-			}
-			if(this.unblur) {
-				SnappyUI.currentPage.blur(false);
-				this.unblur = false;
-			}
-		}
-		this.showError = function(error) {
-			if(error.code == 5) {
-				error.message = "Vous avez été déconnecté.";
-			}
-			this.errorText.text(error.message);
-			if(error.blur) {
-				SnappyUI.currentPage.blur(true);
-				this.unblur = true;
-			}
-			this.show();
-			this.timeout = setTimeout(function() {
-				SnappyUI.ErrorView.hide();
-			}, 10000);
-		}
-	})();
 	this.Header = function(parent) {
 		this.element = e("header").appendTo(parent.element);
 		this.parent  = parent;
@@ -274,6 +190,11 @@ SnappyUI.init = function() {
 				|| $(".zoom").length
 				|| currentPage == SnappyUI.SendPage) && !force)
 				return;
+				
+			if(currentPage == this) {
+				$(this.content).animate({scrollTop: 0}, 500);
+				return;
+			}
 			
 			if(this.showed)
 				this.showed();
@@ -284,6 +205,10 @@ SnappyUI.init = function() {
 			SnappyUI.currentPage = this;
 			this.element.addClass("active");
 			this.element.scrollTop(0);
+			
+			SnapJS.clearSearchField();
+			if(this.search)
+				this.search("");
 			
 			if(this.content)
 				this.content.scrollTop(0);
@@ -302,40 +227,14 @@ SnappyUI.init = function() {
 		
 	}
 	
-	this.toggleCam = new (function() {
-		this.element = e("span", "toggleCam");
-		this.element.appendTo("body");
-		this.icon = "hide";
-		
-		this.setIcon = function(icon) {
-			this.icon = icon;
-			this.element.html(this.icon == "hide" ? "^" : "5");
-		}
-		
-		this.element.click(function() {
-			if(SnappyUI.toggleCam.icon == "show")
-				SnapJS.showCamera();
-			else
-				SnapJS.hideCamera();
-		});
-		
-		this.setIcon("hide");
-		
-		return this;
-	})();
-	
-	this.FriendsPage = new FriendsPage();
-	this.LoadingPage = new LoadingPage();
-	this.LoginPage	 = new LoginPage();
-	this.SendPage 	 = new SendPage();
-	this.FeedPage	 = new FeedPage();
+
 	
 	this.updateFrame = function() {
 		if(!$("body").hasClass("enableParallax"))
 			return;
 			
-		SnappyUI.FriendsPage.StoriesView.updateFrame();
-		webkitRequestAnimationFrame(SnappyUI.updateFrame);
+		this.FriendsPage.StoriesView.updateFrame();
+		webkitRequestAnimationFrame(this.updateFrame);
 	}
 	this.setUpdates = function(updates) {
 		
@@ -344,7 +243,7 @@ SnappyUI.init = function() {
 		
 		this.FeedPage.setConversations(updates.Conversations);
 		
-		if(this.LoginPage.isVisible() || !SnappyUI.currentPage) {
+		if(this.LoginPage.isVisible() || !this.currentPage) {
 			this.logged = true;
 			this.FeedPage.show();
 		}
@@ -353,50 +252,57 @@ SnappyUI.init = function() {
 		this.SendPage.setFriends(updates.Friends);
 	}
 	
-	this.setTheme(SnapJS.darkTheme() ? "dark" : "light");
-	this.use3D(SnapJS.use3D());
-	this.useParallax(SnapJS.useParallax());
-	this.hideFeedPics(SnapJS.hideFeedPics());
-	
+	this.updated = false;
 	this.update = function() {
+		var _this = this;
 		Snappy.getUpdates(function(updates) {
-			SnappyUI.LoadingPage.hide();
+			_this.LoadingPage.hide();
 			if(updates.error) {
-				SnappyUI.ErrorView.showError(updates.error);
+				if(!_this.updated) {
+					_this.updated = true;
+					_this.updateKeychain();
+				}
+				_this.ErrorView.showError(updates.error);
 			}
 			else {
-				SnappyUI.FeedPage.header.leftButton.spin(false);
-				SnappyUI.FriendsPage.header.leftButton.spin(false);
-				SnappyUI.setUpdates(updates);
+				_this.FeedPage.header.leftButton.spin(false);
+				_this.FriendsPage.header.leftButton.spin(false);
+				_this.setUpdates(updates);
 			}
 		
 		});
 	}
 	
-	Snappy.rightClick = function(element) {
+	this.contextMenuForElement = function(element) {
 		var el	  = $(element),
 			items = new Object();
 		
-		if(el.is(".snap")) {
+		if(el.parents(".snap").length || el.is(".snap")) {
+			if(!el.is(".snap"))
+				el = el.parents(".snap");
+				
 			var snap = $(el).data("snap");
-			items["Voir le fichier"] = function() {
+			items[loc("Show in Finder")] = function() {
 				snap.showInFinder();
 			}
 			items["separator"] = null;
 		}
 		if(el.parents(".friend").length || el.is(".friend")) {
+			if(!el.is(".friend"))
+				el = el.parents(".friend");
+				
 			var friend = el.data("friend");
 			
 			items[friend.displayName] = "disabled";
 			items["separator"] = null;
-			items["Renommer"] = function() {
+			items[loc("Rename")] = function() {
 				el.children(".displayName").addClass("edit");
 			}
 			
-			items["Supprimer"] = function() {
+			items[loc("Delete")] = function() {
 				
 			}
-			items["Bloquer"] = function() {
+			items[loc("Block %@", friend.displayName)] = function() {
 				
 			}
 		}
@@ -404,6 +310,17 @@ SnappyUI.init = function() {
 		return items;
 	}
 	
+	var _this = this;
+	
+	Snappy.search = function(str) {
+		console.log(str);
+		_this.search(str);
+	}
+	
+	this.search = function(str) {
+		if(this.currentPage && this.currentPage.search)
+			this.currentPage.search(str);
+	}
 	this.updateInterval = null;
 	this.setUpdateInterval = function(time) {
 		if(this.updateInterval)
@@ -427,9 +344,107 @@ SnappyUI.init = function() {
 		});
 	}
 	
-	this.update();
+	this.init = function() {
 	
-	this.setUpdateInterval(60);
-	this.LoginPage.show();
-	this.LoadingPage.show();
+		this.FriendsPage = new FriendsPage();
+		this.LoadingPage = new LoadingPage();
+		this.LoginPage	 = new LoginPage();
+		this.SendPage 	 = new SendPage(this);
+		this.FeedPage	 = new FeedPage();
+		this.ErrorView	 = new ErrorView(this);
+		this.toggleCam   = new ToggleCamView();
+		this.logged		 = false;
+		this.body		 = $("body");
+		this.updates	 = new Object();
+		
+		var _this = this;
+		
+		Snappy.rightClick = function(element) {
+			return _this.contextMenuForElement(element);
+		}
+		Snappy.search = function(str) {
+			_this.search(str);
+		}
+		
+		
+		this.setTheme(SnapJS.darkTheme() ? "dark" : "light");
+		this.use3D(SnapJS.use3D());
+		this.useParallax(SnapJS.useParallax());
+		this.hideFeedPics(SnapJS.hideFeedPics());
+		this.update();
+	
+		this.setUpdateInterval(60);
+		this.LoginPage.show();
+		this.LoadingPage.show();
+	}
+	
+	
+	this.use3D = function(value) {
+		toggleClass(this.body, "enable3d", value);
+	}
+	this.setTheme = function(theme) {
+		if(theme == "light")
+			this.body.removeClass("dark").addClass("light");
+		else
+			this.body.removeClass("light").addClass("dark");
+	}
+	this.useParallax = function(value) {
+		toggleClass(this.body, "enableParallax", value);
+		this.updateFrame();
+	}
+	this.uhfp = function() {
+		this.hideFeedPics(SnapJS.hideFeedPics());
+	}
+	this.hideFeedPics = function(value) {
+		toggleClass(this.body, "hideFeedPics", value);
+	}
+	
+	this.hideSend = function() {
+		if(!this.SendPage.isVisible())
+			return;
+			
+		this.SendPage.hide();
+		this.FeedPage.show();
+	}
+	this.logout = function() {
+		this.LoginPage.show();
+		this.FeedPage.erase();
+		this.FriendsPage.erase();
+		this.logged = false;
+		this.updateKeychain();
+		this.updates = new Object();
+		
+		SnapJS.logout();
+	}
+	
+	$(document).ready(function() {
+		SnappyUI.init();
+	});
+	
+	return this;
+})();
+
+var SnappyUI = new UI();
+
+
+function ToggleCamView() {
+	this.element = e("span", "toggleCam");
+	this.element.appendTo("body");
+	this.icon = "hide";
+		
+	this.setIcon = function(icon) {
+		this.icon = icon;
+		this.element.html(this.icon == "hide" ? "^" : "5");
+	}
+	var _this = this;
+	this.element.click(function() {
+		if(_this.icon == "show")
+			SnapJS.showCamera();
+		else
+			SnapJS.hideCamera();
+	});
+		
+	this.setIcon("hide");
+		
+	return this;
 }

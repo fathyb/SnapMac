@@ -14,6 +14,7 @@
 
 @class SMPaintingLayer;
 @class SMLine;
+@class SMTimerLayer;
 
 @interface SMCamView : NSView
 
@@ -36,6 +37,7 @@
 @property (nonatomic) NSBezierPath *path;
 @property (nonatomic) SMLine *currentLine;
 @property (nonatomic) SMPaintingLayer *paintingLayer;
+@property (nonatomic) SMTimerLayer *timerLayer;
 @property (nonatomic) NSColor *drawingColor;
 
 -(void)setFilter:(CIFilter*)filter;

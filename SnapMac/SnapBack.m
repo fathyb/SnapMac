@@ -9,7 +9,9 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <JavaScriptCore/JSContext.h>
 #import "SnapBack.h"
+#import "SnappyFunction.h"
 #import <objc/runtime.h>
+#import "SnappyDictionary.h"
 
 JSContextRef SMJSContext = nil;
 
@@ -18,6 +20,10 @@ JSValueRef NStoJS(id ns) {
         return nil;
     
     JSValueRef jsObject = nil;
+    
+    if([ns respondsToSelector:@selector(JSObject)]) {
+        return ((WebScriptObject*)ns).JSObject;
+    }
     
     NSDictionary* actions = @{
         @"String": ^(NSString *o) {
@@ -106,31 +112,39 @@ id JSToNS(JSValueRef object) {
     JSType type = JSValueGetType(SMJSContext, object);
     id   result = nil;
     
-    
     switch(type) {
-        case kJSTypeObject:
-            result = NSMutableDictionary.new;
+        case kJSTypeObject:;
+            JSObjectRef jsObject = (JSObjectRef)object;
             
-            JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(SMJSContext, (JSObjectRef)object);
-            ssize_t            arraySize = JSPropertyNameArrayGetCount(props);
-        
-            for(ssize_t i = 0; i < arraySize; i++) {
-                JSStringRef   k = JSPropertyNameArrayGetNameAtIndex(props, i);
-                JSValueRef vval = JSObjectGetProperty(SMJSContext, (JSObjectRef)object, k, nil);
-                NSString   *key = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, k));
-            
-                result[key] = JSToNS(vval);
-            
-                JSStringRelease(k);
+            if(JSObjectIsFunction(SMJSContext, jsObject)) {
+                result = SnappyFunction.new;
+                ((SnappyFunction*)result).JSObject = jsObject;
             }
-            
+            else {
+                JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(SMJSContext, jsObject);
+                ssize_t            arraySize = JSPropertyNameArrayGetCount(props);
+                                      result = [SnappyDictionary.alloc initWithCapacity:arraySize];
+                
+                for(ssize_t i = 0; i < arraySize; i++) {
+                    JSStringRef   k = JSPropertyNameArrayGetNameAtIndex(props, i);
+                    JSValueRef vval = JSObjectGetProperty(SMJSContext, jsObject, k, nil);
+                    NSString   *key = CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, k));
+                    
+                    [result setObject:JSToNS(vval)
+                               forKey:key];
+                    
+                    JSStringRelease(k);
+                }
+                
+                
+                
+            }
             
             break;
     
-        case kJSTypeString:
-            ;
+        case kJSTypeString:;
             JSStringRef jsStr = JSValueToStringCopy(SMJSContext, object, nil);
-            result = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, jsStr));
+                       result = CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, jsStr));
             JSStringRelease(jsStr);
             
             break;
@@ -142,13 +156,11 @@ id JSToNS(JSValueRef object) {
         case kJSTypeNumber:
             result = @(JSValueToNumber(SMJSContext, object, nil));
             break;
-            
         default:
             NSLog(@"__id_to_jsValue(runtime) : unknown kJSType : %d", type);
         case kJSTypeNull:
-        case kJSTypeUndefined:
-            ;
-            result = nil;
+        case kJSTypeUndefined:;
+            result = @"null";
             break;
     }
     
@@ -166,13 +178,20 @@ id JSToNS(JSValueRef object) {
     return [self call:nil];
 }
 -(void)call:(id)firstArg, ... {
+    JSValueRef exception = nil;
+    
     if(!firstArg) {
         JSObjectCallAsFunction(SMJSContext,
                                self.JSObject,
                                nil,
                                0,
                                nil,
-                               nil);
+                               &exception);
+        if(exception) {
+            NSLog(@"Snappy Javascript runtime error");
+            NSDictionary *result = JSToNS(exception);
+            NSLog(@"Error in file %@ line %@ column %@", result[@"sourceURL"], result[@"line"], result[@"column"]);
+        }
         return;
     }
     id  argument = nil;
@@ -203,8 +222,14 @@ id JSToNS(JSValueRef object) {
                            nil,
                            length,
                            length == 1 ? &arguments[0] : arguments,
-                           nil);
+                           &exception);
     free(arguments);
+    
+    if(exception) {
+        NSLog(@"Snappy Javascript runtime error");
+        NSDictionary *result = JSToNS(exception);
+        NSLog(@"Error in file %@ line %@ column %@", result[@"sourceURL"], result[@"line"], result[@"column"]);
+    }
 }
 
 @end

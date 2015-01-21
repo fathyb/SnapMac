@@ -11,6 +11,7 @@
 #import "SnapBack.h"
 #import "SnappyNotification.h"
 #import "SMWebUI.h"
+#import "SMAndroidSync.h"
 
 
 enum {
@@ -32,7 +33,7 @@ typedef NS_ENUM(NSUInteger, SnappyError) {
 
 #define SNAPCHAT_VERSION "7.1.0.10"
 
-@interface SnapJS : NSObject
+@interface SnapJS : NSObject <NSTextFieldDelegate>
 
 -(void)script:(NSString*)command;
 
@@ -40,6 +41,7 @@ typedef NS_ENUM(NSUInteger, SnappyError) {
 @property (nonatomic) NSString* username;
 @property (nonatomic, weak) SMWebUI* webView;
 @property (nonatomic) NSOperationQueue* opQueue;
+@property (nonatomic) SMAndroidSync* androSync;
 @property (nonatomic) BOOL logged;
 @property (nonatomic) BOOL use3D;
 @property (nonatomic) BOOL useParallax;

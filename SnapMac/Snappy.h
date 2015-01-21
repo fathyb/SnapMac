@@ -22,12 +22,11 @@
 }
 
 
-@property (weak) IBOutlet NSLayoutConstraint *cameraPosition;
+@property (weak) IBOutlet NSSearchField *searchField;
 @property (nonatomic)       NSView* mainButtonView;
 @property (nonatomic)       AVCaptureVideoPreviewLayer* previewLayer;
 @property (nonatomic)       AVCaptureSession* session;
 @property (nonatomic)       NSDictionary* effects;
-@property (nonatomic)       SMWebUI* webUI;
 @property (nonatomic)       Settings* settingsView;
 @property (nonatomic)       CALayer* progressLayer;
 @property (nonatomic)       SMClearFeedWindow* clearFeedWindow;
@@ -36,8 +35,6 @@
 @property (weak) IBOutlet   NSPopUpButton* effectList;
 @property (weak) IBOutlet   SMPhotoButton* photoButton;
 @property (assign) IBOutlet SMWindow* window;
-@property (weak) IBOutlet NSLayoutConstraint *photoToolsYPos;
-@property (weak) IBOutlet NSView *photoToolsView;
 @property (weak) IBOutlet NSLayoutConstraint *camPosConstraint;
 @property (nonatomic) About* about;
 

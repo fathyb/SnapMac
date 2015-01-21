@@ -18,6 +18,7 @@
                 <outlet property="camView" destination="h1g-yp-uEh" id="5qn-WC-eIq"/>
                 <outlet property="effectList" destination="eSi-cs-lQi" id="MKq-bp-yeI"/>
                 <outlet property="photoButton" destination="US1-JY-dFX" id="xYe-ib-kDH"/>
+                <outlet property="searchField" destination="J5p-VE-SrC" id="gCp-Or-AU9"/>
                 <outlet property="webView" destination="P10-EU-aeZ" id="ghC-ly-9mX"/>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
             </connections>
@@ -73,9 +74,9 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="File" id="dMs-cI-mzQ">
+                <menuItem title="Fichier" id="dMs-cI-mzQ">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="File" id="bib-Uj-vzu">
+                    <menu key="submenu" title="Fichier" id="bib-Uj-vzu">
                         <items>
                             <menuItem title="New" keyEquivalent="n" id="Was-JA-tGl">
                                 <connections>
@@ -137,9 +138,9 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Edit" id="5QF-Oa-p0T">
+                <menuItem title="Modifier" id="5QF-Oa-p0T">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Edit" id="W48-6f-4Dl">
+                    <menu key="submenu" title="Modifier" id="W48-6f-4Dl">
                         <items>
                             <menuItem title="Undo" keyEquivalent="z" id="dRJ-4n-Yzg">
                                 <connections>
@@ -618,17 +619,17 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="View" id="H8h-7b-M4v">
+                <menuItem title="Présentation" id="H8h-7b-M4v">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="View" id="HyV-fh-RgO">
+                    <menu key="submenu" title="Présentation" id="HyV-fh-RgO">
                         <items>
-                            <menuItem title="Show Toolbar" keyEquivalent="t" id="snW-S8-Cw5">
+                            <menuItem title="Afficher la barre d'outil" keyEquivalent="t" id="snW-S8-Cw5">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
                                     <action selector="toggleToolbarShown:" target="-1" id="BXY-wc-z0C"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Customize Toolbar…" id="1UK-8n-QPP">
+                            <menuItem title="Personnaliser la barre d'outil" id="1UK-8n-QPP">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="runToolbarCustomizationPalette:" target="-1" id="pQI-g3-MTW"/>
@@ -637,9 +638,9 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Window" id="aUF-d1-5bR">
+                <menuItem title="Fenêtre" id="aUF-d1-5bR">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Window" systemMenu="window" id="Td7-aD-5lo">
+                    <menu key="submenu" title="Fenêtre" systemMenu="window" id="Td7-aD-5lo">
                         <items>
                             <menuItem title="Minimize" keyEquivalent="m" id="OY7-WF-poV">
                                 <connections>
@@ -662,11 +663,11 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Help" id="wpr-3q-Mcd">
+                <menuItem title="Aide" id="wpr-3q-Mcd">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Help" systemMenu="help" id="F2S-fz-NVQ">
+                    <menu key="submenu" title="Aide" systemMenu="help" id="F2S-fz-NVQ">
                         <items>
-                            <menuItem title="Snappy Help" keyEquivalent="?" id="FKE-Sm-Kum">
+                            <menuItem title="Aide Snappy" keyEquivalent="?" id="FKE-Sm-Kum">
                                 <connections>
                                     <action selector="showHelp:" target="-1" id="y7X-2Q-9no"/>
                                 </connections>
@@ -850,9 +851,6 @@
                     </customView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="P10-EU-aeZ" customClass="SMWebUI">
                         <rect key="frame" x="342" y="0.0" width="514" height="513"/>
-                        <connections>
-                            <binding destination="Voe-Tx-rLC" name="hidden" keyPath="self.webUI" id="7Wt-tE-mHH"/>
-                        </connections>
                     </customView>
                 </subviews>
                 <constraints>
@@ -915,7 +913,6 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="ffh-cg-wro"/>
                     <toolbarItem implicitItemIdentifier="BA21501C-0A9D-44EB-A8E9-3991AC506501" label="Déconnection" paletteLabel="Déconnection" image="Deconnection" id="4pq-Un-sHY">
                         <nil key="toolTip"/>
                         <size key="minSize" width="40" height="32"/>
@@ -932,28 +929,28 @@
                             </connections>
                         </button>
                     </toolbarItem>
-                    <toolbarItem implicitItemIdentifier="6F693F34-146D-4778-A103-1B17EA21C7C3" label="Moi" paletteLabel="Moi" image="NSUser" id="5ig-cE-Z98">
+                    <toolbarItem implicitItemIdentifier="06879047-94ED-45EE-A351-B658FC9E4FB0" label="" paletteLabel="" id="TdX-bW-Rdg">
                         <nil key="toolTip"/>
-                        <size key="minSize" width="70" height="21"/>
-                        <size key="maxSize" width="82" height="32"/>
-                        <button key="view" id="BXE-aG-usa">
-                            <rect key="frame" x="6" y="21" width="70" height="32"/>
+                        <size key="minSize" width="96" height="22"/>
+                        <size key="maxSize" width="158" height="22"/>
+                        <searchField key="view" wantsLayer="YES" verticalHuggingPriority="750" id="J5p-VE-SrC">
+                            <rect key="frame" x="0.0" y="14" width="158" height="22"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                            <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="NSUser" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="hAH-JB-W0F">
-                                <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <searchFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" placeholderString="Rechercher..." usesSingleLineMode="YES" bezelStyle="round" id="Cfp-fI-pWG">
                                 <font key="font" metaFont="system"/>
-                            </buttonCell>
-                        </button>
+                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                            </searchFieldCell>
+                        </searchField>
                     </toolbarItem>
+                    <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="ffh-cg-wro"/>
                 </allowedToolbarItems>
                 <defaultToolbarItems>
-                    <toolbarItem reference="ffh-cg-wro"/>
-                    <toolbarItem reference="IKE-pR-h2v"/>
                     <toolbarItem reference="8HH-x1-JWn"/>
                     <toolbarItem reference="6aq-lw-6Np"/>
-                    <toolbarItem reference="5ig-cE-Z98"/>
                     <toolbarItem reference="4pq-Un-sHY"/>
                     <toolbarItem reference="ffh-cg-wro"/>
+                    <toolbarItem reference="TdX-bW-Rdg"/>
                 </defaultToolbarItems>
             </toolbar>
             <point key="canvasLocation" x="-1583" y="-320.5"/>
@@ -968,7 +965,6 @@
         <image name="NSColorPanel" width="32" height="32"/>
         <image name="NSRefreshTemplate" width="11" height="15"/>
         <image name="NSStopProgressTemplate" width="11" height="11"/>
-        <image name="NSUser" width="32" height="32"/>
         <image name="Réglages" width="26" height="28"/>
         <image name="Snaps" width="24" height="25"/>
     </resources>

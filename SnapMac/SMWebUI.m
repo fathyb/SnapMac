@@ -11,6 +11,9 @@
 #import <JavaScriptCore/JavaScriptCore.h>
 #import <objc/runtime.h>
 #import "SnapJS.h"
+#import "SnappyFunction.h"
+
+id JSToNS(JSValueRef object);
 
 @implementation SMWebUI
 
@@ -54,51 +57,48 @@
 contextMenuItemsForElement:(NSDictionary *)element
           defaultMenuItems:(NSArray *)defaultMenuItems {
     
-    if(!element[@"WebElementDOMNode"])
+    if(!element[@"WebElementDOMNode"]) {
+#ifdef Snapbug
         return defaultMenuItems;
+#else
+        return @[];
+#endif
+    }
+    
     WebScriptObject *el     = element[@"WebElementDOMNode"];
+    
+    if([el isKindOfClass:DOMText.class]) {
+        DOMNode *node = ((DOMText*)el).parentNode;
+        el = node;
+    }
+    
     NSMutableArray *items   = NSMutableArray.new;
     
     WebScriptObject *result = [self.windowScriptObject callWebScriptMethod:@"SnappyRClickHandler"
                                                              withArguments:@[el]];
+    
     if(result.class != WebUndefined.class) {
-        JSContextRef jsContext = self.mainFrame.globalContext;
-        JSObjectRef   jsObject = result.JSObject;
-        if(JSValueIsNull(jsContext, jsObject))
-            goto quit;
-        
-        JSPropertyNameArrayRef props = JSObjectCopyPropertyNames(jsContext, jsObject);
-        ssize_t            arraySize = JSPropertyNameArrayGetCount(props);
-        for(ssize_t i = 0; i < arraySize; i++) {
-            JSStringRef    k = JSPropertyNameArrayGetNameAtIndex(props, i);
-            JSValueRef  vval = JSObjectGetProperty(jsContext, jsObject, k, nil);
-            NSString  *title = (NSString*)CFBridgingRelease(JSStringCopyCFString(kCFAllocatorDefault, k));
+        NSDictionary *resultDict = result.toObjCObject;
+        for(NSString *title in resultDict.allKeys) {
+            id        object = [resultDict objectForKey:title];
             NSMenuItem *item = nil;
-            
-            JSStringRelease(k);
             
             if([title isEqualToString:@"separator"])
                 item = NSMenuItem.separatorItem;
             else
                 item = [SMBlockItem.alloc initWithTitle:title
                                                   block:^(NSMenuItem* item) {
-                                                        JSObjectRef object = el.JSObject;
-                                                        JSObjectCallAsFunction(jsContext,
-                                                                  (JSObjectRef)vval,
-                                                                               0,
-                                                                               1,
-                                                                  (JSValueRef*)&object,
-                                                                               0);
+                                                       if([object isKindOfClass:SnappyFunction.class])
+                                                           [object call:el, nil];
                                         } keyEquivalent:@""];
-            if(JSValueGetType(jsContext, vval) == kJSTypeString) {
+            
+            if([object isKindOfClass:NSString.class]) {
                 item.enabled = NO;
             }
             [items addObject:item];
         }
     }
-    goto quit;
     
-quit:
 #ifdef SnapBug
     [items addObject:NSMenuItem.separatorItem];
     [items addObjectsFromArray:defaultMenuItems];

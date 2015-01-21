@@ -124,8 +124,8 @@ static Settings *sharedInstance;
         return;
     
     NSDictionary *themes = @{
-        @"Clair": NSAppearanceNameVibrantLight,
-        @"Sombre": NSAppearanceNameVibrantDark
+        NSLoc(@"Light") : NSAppearanceNameVibrantLight,
+        NSLoc(@"Dark") : NSAppearanceNameVibrantDark
     };
     NSString *theme = themes[btn.selectedItem.title];
     [self setObject:theme forKey:@"SMDefaultTheme"];
