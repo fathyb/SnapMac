@@ -20,9 +20,7 @@
 
 static SnapJS *SnapJSSharedInstance;
 
-NSString *api(NSString *url) {
-	return [NSString stringWithFormat:@"https://feelinsonice-hrd.appspot.com%@", url];
-}
+#define api(url) [NSString stringWithFormat:@"https://feelinsonice-hrd.appspot.com%@", url];
 
 NSString *UUID() {
 	CFUUIDRef uuid = CFUUIDCreate(kCFAllocatorDefault);
@@ -48,10 +46,13 @@ NSDictionary *jsError(id error) {
 			  };
 }
 id AFError(NSError *error, BOOL forJS) {
-	NSInteger code = SnappyErrorUnknowError;
-	NSString *message = [NSString stringWithFormat:NSLoc(@"An unknown connection error occurred. (e%ld)"), (long)error.code];
 	
-	return forJS ? jsError(nserror(code, message)) : nserror(code, message);
+	NSInteger code = SnappyErrorUnknowError;
+	NSString *message = error.userInfo[@"NSLocalizedDescription"];
+	id rError = error;
+	if(forJS)
+		rError = jsError(nserror(code, message));
+	return rError;
 }
 BOOL isError(id obj) {
 	if(!obj)
@@ -165,7 +166,7 @@ BOOL isError(id obj) {
 		@"getSnap:withCallback:": @"getSnap",
 		@"showInFinder:": @"showInFinder",
 		@"getKeychainWithCallback:": @"getKeychain",
-		@"showMedia:": @"showMedia",
+		@"showMedia:withTimeout:": @"showMedia",
 		@"getStory:withKey:iv:andCallback:": @"getStory",
 		@"getUpdates:": @"getUpdates",
 		@"getStories:": @"getStories",
@@ -313,13 +314,16 @@ BOOL isError(id obj) {
 	[NSNotificationCenter.defaultCenter postNotificationName:@"SnappyShowCamera"
 														object:@NO];
 }
--(void)showMedia:(NSString*)media {
+-(void)showMedia:(NSString*)media withTimeout:(double)timeout {
+	NSLog(@"timeout = %f", timeout);
 	[SMFileCollector urlsForMedia:media andCallback:^(NSDictionary* urls) {
 		if(!urls)
 			return;
 		
+		NSMutableDictionary *dict = urls.mutableCopy;
+		dict[@"timeout"] = @(timeout);
 		[NSNotificationCenter.defaultCenter postNotificationName:@"SnappyShowMedia"
-														  object:urls];
+														  object:dict];
 	}];
 }
 -(void)sendSnapTo:(WebScriptObject*)to withCallback:(WebScriptObject*)callback {
@@ -385,6 +389,7 @@ BOOL isError(id obj) {
 									[self requestTo:@(multiPost ? "/bq/double_post" : "/bq/send")
 										   withData:data
 										andCallback:^(NSError *result) {
+											
 											[callback call:result, nil];
 										}];
 								}
@@ -467,6 +472,12 @@ BOOL isError(id obj) {
 				 method:SnappyMethodGET];
 	}];
 
+}
+-(void)updateFriend:(NSString*)friend with:(WebScriptObject*)oFields {
+	NSDictionary *fields = oFields.toObjCObject;
+	
+	NSLog(@"Fields = %@", fields);
+	
 }
 -(void)getUpdates:(WebScriptObject*)callback {
 	[self requestTo:@"/loq/all_updates"

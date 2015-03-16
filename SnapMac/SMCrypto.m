@@ -71,7 +71,7 @@ operation:(CCOperation)operation {
     return [SMCrypto AES:data
                      key:[encryptKey dataUsingEncoding:NSUTF8StringEncoding]
                       iv:nil
-                 options:kCCOptionECBMode
+                 options:kCCOptionECBMode | kCCOptionPKCS7Padding
                operation:kCCDecrypt];
 }
 +(id)encryptSnap:(NSData*)data {
@@ -86,7 +86,6 @@ operation:(CCOperation)operation {
     
     [tmpData appendData:[padding dataUsingEncoding:NSUTF8StringEncoding]];
 
-    
     return [SMCrypto AES:tmpData
                      key:[encryptKey dataUsingEncoding:NSUTF8StringEncoding]
                       iv:nil

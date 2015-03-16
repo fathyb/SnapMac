@@ -16,7 +16,11 @@ int start = 0;
     if((self = super.init)) {
         self.delegate = self;
         self.cornerRadius = 25;
-        self.backgroundColor = [NSColor colorWithCalibratedRed:0 green:0 blue:0 alpha:0.7].CGColor;
+        self.backgroundColor = [NSColor colorWithCalibratedRed:0
+                                                         green:0
+                                                          blue:0
+                                                         alpha:0.7].CGColor;
+        
         self.label = CATextLayer.new;
         self.label.font = (__bridge CFTypeRef)(@"Helvetica-Light");
         self.label.fontSize = 20;
@@ -25,8 +29,20 @@ int start = 0;
         self.label.string = @"0";
         self.label.alignmentMode = kCAAlignmentCenter;
         self.label.foregroundColor = [NSColor colorWithCalibratedWhite:.8 alpha:1].CGColor;
+        
+        float displayScale = 1;
+        if ([NSScreen.mainScreen respondsToSelector:@selector(backingScaleFactor)]) {
+            NSArray *screens = NSScreen.screens;
+            for (int i = 0; i < screens.count; i++) {
+                float s = [[screens objectAtIndex:i] backingScaleFactor];
+                if (s > displayScale)
+                    displayScale = s;
+            }
+        }
+        self.contentsScale = displayScale;
+        self.label.contentsScale = displayScale;
+        
         [self addSublayer:self.label];
-
         [self clear];
     }
     return self;
@@ -46,7 +62,9 @@ int start = 0;
     CGContextAddArc(context, center.x, center.y, radius, startAngle, endAngle, NO);
     CGContextDrawPath(context, kCGPathStroke);
 }
+
 -(void)launchWithTimeout:(CGFloat)timeout {
+    timeout++;
     self.color = [NSColor colorWithCalibratedRed:255 green:255 blue:255 alpha:1];
     start = NSDate.date.timeIntervalSince1970;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
@@ -54,12 +72,13 @@ int start = 0;
             CGFloat seconds = (NSDate.date.timeIntervalSince1970 - start);
             self.progress = seconds/timeout;
             
+            int remaining = round(timeout-seconds);
+            if(remaining > timeout-1)
+                remaining = timeout-1;
+            
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self performSelectorOnMainThread:@selector(setNeedsDisplay)
-                                       withObject:nil
-                                    waitUntilDone:YES];
-                
-                self.label.string = [NSString stringWithFormat:@"%d", (int)round(timeout-seconds)];
+                [self setNeedsDisplay];
+                self.label.string = [NSString stringWithFormat:@"%d", remaining];
             });
             usleep(1000000/60);
         } while(self.progress < 1);

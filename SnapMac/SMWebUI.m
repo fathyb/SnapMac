@@ -57,7 +57,10 @@ id JSToNS(JSValueRef object);
 contextMenuItemsForElement:(NSDictionary *)element
           defaultMenuItems:(NSArray *)defaultMenuItems {
     
-    if(!element[@"WebElementDOMNode"]) {
+    
+    WebScriptObject *el = element[@"WebElementDOMNode"];
+    
+    if(!el) {
 #ifdef Snapbug
         return defaultMenuItems;
 #else
@@ -65,15 +68,10 @@ contextMenuItemsForElement:(NSDictionary *)element
 #endif
     }
     
-    WebScriptObject *el     = element[@"WebElementDOMNode"];
-    
-    if([el isKindOfClass:DOMText.class]) {
-        DOMNode *node = ((DOMText*)el).parentNode;
-        el = node;
-    }
+    if([el isKindOfClass:DOMText.class])
+        el = ((DOMText*)el).parentNode;
     
     NSMutableArray *items   = NSMutableArray.new;
-    
     WebScriptObject *result = [self.windowScriptObject callWebScriptMethod:@"SnappyRClickHandler"
                                                              withArguments:@[el]];
     

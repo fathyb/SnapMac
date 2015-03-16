@@ -648,6 +648,7 @@ quit:
     self.layer = CALayer.new;
     if(session.isRunning)
             [session stopRunning];
+    [self hideLoading];
     [self resetSubviews];
 }
 
@@ -756,7 +757,7 @@ quit:
     self.timerLayer.frame = NSMakeRect(size.width - (20 + 50), size.height - (20 + 50), 50, 50);
     
     [self.layer addSublayer:self.timerLayer];
-    [self.timerLayer launchWithTimeout:10];
+    [self.timerLayer launchWithTimeout:[urls[@"timeout"] integerValue]];
     
     [self resetSubviews];
 }

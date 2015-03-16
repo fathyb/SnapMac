@@ -471,7 +471,7 @@
 				01ACADC21A55F43600297E9B /* Localizable.strings */,
 				011F91361A29363500F7BBE5 /* Minizip */,
 				49BB97531938BD6E000EB7B5 /* Coeur */,
-				49BB97541938BD82000EB7B5 /* Bridge Interface */,
+				49BB97541938BD82000EB7B5 /* Objective-C <-> JS */,
 				49BB97511938BD29000EB7B5 /* Interface */,
 				49BB97521938BD4B000EB7B5 /* Documents */,
 				49248D1018F023B8009837CD /* Fonts */,
@@ -563,7 +563,7 @@
 			name = Coeur;
 			sourceTree = "<group>";
 		};
-		49BB97541938BD82000EB7B5 /* Bridge Interface */ = {
+		49BB97541938BD82000EB7B5 /* Objective-C <-> JS */ = {
 			isa = PBXGroup;
 			children = (
 				015D048C19F546F800B4F461 /* AFNetworking */,
@@ -584,7 +584,7 @@
 				01ACADC71A563F4300297E9B /* SnappyDictionary.h */,
 				01ACADC81A563F4300297E9B /* SnappyDictionary.m */,
 			);
-			name = "Bridge Interface";
+			name = "Objective-C <-> JS";
 			sourceTree = "<group>";
 		};
 		49CDBDE018F1CEA10097C4B1 /* SSKeychain */ = {

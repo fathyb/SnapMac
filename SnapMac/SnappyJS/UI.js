@@ -123,8 +123,9 @@ UI.prototype = new (function() {
 					this.element.html("");
 				else
 					this.element.html(({
-						search : "U",
-						clear  : "Q"
+						search  : "U",
+						clear   : "Q",
+						settings: ""
 					})[this.icon]);
 				
 				
@@ -151,8 +152,12 @@ UI.prototype = new (function() {
 							this.parent.parent.search.show();
 						}
 						break;
+					case "settings":
+						SnappyUI.Settings.show();
+						break;
 					case "clear":
 						SnapJS.clearFeed();
+						break;
 				}
 			});
 				
@@ -215,6 +220,7 @@ UI.prototype = new (function() {
 		}
 		
 		_this.blur = function(bool) {
+			console.log("on blur", this, "fn = ", arguments.callee.caller);
 			toggleClass(this.element, "blur", bool);
 		}
 		_this.zoom = function(bool) {
@@ -329,7 +335,7 @@ UI.prototype = new (function() {
 		this.updateInterval = setInterval(function() {
 			if(SnappyUI.logged)
 				SnappyUI.update();
-		}, time*1000);
+		}, time * 1000);
 	}
 	
 	this.updateKeychain = function() {
@@ -346,6 +352,9 @@ UI.prototype = new (function() {
 	
 	this.init = function() {
 	
+		this.logged		 = false;
+		this.body		 = $("body");
+		this.updates	 = new Object();
 		this.FriendsPage = new FriendsPage();
 		this.LoadingPage = new LoadingPage();
 		this.LoginPage	 = new LoginPage();
@@ -353,9 +362,7 @@ UI.prototype = new (function() {
 		this.FeedPage	 = new FeedPage();
 		this.ErrorView	 = new ErrorView(this);
 		this.toggleCam   = new ToggleCamView();
-		this.logged		 = false;
-		this.body		 = $("body");
-		this.updates	 = new Object();
+		this.Settings	 = new Settings(this);
 		
 		var _this = this;
 		

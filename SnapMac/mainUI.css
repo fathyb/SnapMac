@@ -189,7 +189,7 @@ section header>span {
     line-height: 50px;
     font-size: 20px;
     opacity: 0.7;
-    -webkit-transition: all 0.5s, font-size 0;
+    -webkit-transition: all 0.25s ease-in , font-size 0;
     position: absolute;
     top: 0;
 }
@@ -214,7 +214,6 @@ section header .rightButton {
 section header .rightButton:hover {
 	-webkit-transform: rotate(-90deg);
 }
-
 .iOSSync, .androSync {
     padding: 20px 0;
 }
@@ -404,7 +403,7 @@ div.snap p, div.friend p {
     -webkit-transition: all 0.5s;
     max-height: 10px;
     margin: 0;
-    word-wrap: break-word;
+    word-wrap: normal;
 }
 
 div.friend .displayName {
@@ -1114,4 +1113,36 @@ body.light div.snap p, body.light div.friend p {
 }
 .friendsPage .search.active {
 	top: 0;
+}
+.settingsView {
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	top: 0;
+	left: 0;
+	-webkit-transform: scale(0);
+	-webkit-transition: 0.25s ease-in-out;
+}
+.settingsView.show {
+	-webkit-transform: scale(1);
+}
+.settingsView .content {
+	height: 90%;
+	width: 90%;
+	left: 5%;
+	top: 5%;
+	position: fixed;
+	background-color: rgba(0, 0, 0, 0.8);
+	box-shadow: 0 0 10px black;
+	color: white;
+}
+.settingsView button.close {
+	float: right;
+	color: white !important;
+	font-size: 20px;
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	border: 0;
+	background: transparent;
 }

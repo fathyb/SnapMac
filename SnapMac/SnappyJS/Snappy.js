@@ -121,14 +121,34 @@ var Snappy = new (function() {
 				this.stories.push(story);
 			}
 		}
-		this.setMyStories = function(stories) {
-			var story;
-			
-			for(var i in stories) {
-				
-			}
-		}
 		
+		this.block = function() {
+			this.update({
+				action: "block"
+			});
+		}
+		this.unblock = function() {
+			this.update({
+				action: "unblock"
+			});
+		}
+		this.deleteFriend = function() {
+			this.update({
+				action: "delete"
+			});
+		}
+		this.rename = function(name) {
+			this.update({
+				action: "dislay",
+				display: name
+			});
+			this.displayName = name;
+		}
+		this.update = function(fields) {
+			SnapJS.updateFriend(this.name, fields, function(result) {
+				
+			});
+		}
 		return this;
 	}
 	
@@ -293,8 +313,8 @@ var Snappy = new (function() {
 			for(i in raw.story_notes) {
 				note = raw.story_notes[i];
 				this.views[note.viewer] = {
-					date		 : new Snappy.SnappyDate(note.timestamp),
-					screenshoted : false
+					date		  : new Snappy.SnappyDate(note.timestamp),
+					screenshotted : note.screenshotted
 				}
 			}
 		}
@@ -308,11 +328,16 @@ var Snappy = new (function() {
 		this.mediaType = new Snappy.MediaType(story.media_type);
 		
 		this.show = function() {
-			SnapJS.showMedia(this.id);
+			SnapJS.showMedia(this.id, this.duration);
 		}
 		this.changeBlocks = new Array();
 		
 		this.change = function(fn) {
+			if(this.stated == "loaded") {
+				fn(this);
+				return;
+			}
+				
 			if(!fn) {
 				for(var i in this.changeBlocks)
 					this.changeBlocks[i](this);
@@ -405,11 +430,11 @@ var Snappy = new (function() {
 		this.mediaType 	= new Snappy.MediaType(raw.m);
 		this.state		= kStateLoading;
 		this.url		= null;
-		this.timer		= raw.t || null;
+		this.timer		= raw.t || 0;
 		this.read 		= !!this.timer;
 		
 		this.show = function() {
-			SnapJS.showMedia(this.id);
+			SnapJS.showMedia(this.id, this.timer);
 		}		
 		
 		this.changeBlocks = new Array();
@@ -524,3 +549,4 @@ function loc(str) {
 		
 	return lStr;
 }
+

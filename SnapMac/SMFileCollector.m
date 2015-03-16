@@ -77,7 +77,7 @@ NSOperationQueue *thumbQueue;
                         unzClose(zipfile);
                         callback(nil);
                     }
-                    nsFilename = [(isMedia ? @"media_" : @"overlay_") stringByAppendingString:identifier];
+                    nsFilename = [@(isMedia ? "media_" : "overlay_") stringByAppendingString:identifier];
                     FILE *out = fopen(nsFilename.UTF8String, "wb" );
                     int error = UNZ_OK;
                     
@@ -134,10 +134,11 @@ NSOperationQueue *thumbQueue;
         CMTime time = asset.duration;
         time.value  = 1000;
         
-        NSError *error = nil;
-        CGImageRef imageRef = [generator copyCGImageAtTime:time
-                                                actualTime:nil
-                                                     error:&error];
+        [NSOperationQueue.mainQueue addOperationWithBlock:^{
+            NSError *error = nil;
+            CGImageRef imageRef = [generator copyCGImageAtTime:time
+                                                    actualTime:nil
+                                                         error:&error];
             NSImage *thumb = nil;
             if(error || !imageRef) {
                 callback(error);
@@ -147,13 +148,14 @@ NSOperationQueue *thumbQueue;
                 thumb = [NSImage.alloc initWithCGImage:imageRef size:NSZeroSize];
                 CGImageRelease(imageRef);
             }
-        
+            
             if(!thumb) {
                 NSLog(@"Error while generating thumb for file %@ \n Error : empty output", file);
                 callback(nil);
             }
             else
                 callback(thumb);
+        }];
     }];
     
 }
